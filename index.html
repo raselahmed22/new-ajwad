@@ -1,0 +1,1253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Atelier Store</title>
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script>
+    window.storage = {
+      async get(key, fallback) {
+        const value = localStorage.getItem(key);
+        return value ? { value } : null;
+      },
+      async set(key, value, persist) {
+        localStorage.setItem(key, value);
+        return true;
+      }
+    };
+  </script>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="text/babel">
+    const { useState, useEffect, useMemo, useRef, useCallback } = React;
+
+    // Mock icons using emoji/text since CDNs are blocked
+    const createIcon = (emoji) => ({ children, size, ...props }) => (
+      <span {...props} style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: size ? `${size}px` : '16px' }}>
+        {emoji}
+      </span>
+    );
+
+    const ShoppingBag = createIcon('🛍️');
+    const X = createIcon('✕');
+    const Plus = createIcon('+');
+    const Minus = createIcon('−');
+    const Search = createIcon('🔍');
+    const Trash2 = createIcon('🗑️');
+    const Pencil = createIcon('✏️');
+    const LayoutDashboard = createIcon('📊');
+    const Package = createIcon('📦');
+    const Receipt = createIcon('🧾');
+    const SettingsIcon = createIcon('⚙️');
+    const LogOut = createIcon('🚪');
+    const TrendingUp = createIcon('📈');
+    const DollarSign = createIcon('$');
+    const ShoppingCart = createIcon('🛒');
+    const Boxes = createIcon('📦');
+    const AlertTriangle = createIcon('⚠️');
+    const ArrowRight = createIcon('→');
+    const ArrowLeft = createIcon('←');
+    const Check = createIcon('✓');
+    const CreditCard = createIcon('💳');
+    const Radio = createIcon('🔘');
+    const StoreIcon = createIcon('🏪');
+    const Lock = createIcon('🔒');
+    const Eye = createIcon('👁️');
+    const EyeOff = createIcon('🙈');
+    const RotateCcw = createIcon('↺');
+    const Filter = createIcon('🔎');
+    const ChevronDown = createIcon('▼');
+    const MapPin = createIcon('📍');
+    const Phone = createIcon('📞');
+    const Whatsapp = createIcon('💬');
+    const Facebook = createIcon('📘');
+
+    function TrendBars({ data, valueKey, color, format }) {
+      const max = Math.max(...data.map(d => d[valueKey]), 1);
+      return (
+        <div style={{ display: "flex", alignItems: "flex-end", gap: 10, height: 140 }}>
+          {data.map((d, i) => (
+            <div key={i} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 8, height: "100%" }}>
+              <div style={{ flex: 1, display: "flex", alignItems: "flex-end", width: "100%" }}>
+                <div
+                  title={`${d.label}: ${format ? format(d[valueKey]) : d[valueKey]}`}
+                  style={{
+                    width: "100%",
+                    height: (d[valueKey] > 0 ? Math.max((d[valueKey] / max) * 100, 4) : 0) + "%",
+                    background: color, borderRadius: "4px 4px 0 0",
+                    transition: "height .3s ease",
+                  }}
+                />
+              </div>
+              <div className="at-mono" style={{ fontSize: 10, color: "var(--muted)" }}>{d.label}</div>
+            </div>
+          ))}
+        </div>
+      );
+    }
+
+    // --- Rest of the code from atelier-store.jsx (without imports/export) ---
+    const STYLES = `
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap');
+
+.at-root{
+  --paper:#F1F0EC; --surface:#FFFFFF; --ink:#16161A; --ink-soft:#3B3B44;
+  --muted:#7A7A84; --line:#E4E3DD; --line-strong:#D5D4CD;
+  --accent:#2733E6; --accent-press:#1B24C4; --accent-tint:#EBEDFF;
+  --live:#188A4A; --live-tint:#E4F3EA; --warn:#B4634B; --warn-tint:#FBEFE9;
+  --display:'Space Grotesk',system-ui,sans-serif;
+  --body:'Inter',system-ui,sans-serif;
+  --mono:'Space Mono',ui-monospace,monospace;
+  color:var(--ink); font-family:var(--body);
+  background:var(--paper); min-height:100vh; -webkit-font-smoothing:antialiased;
+}
+.at-root *{box-sizing:border-box;}
+.at-root button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit;}
+.at-root input,.at-root textarea,.at-root select{font-family:inherit;font-size:14px;color:var(--ink);}
+.at-mono{font-family:var(--mono);font-variant-numeric:tabular-nums;}
+.at-disp{font-family:var(--display);letter-spacing:-0.01em;}
+
+/* focus + motion floor */
+.at-root :focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px;}
+@media (prefers-reduced-motion:reduce){.at-root *{animation:none!important;transition:none!important;}}
+
+/* buttons */
+.at-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  font-family:var(--display);font-weight:600;font-size:13px;letter-spacing:.01em;
+  padding:12px 20px;border-radius:2px;transition:transform .12s ease,background .15s ease;}
+.at-btn:active{transform:translateY(1px);}
+.at-btn-primary{background:var(--accent);color:#fff;}
+.at-btn-primary:hover{background:var(--accent-press);}
+.at-btn-dark{background:var(--ink);color:var(--paper);}
+.at-btn-dark:hover{background:#000;}
+.at-btn-ghost{background:transparent;color:var(--ink);border:1px solid var(--line-strong);}
+.at-btn-ghost:hover{border-color:var(--ink);}
+.at-btn-sm{padding:8px 14px;font-size:12px;}
+.at-btn:disabled{opacity:.5;cursor:not-allowed;}
+
+.at-eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);}
+.at-pulse{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--live);position:relative;}
+.at-pulse::after{content:'';position:absolute;inset:0;border-radius:50%;background:var(--live);animation:atping 1.8s ease-out infinite;}
+@keyframes atping{0%{transform:scale(1);opacity:.6;}100%{transform:scale(3.2);opacity:0;}}
+@keyframes atrise{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+@keyframes atfade{from{opacity:0;}to{opacity:1;}}
+.at-rise{animation:atrise .35s ease both;}
+
+/* form controls */
+.at-field{width:100%;padding:11px 13px;border:1px solid var(--line-strong);border-radius:2px;
+  background:var(--surface);transition:border-color .15s ease;}
+.at-field:focus{outline:none;border-color:var(--accent);}
+.at-label{display:block;font-size:12px;font-weight:600;color:var(--ink-soft);margin-bottom:6px;}
+
+/* cards / surfaces */
+.at-card{background:var(--surface);border:1px solid var(--line);border-radius:3px;}
+
+/* store product card */
+.at-prod{background:var(--surface);border:1px solid var(--line);cursor:pointer;
+  transition:border-color .18s ease,transform .18s ease;display:flex;flex-direction:column;}
+.at-prod:hover{border-color:var(--ink);}
+.at-prod:hover .at-prod-img{transform:scale(1.02);}
+.at-prod-imgwrap{overflow:hidden;aspect-ratio:3/4;background:var(--paper);}
+.at-prod-img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .5s ease;}
+
+/* overlay + drawer */
+.at-scrim{position:fixed;inset:0;background:rgba(16,16,20,.5);z-index:60;animation:atfade .2s ease;}
+.at-drawer{position:fixed;top:0;right:0;bottom:0;width:100%;max-width:420px;background:var(--paper);
+  z-index:70;display:flex;flex-direction:column;box-shadow:-20px 0 60px rgba(0,0,0,.15);animation:atslide .28s cubic-bezier(.2,.8,.2,1);}
+@keyframes atslide{from{transform:translateX(100%);}to{transform:none;}}
+.at-modal{position:fixed;inset:0;z-index:70;display:flex;align-items:flex-start;justify-content:center;
+  padding:24px;overflow:auto;animation:atfade .2s ease;}
+
+/* admin nav */
+.at-navitem{display:flex;align-items:center;gap:11px;width:100%;padding:10px 14px;border-radius:3px;
+  font-size:14px;font-weight:500;color:var(--muted);transition:background .12s ease,color .12s ease;}
+.at-navitem:hover{background:rgba(255,255,255,.06);color:#fff;}
+.at-navitem.active{background:var(--accent);color:#fff;}
+
+/* stat */
+.at-stat-num{font-family:var(--mono);font-weight:700;font-size:30px;letter-spacing:-.02em;line-height:1;}
+
+/* table */
+.at-table{width:100%;border-collapse:collapse;}
+.at-table th{text-align:left;font-size:11px;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--muted);font-weight:600;padding:12px 14px;border-bottom:1px solid var(--line);}
+.at-table td{padding:14px;border-bottom:1px solid var(--line);font-size:14px;vertical-align:middle;}
+.at-table tr:last-child td{border-bottom:none;}
+
+.at-badge{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:11px;
+  padding:4px 9px;border-radius:2px;text-transform:uppercase;letter-spacing:.04em;}
+
+.at-scroll::-webkit-scrollbar{width:8px;height:8px;}
+.at-scroll::-webkit-scrollbar-thumb{background:var(--line-strong);border-radius:8px;}
+
+@media (max-width:720px){
+  .at-footer-grid{grid-template-columns:1fr !important;gap:28px !important;}
+}
+`;
+
+    const KEYS = { products: "atelier:products", orders: "atelier:orders", settings: "atelier:settings" };
+
+    async function loadKey(key, fallback) {
+      try {
+        const r = await window.storage.get(key, false);
+        return r ? JSON.parse(r.value) : fallback;
+      } catch {
+        return fallback;
+      }
+    }
+    async function saveKey(key, value) {
+      try {
+        const r = await window.storage.set(key, JSON.stringify(value), false);
+        if (!r) console.error("storage.set returned null for", key);
+      } catch (e) {
+        console.error("storage error", key, e);
+      }
+    }
+
+    const CATEGORIES = ["Tops", "Knitwear", "Outerwear", "Bottoms", "Dresses", "Accessories"];
+    const SWATCHES = [
+      { bg: "#1B1B20", fg: "#E9E7DF" }, { bg: "#E7E3D8", fg: "#1B1B20" },
+      { bg: "#2733E6", fg: "#EDEBFF" }, { bg: "#7C8B6E", fg: "#F3F5EE" },
+      { bg: "#B4634B", fg: "#FBEFE9" }, { bg: "#46505C", fg: "#E9EEF2" },
+      { bg: "#C9B08A", fg: "#2A2420" }, { bg: "#5B3A56", fg: "#F3E9F1" },
+    ];
+    const uid = (p = "id") => p + "_" + Math.random().toString(36).slice(2, 9);
+    const bdIntl = (n) => (n || "").replace(/\D/g, "").replace(/^0/, "880");
+
+    function seedProducts() {
+      const raw = [
+        ["Boxy Poplin Shirt", "Tops", 78, 24, ["XS", "S", "M", "L", "XL"], "Crisp cotton poplin with a relaxed, squared silhouette. Mother-of-pearl buttons."],
+        ["Merino Ribbed Knit", "Knitwear", 120, 12, ["S", "M", "L"], "Fine-grained extra-fine merino. Warm without weight, holds its shape."],
+        ["Waxed Field Jacket", "Outerwear", 245, 7, ["S", "M", "L", "XL"], "British waxed cotton, four-pocket field cut, corduroy collar."],
+        ["Pleated Wide Trouser", "Bottoms", 135, 18, ["28", "30", "32", "34", "36"], "High-rise, single-pleat, fluid drape in wool-blend twill."],
+        ["Bias-Cut Slip Dress", "Dresses", 165, 9, ["XS", "S", "M", "L"], "Cut on the bias in matte satin. Adjustable straps, midi length."],
+        ["Structured Wool Coat", "Outerwear", 390, 4, ["S", "M", "L"], "Double-faced wool, unlined for a clean line. Concealed placket."],
+        ["Cashmere Crew", "Knitwear", 210, 15, ["S", "M", "L", "XL"], "Two-ply Grade-A cashmere. The everyday luxury layer."],
+        ["Cotton Tank", "Tops", 42, 40, ["XS", "S", "M", "L"], "Heavyweight ribbed cotton, scooped neck, boxed hem."],
+        ["Leather Belt", "Accessories", 68, 30, ["S/M", "L/XL"], "Vegetable-tanned full-grain leather, solid brass buckle."],
+        ["Silk Neck Scarf", "Accessories", 55, 3, ["One Size"], "Hand-rolled silk twill, seasonal print."],
+        ["Tapered Denim", "Bottoms", 118, 22, ["28", "30", "32", "34"], "13oz Japanese selvedge, mid-rise, tapered leg."],
+        ["Linen Camp Shirt", "Tops", 88, 0, ["S", "M", "L", "XL"], "Airy European linen, camp collar, patch pocket. Restocking soon."],
+      ];
+      return raw.map((r, i) => ({
+        id: uid("prod"), name: r[0], category: r[1], price: r[2], stock: r[3],
+        sizes: r[4], description: r[5], status: "active",
+        colorKey: i % SWATCHES.length, image: "",
+        createdAt: Date.now() - (raw.length - i) * 86400000,
+      }));
+    }
+
+    function seedOrders(products) {
+      const now = Date.now();
+      const pick = (n) => products.filter(p => p.stock > 0)[n % products.length];
+      const mk = (daysAgo, status, prodIdxs) => {
+        const items = prodIdxs.map((pi, k) => {
+          const p = pick(pi);
+          return { id: p.id, name: p.name, size: p.sizes[0], price: p.price, qty: (k % 2) + 1, colorKey: p.colorKey };
+        });
+        const subtotal = items.reduce((s, it) => s + it.price * it.qty, 0);
+        const shipping = subtotal > 150 ? 0 : 12;
+        return {
+          id: "ORD-" + Math.floor(1000 + Math.random() * 9000),
+          createdAt: now - daysAgo * 86400000 - Math.floor(Math.random() * 6e7),
+          items, subtotal, shipping, total: subtotal + shipping, status,
+          customer: { name: ["Ava Lindqvist", "Noah Carr", "Mira Okoye", "Leo Fontaine", "Saanvi Rao"][daysAgo % 5], email: "customer@example.com", address: "12 Market St, Portland, OR" },
+          payment: { brand: "Visa", last4: String(4000 + daysAgo).slice(-4) },
+        };
+      };
+      return [
+        mk(0, "paid", [0, 3]), mk(1, "shipped", [2]), mk(1, "delivered", [5, 6]),
+        mk(2, "delivered", [1]), mk(3, "shipped", [4, 7]), mk(4, "delivered", [0]),
+        mk(5, "delivered", [3, 6]), mk(6, "pending", [2]),
+      ];
+    }
+
+    const DEFAULT_SETTINGS = { brand: "Ajwad Barakah", tagline: "Considered clothing, made to last.", currency: "BDT", symbol: "৳", shipInsideDhaka: 80, shipOutsideDhaka: 140, adminPass: "admin", logo: "Ajwad Logo.png", adminUrl: "index.html#admin", address: "Dhaka, Bangladesh", phone: "01333707715", whatsapp: "01333707715", facebook: "https://www.facebook.com/profile.php?id=61590579107774" };
+
+    const useMoney = (settings) => useCallback(
+      (n) => settings.symbol + Number(n || 0).toLocaleString(undefined, { minimumFractionDigits: n % 1 ? 2 : 0, maximumFractionDigits: 2 }),
+      [settings.symbol]
+    );
+    const timeAgo = (ts) => {
+      const s = Math.floor((Date.now() - ts) / 1000);
+      if (s < 60) return s + "s ago";
+      const m = Math.floor(s / 60); if (m < 60) return m + "m ago";
+      const h = Math.floor(m / 60); if (h < 24) return h + "h ago";
+      return Math.floor(h / 24) + "d ago";
+    };
+    const STATUS_META = {
+      pending: { label: "Pending", bg: "var(--warn-tint)", fg: "var(--warn)" },
+      paid: { label: "Paid", bg: "var(--accent-tint)", fg: "var(--accent)" },
+      shipped: { label: "Shipped", bg: "#EEF0F2", fg: "#46505C" },
+      delivered: { label: "Delivered", bg: "var(--live-tint)", fg: "var(--live)" },
+    };
+
+    function ProductImage({ product, className }) {
+      if (product.image) {
+        return <img src={product.image} alt={product.name} className={className} style={{ width: "100%", height: "100%", objectFit: "cover" }} />;
+      }
+      const sw = SWATCHES[product.colorKey % SWATCHES.length];
+      const words = product.name.split(" ");
+      const l1 = words.slice(0, Math.ceil(words.length / 2)).join(" ");
+      const l2 = words.slice(Math.ceil(words.length / 2)).join(" ");
+      return (
+        <div className={className} style={{ width: "100%", height: "100%", background: sw.bg, display: "flex", flexDirection: "column", justifyContent: "flex-end", padding: 24 }}>
+          <div style={{ fontFamily: "'Space Mono',monospace", fontSize: 11, letterSpacing: 2, color: sw.fg, opacity: 0.7 }}>{product.category.toUpperCase()}</div>
+          <div style={{ fontFamily: "'Space Grotesk',sans-serif", fontSize: 26, fontWeight: 600, color: sw.fg, marginTop: "auto" }}>
+            {l1}<br/>{l2}
+          </div>
+        </div>
+      );
+    }
+
+    function App() {
+      const [ready, setReady] = useState(false);
+      const [products, setProducts] = useState([]);
+      const [orders, setOrders] = useState([]);
+      const [settings, setSettings] = useState(DEFAULT_SETTINGS);
+      const [mode, setMode] = useState(() => (window.location.hash === "#admin" ? "admin" : "store"));
+      const [cart, setCart] = useState([]);
+      const [toast, setToast] = useState(null);
+
+      useEffect(() => {
+        (async () => {
+          let p = await loadKey(KEYS.products, null);
+          let o = await loadKey(KEYS.orders, null);
+          let s = await loadKey(KEYS.settings, null);
+          if (!p) { p = seedProducts(); await saveKey(KEYS.products, p); }
+          if (!o) { o = seedOrders(p); await saveKey(KEYS.orders, o); }
+          if (!s) { s = DEFAULT_SETTINGS; await saveKey(KEYS.settings, s); }
+          // Merge saved settings with defaults, but keep the default logo if saved logo is empty
+          const mergedSettings = {
+            ...DEFAULT_SETTINGS,
+            ...s,
+            logo: s?.logo || DEFAULT_SETTINGS.logo,
+            brand: s?.brand || DEFAULT_SETTINGS.brand
+          };
+          setProducts(p); setOrders(o); setSettings(mergedSettings); setReady(true);
+        })();
+      }, []);
+
+      useEffect(() => { if (ready) saveKey(KEYS.products, products); }, [products, ready]);
+      useEffect(() => { if (ready) saveKey(KEYS.orders, orders); }, [orders, ready]);
+      useEffect(() => { if (ready) saveKey(KEYS.settings, settings); }, [settings, ready]);
+
+      const notify = useCallback((msg) => { setToast(msg); setTimeout(() => setToast(null), 2600); }, []);
+
+      const money = useMoney(settings);
+
+      const placeOrder = useCallback((order) => {
+        setOrders(o => [order, ...o]);
+        setProducts(ps => ps.map(p => {
+          const bought = order.items.filter(it => it.id === p.id).reduce((s, it) => s + it.qty, 0);
+          return bought ? { ...p, stock: Math.max(0, p.stock - bought) } : p;
+        }));
+      }, []);
+
+      const resetAll = useCallback(async () => {
+        const p = seedProducts(); const o = seedOrders(p);
+        setProducts(p); setOrders(o); setSettings(DEFAULT_SETTINGS);
+        await saveKey(KEYS.products, p); await saveKey(KEYS.orders, o); await saveKey(KEYS.settings, DEFAULT_SETTINGS);
+        notify("Store reset to sample data");
+      }, [notify]);
+
+      if (!ready) {
+        return (
+          <div className="at-root" style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100vh" }}>
+            <style>{STYLES}</style>
+            <div style={{ textAlign: "center" }}>
+              <div className="at-disp" style={{ fontSize: 22, letterSpacing: ".3em" }}>{DEFAULT_SETTINGS.brand}</div>
+              <div className="at-mono" style={{ fontSize: 12, color: "var(--muted)", marginTop: 10 }}>loading your store…</div>
+            </div>
+          </div>
+        );
+      }
+
+      return (
+        <div className="at-root">
+          <style>{STYLES}</style>
+          {mode === "store" ? (
+            <Storefront
+              products={products} settings={settings} cart={cart} setCart={setCart}
+              money={money} placeOrder={placeOrder} notify={notify}
+            />
+          ) : (
+            <Admin
+              products={products} setProducts={setProducts} orders={orders} setOrders={setOrders}
+              settings={settings} setSettings={setSettings} money={money}
+              notify={notify}
+              onExit={() => { window.location.hash = ""; setMode("store"); }} onReset={resetAll}
+            />
+          )}
+          {toast && (
+            <div style={{ position: "fixed", bottom: 24, left: "50%", transform: "translateX(-50%)", background: "var(--ink)", color: "var(--paper)", padding: "12px 20px", borderRadius: 3, zIndex: 90, fontSize: 13, fontWeight: 500 }} className="at-rise">
+              {toast}
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    function Storefront({ products, settings, cart, setCart, money, placeOrder, notify }) {
+      const [view, setView] = useState("home");
+      const [quick, setQuick] = useState(null);
+      const [cartOpen, setCartOpen] = useState(false);
+      const [cat, setCat] = useState("All");
+      const [q, setQ] = useState("");
+      const [sort, setSort] = useState("featured");
+      const [confirmedOrder, setConfirmedOrder] = useState(null);
+
+      const cartCount = cart.reduce((s, i) => s + i.qty, 0);
+      const addToCart = (product, size) => {
+        setCart(c => {
+          const key = product.id + "|" + size;
+          const existing = c.find(i => i.key === key);
+          if (existing) return c.map(i => i.key === key ? { ...i, qty: i.qty + 1 } : i);
+          return [...c, { key, id: product.id, name: product.name, category: product.category, size, price: product.price, colorKey: product.colorKey, image: product.image, qty: 1 }];
+        });
+        setQuick(null); setCartOpen(true); notify(`Added ${product.name} (${size})`);
+      };
+      const updateQty = (key, d) => setCart(c => c.map(i => i.key === key ? { ...i, qty: Math.max(1, i.qty + d) } : i));
+      const removeItem = (key) => setCart(c => c.filter(i => i.key !== key));
+
+      const visible = useMemo(() => {
+        let list = products.filter(p => p.status === "active");
+        if (cat !== "All") list = list.filter(p => p.category === cat);
+        if (q.trim()) list = list.filter(p => (p.name + p.category).toLowerCase().includes(q.toLowerCase()));
+        if (sort === "low") list = [...list].sort((a, b) => a.price - b.price);
+        if (sort === "high") list = [...list].sort((a, b) => b.price - a.price);
+        return list;
+      }, [products, cat, q, sort]);
+
+      const subtotal = cart.reduce((s, i) => s + i.price * i.qty, 0);
+
+      const completeOrder = (customer, payment, shipping) => {
+        const order = {
+          id: "ORD-" + Math.floor(1000 + Math.random() * 9000),
+          createdAt: Date.now(),
+          items: cart.map(({ key, ...rest }) => rest),
+          subtotal, shipping, total: subtotal + shipping,
+          status: payment.method === "cod" ? "pending" : "paid", customer, payment,
+        };
+        placeOrder(order); setConfirmedOrder(order); setCart([]); setView("confirm");
+      };
+
+      if (view === "checkout") {
+        return <Checkout cart={cart} subtotal={subtotal} settings={settings} money={money}
+          onBack={() => setView("home")} onComplete={completeOrder} />;
+      }
+      if (view === "confirm" && confirmedOrder) {
+        return <Confirmation order={confirmedOrder} settings={settings} money={money} onDone={() => { setView("home"); setConfirmedOrder(null); }} />;
+      }
+
+      return (
+        <div>
+          <header style={{ position: "sticky", top: 0, zIndex: 40, background: "rgba(241,240,236,.9)", backdropFilter: "blur(10px)", borderBottom: "1px solid var(--line)" }}>
+            <div style={{ maxWidth: 1240, margin: "0 auto", padding: "0 24px", height: 80, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+              <button onClick={() => { setView("home"); setCat("All"); }} style={{ display: "flex", alignItems: "center", gap: 16, border: "none", background: "transparent", cursor: "pointer", padding: 0 }}>
+                {settings.logo ? (
+                  <>
+                    <img src={settings.logo} alt={settings.brand} style={{ height: 76, width: "auto", maxWidth: 320 }} />
+                    <span className="at-disp" style={{ fontSize: 22, fontWeight: 700, letterSpacing: ".24em" }}>{settings.brand}</span>
+                  </>
+                ) : (
+                  <span className="at-disp" style={{ fontSize: 22, fontWeight: 700, letterSpacing: ".24em" }}>{settings.brand}</span>
+                )}
+              </button>
+              <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+                <button onClick={() => setCartOpen(true)} style={{ position: "relative", display: "flex", alignItems: "center", gap: 8, fontSize: 24, border: "none", background: "transparent", cursor: "pointer" }}>
+                  <ShoppingBag />
+                  {cartCount > 0 && <span className="at-mono" style={{ position: "absolute", top: -8, right: -10, background: "var(--accent)", color: "#fff", fontSize: 10, minWidth: 17, height: 17, borderRadius: 9, display: "flex", alignItems: "center", justifyContent: "center", padding: "0 4px" }}>{cartCount}</span>}
+                </button>
+              </div>
+            </div>
+          </header>
+
+          <section style={{ maxWidth: 1240, margin: "0 auto", padding: "56px 24px 40px" }}>
+            <div className="at-eyebrow" style={{ marginBottom: 16 }}>New Season · {new Date().getFullYear()}</div>
+            <h1 className="at-disp" style={{ fontSize: "clamp(38px,6vw,72px)", fontWeight: 700, lineHeight: 1.02, maxWidth: 820, margin: 0 }}>
+              {settings.tagline}
+            </h1>
+          </section>
+
+          <div style={{ maxWidth: 1240, margin: "0 auto", padding: "0 24px" }}>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 10, alignItems: "center", paddingBottom: 20, borderBottom: "1px solid var(--line)", justifyContent: "space-between" }}>
+              <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+                {["All", ...CATEGORIES].map(c => (
+                  <button key={c} onClick={() => setCat(c)} className="at-btn at-btn-sm" style={{ background: cat === c ? "var(--ink)" : "transparent", color: cat === c ? "var(--paper)" : "var(--ink-soft)", border: cat === c ? "none" : "1px solid var(--line-strong)" }}>{c}</button>
+                ))}
+              </div>
+              <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+                <div style={{ position: "relative" }}>
+                  <span style={{ position: "absolute", left: 11, top: "50%", transform: "translateY(-50%)", color: "var(--muted)", fontSize: 16 }}><Search /></span>
+                  <input value={q} onChange={e => setQ(e.target.value)} placeholder="Search" className="at-field" style={{ paddingLeft: 34, width: 160 }} />
+                </div>
+                <select value={sort} onChange={e => setSort(e.target.value)} className="at-field" style={{ width: 150 }}>
+                  <option value="featured">Featured</option>
+                  <option value="low">Price: Low–High</option>
+                  <option value="high">Price: High–Low</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <section style={{ maxWidth: 1240, margin: "0 auto", padding: "28px 24px 80px" }}>
+            {visible.length === 0 ? (
+              <div style={{ textAlign: "center", padding: "80px 0", color: "var(--muted)" }}>
+                <p style={{ fontSize: 15 }}>Nothing matches that yet. Try another category or clear your search.</p>
+              </div>
+            ) : (
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(230px,1fr))", gap: 20 }}>
+                {visible.map(p => (
+                  <article key={p.id} className="at-prod at-rise" onClick={() => setQuick(p)}>
+                    <div className="at-prod-imgwrap" style={{ position: "relative" }}>
+                      <ProductImage product={p} className="at-prod-img" />
+                      {p.stock === 0 && <span className="at-badge" style={{ position: "absolute", top: 12, left: 12, background: "var(--ink)", color: "var(--paper)" }}>Sold out</span>}
+                      {p.stock > 0 && p.stock <= 5 && <span className="at-badge" style={{ position: "absolute", top: 12, left: 12, background: "var(--warn-tint)", color: "var(--warn)" }}>Low stock</span>}
+                    </div>
+                    <div style={{ padding: "14px 14px 16px" }}>
+                      <div className="at-eyebrow" style={{ marginBottom: 6 }}>{p.category}</div>
+                      <div className="at-disp" style={{ fontSize: 15, fontWeight: 600, lineHeight: 1.25 }}>{p.name}</div>
+                      <div className="at-mono" style={{ fontSize: 14, marginTop: 8 }}>{money(p.price)}</div>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            )}
+          </section>
+
+          <footer style={{ borderTop: "1px solid var(--line)", background: "var(--ink)", color: "var(--paper)" }}>
+            <div style={{ maxWidth: 1240, margin: "0 auto", padding: "56px 24px 28px" }}>
+              <div style={{ display: "grid", gridTemplateColumns: "1.3fr 1fr 1fr", gap: 40 }} className="at-footer-grid">
+                <div>
+                  {settings.logo ? (
+                    <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                      <img src={settings.logo} alt={settings.brand} style={{ height: 44, width: "auto", maxWidth: 220, filter: "brightness(0) invert(1)" }} />
+                      <span className="at-disp" style={{ fontSize: 16, letterSpacing: ".24em", fontWeight: 700 }}>{settings.brand}</span>
+                    </div>
+                  ) : (
+                    <div className="at-disp" style={{ fontSize: 18, letterSpacing: ".24em", fontWeight: 700 }}>{settings.brand}</div>
+                  )}
+                  <p style={{ color: "rgba(241,240,236,.6)", fontSize: 13, lineHeight: 1.7, marginTop: 14, maxWidth: 280 }}>{settings.tagline}</p>
+                </div>
+
+                <div>
+                  <div className="at-eyebrow" style={{ color: "rgba(241,240,236,.5)", marginBottom: 16 }}>Contact</div>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 13, color: "rgba(241,240,236,.85)" }}>
+                      <span style={{ opacity: 0.7 }}><MapPin /></span> {settings.address}
+                    </div>
+                    <a href={`tel:+${bdIntl(settings.phone)}`} style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 13, color: "rgba(241,240,236,.85)", textDecoration: "none" }}>
+                      <span style={{ opacity: 0.7 }}><Phone /></span> {settings.phone}
+                    </a>
+                    <a href={`https://wa.me/${bdIntl(settings.whatsapp)}`} target="_blank" rel="noopener noreferrer" style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 13, color: "rgba(241,240,236,.85)", textDecoration: "none" }}>
+                      <span style={{ opacity: 0.7 }}><Whatsapp /></span> WhatsApp: {settings.whatsapp}
+                    </a>
+                  </div>
+                </div>
+
+                <div>
+                  <div className="at-eyebrow" style={{ color: "rgba(241,240,236,.5)", marginBottom: 16 }}>Follow us</div>
+                  <a href={settings.facebook} target="_blank" rel="noopener noreferrer" style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 13, color: "rgba(241,240,236,.85)", textDecoration: "none" }}>
+                    <span style={{ opacity: 0.7 }}><Facebook /></span> Facebook Page
+                  </a>
+                </div>
+              </div>
+
+              <div style={{ borderTop: "1px solid rgba(255,255,255,.12)", marginTop: 44, paddingTop: 20, display: "flex", flexWrap: "wrap", gap: 14, justifyContent: "space-between", alignItems: "center" }}>
+                <div className="at-mono" style={{ fontSize: 11, color: "rgba(241,240,236,.55)" }}>© {new Date().getFullYear()} {settings.brand} — All rights reserved</div>
+                <a href={settings.adminUrl} target="_blank" rel="noopener noreferrer" className="at-btn at-btn-sm" style={{ background: "rgba(255,255,255,.08)", color: "var(--paper)", textDecoration: "none" }}>
+                  <Lock /> Admin panel
+                </a>
+              </div>
+            </div>
+          </footer>
+
+          {quick && <QuickView product={quick} settings={settings} money={money} onClose={() => setQuick(null)} onAdd={addToCart} />}
+
+          {cartOpen && (
+            <>
+              <div className="at-scrim" onClick={() => setCartOpen(false)} />
+              <aside className="at-drawer at-scroll">
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "20px 22px", borderBottom: "1px solid var(--line)" }}>
+                  <div className="at-disp" style={{ fontSize: 16, fontWeight: 700 }}>Your bag · {cartCount}</div>
+                  <button onClick={() => setCartOpen(false)} style={{ fontSize: 20 }}><X /></button>
+                </div>
+                <div style={{ flex: 1, overflow: "auto", padding: "8px 0" }} className="at-scroll">
+                  {cart.length === 0 ? (
+                    <div style={{ textAlign: "center", padding: "60px 24px", color: "var(--muted)" }}>
+                      <span style={{ fontSize: 32, opacity: 0.4 }}><ShoppingBag /></span>
+                      <p style={{ marginTop: 14, fontSize: 14 }}>Your bag is empty.</p>
+                      <button onClick={() => setCartOpen(false)} className="at-btn at-btn-ghost at-btn-sm" style={{ marginTop: 16 }}>Continue shopping</button>
+                    </div>
+                  ) : cart.map(i => (
+                    <div key={i.key} style={{ display: "flex", gap: 12, padding: "14px 22px", borderBottom: "1px solid var(--line)" }}>
+                      <div style={{ width: 62, height: 82, flexShrink: 0, overflow: "hidden" }}><ProductImage product={i} /></div>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div className="at-disp" style={{ fontSize: 13, fontWeight: 600 }}>{i.name}</div>
+                        <div className="at-mono" style={{ fontSize: 11, color: "var(--muted)", marginTop: 3 }}>Size {i.size}</div>
+                        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 10 }}>
+                          <div style={{ display: "flex", alignItems: "center", border: "1px solid var(--line-strong)", borderRadius: 2 }}>
+                            <button onClick={() => updateQty(i.key, -1)} style={{ padding: "6px 9px", fontSize: 18 }}><Minus /></button>
+                            <span className="at-mono" style={{ fontSize: 13, minWidth: 22, textAlign: "center" }}>{i.qty}</span>
+                            <button onClick={() => updateQty(i.key, 1)} style={{ padding: "6px 9px", fontSize: 18 }}><Plus /></button>
+                          </div>
+                          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                            <span className="at-mono" style={{ fontSize: 13 }}>{money(i.price * i.qty)}</span>
+                            <button onClick={() => removeItem(i.key)} style={{ color: "var(--muted)", fontSize: 18 }}><Trash2 /></button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                {cart.length > 0 && (
+                  <div style={{ borderTop: "1px solid var(--line)", padding: "18px 22px" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13, marginBottom: 8 }}>
+                      <span style={{ color: "var(--muted)" }}>Subtotal</span><span className="at-mono">{money(subtotal)}</span>
+                    </div>
+                    <div className="at-mono" style={{ fontSize: 11, color: "var(--muted)", marginBottom: 14 }}>Shipping calculated at checkout</div>
+                    <button onClick={() => { setCartOpen(false); setView("checkout"); }} className="at-btn at-btn-primary" style={{ width: "100%" }}>
+                      Checkout · {money(subtotal)} <ArrowRight />
+                    </button>
+                  </div>
+                )}
+              </aside>
+            </>
+          )}
+        </div>
+      );
+    }
+
+    function QuickView({ product, settings, money, onClose, onAdd }) {
+      const [size, setSize] = useState(null);
+      const soldOut = product.stock === 0;
+      return (
+        <>
+          <div className="at-scrim" onClick={onClose} />
+          <div className="at-modal" onClick={onClose}>
+            <div className="at-card at-rise" onClick={e => e.stopPropagation()} style={{ maxWidth: 780, width: "100%", display: "grid", gridTemplateColumns: "1fr 1fr", overflow: "hidden", marginTop: 40 }}>
+              <div style={{ aspectRatio: "3/4", background: "var(--paper)", minWidth: 0 }}><ProductImage product={product} /></div>
+              <div style={{ padding: 28, display: "flex", flexDirection: "column" }}>
+                <div style={{ display: "flex", justifyContent: "space-between" }}>
+                  <span className="at-eyebrow">{product.category}</span>
+                  <button onClick={onClose} style={{ fontSize: 18 }}><X /></button>
+                </div>
+                <h2 className="at-disp" style={{ fontSize: 26, fontWeight: 700, marginTop: 12, lineHeight: 1.1 }}>{product.name}</h2>
+                <div className="at-mono" style={{ fontSize: 18, marginTop: 10 }}>{money(product.price)}</div>
+                <p style={{ color: "var(--ink-soft)", fontSize: 14, lineHeight: 1.6, marginTop: 16 }}>{product.description}</p>
+                <div style={{ marginTop: "auto", paddingTop: 20 }}>
+                  <div className="at-label">Select size</div>
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 18 }}>
+                    {product.sizes.map(s => (
+                      <button key={s} onClick={() => setSize(s)} disabled={soldOut} className="at-mono"
+                        style={{ padding: "9px 14px", fontSize: 12, border: "1px solid " + (size === s ? "var(--ink)" : "var(--line-strong)"), background: size === s ? "var(--ink)" : "transparent", color: size === s ? "var(--paper)" : "var(--ink)", borderRadius: 2 }}>{s}</button>
+                    ))}
+                  </div>
+                  <button disabled={soldOut || !size} onClick={() => onAdd(product, size)} className="at-btn at-btn-primary" style={{ width: "100%" }}>
+                    {soldOut ? "Sold out" : !size ? "Choose a size" : <>Add to bag <ShoppingBag /></>}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </>
+      );
+    }
+
+    function Checkout({ cart, subtotal, settings, money, onBack, onComplete }) {
+      const [form, setForm] = useState({ name: "", email: "", address: "", city: "", zip: "", card: "", exp: "", cvc: "" });
+      const [location, setLocation] = useState("dhaka");
+      const [payMethod, setPayMethod] = useState("card");
+      const [processing, setProcessing] = useState(false);
+      const set = (k) => (e) => setForm(f => ({ ...f, [k]: e.target.value }));
+      const cardFmt = (v) => v.replace(/\D/g, "").slice(0, 16).replace(/(.{4})/g, "$1 ").trim();
+      const expFmt = (v) => v.replace(/\D/g, "").slice(0, 4).replace(/(.{2})(.+)/, "$1/$2");
+      const shipping = location === "dhaka" ? settings.shipInsideDhaka : settings.shipOutsideDhaka;
+      const total = subtotal + shipping;
+
+      const valid = form.name && /\S+@\S+/.test(form.email) && form.address && form.city && form.zip
+        && (payMethod === "cod" || (form.card.replace(/\s/g, "").length === 16 && form.exp.length === 5 && form.cvc.length >= 3));
+
+      const submit = () => {
+        if (!valid || processing) return;
+        setProcessing(true);
+        setTimeout(() => {
+          onComplete(
+            { name: form.name, email: form.email, address: `${form.address}, ${form.city} ${form.zip}` },
+            payMethod === "cod"
+              ? { method: "cod" }
+              : { method: "card", brand: "Visa", last4: form.card.replace(/\s/g, "").slice(-4) },
+            shipping
+          );
+        }, 1400);
+      };
+
+      return (
+        <div style={{ minHeight: "100vh" }}>
+          <header style={{ borderBottom: "1px solid var(--line)" }}>
+            <div style={{ maxWidth: 1080, margin: "0 auto", padding: "0 24px", height: 68, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+              <button onClick={onBack} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, color: "var(--muted)", border: "none", background: "transparent", cursor: "pointer" }}><ArrowLeft /> Back to store</button>
+              {settings.logo ? (
+                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                  <img src={settings.logo} alt={settings.brand} style={{ height: 48, width: "auto", maxWidth: 220 }} />
+                  <span className="at-disp" style={{ fontSize: 16, letterSpacing: ".24em", fontWeight: 700 }}>{settings.brand}</span>
+                </div>
+              ) : (
+                <div className="at-disp" style={{ fontSize: 18, letterSpacing: ".24em", fontWeight: 700 }}>{settings.brand}</div>
+              )}
+            </div>
+          </header>
+          <div style={{ maxWidth: 1080, margin: "0 auto", padding: "40px 24px", display: "grid", gridTemplateColumns: "1.6fr 1fr", gap: 40 }}>
+            <div>
+              <h1 className="at-disp" style={{ fontSize: 28, fontWeight: 700, marginBottom: 4 }}>Checkout</h1>
+              <span className="at-badge" style={{ background: "var(--accent-tint)", color: "var(--accent)", marginBottom: 24 }}>Test mode — no real charge</span>
+
+              <section style={{ marginTop: 28 }}>
+                <div className="at-eyebrow" style={{ marginBottom: 14 }}>01 — Contact & shipping</div>
+                <Field label="Full name" value={form.name} onChange={set("name")} placeholder="Ava Lindqvist" />
+                <Field label="Email" value={form.email} onChange={set("email")} placeholder="you@email.com" type="email" />
+                <Field label="Address" value={form.address} onChange={set("address")} placeholder="12 Market St" />
+                <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: 12 }}>
+                  <Field label="City" value={form.city} onChange={set("city")} placeholder="Portland" />
+                  <Field label="ZIP" value={form.zip} onChange={set("zip")} placeholder="97201" />
+                </div>
+                <div style={{ marginBottom: 14 }}>
+                  <label className="at-label">Delivery location</label>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+                    {[{ id: "dhaka", label: "Inside Dhaka", rate: settings.shipInsideDhaka }, { id: "outside", label: "Outside Dhaka", rate: settings.shipOutsideDhaka }].map(opt => (
+                      <button key={opt.id} type="button" onClick={() => setLocation(opt.id)} className="at-field"
+                        style={{ textAlign: "left", cursor: "pointer", border: "1px solid " + (location === opt.id ? "var(--ink)" : "var(--line-strong)"), background: location === opt.id ? "var(--ink)" : "transparent", color: location === opt.id ? "var(--paper)" : "var(--ink)" }}>
+                        {opt.label} <span className="at-mono" style={{ fontSize: 12, opacity: 0.75 }}>· {money(opt.rate)}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </section>
+
+              <section style={{ marginTop: 28 }}>
+                <div className="at-eyebrow" style={{ marginBottom: 14, display: "flex", alignItems: "center", gap: 8 }}><CreditCard /> 02 — Payment</div>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 16 }}>
+                  <button type="button" onClick={() => setPayMethod("card")} className="at-field"
+                    style={{ textAlign: "left", cursor: "pointer", border: "1px solid " + (payMethod === "card" ? "var(--ink)" : "var(--line-strong)"), background: payMethod === "card" ? "var(--ink)" : "transparent", color: payMethod === "card" ? "var(--paper)" : "var(--ink)" }}>
+                    Card
+                  </button>
+                  <button type="button" onClick={() => setPayMethod("cod")} className="at-field"
+                    style={{ textAlign: "left", cursor: "pointer", border: "1px solid " + (payMethod === "cod" ? "var(--ink)" : "var(--line-strong)"), background: payMethod === "cod" ? "var(--ink)" : "transparent", color: payMethod === "cod" ? "var(--paper)" : "var(--ink)" }}>
+                    Cash on delivery
+                  </button>
+                </div>
+                {payMethod === "card" ? (
+                  <>
+                    <Field label="Card number" value={form.card} onChange={(e) => setForm(f => ({ ...f, card: cardFmt(e.target.value) }))} placeholder="4242 4242 4242 4242" mono />
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+                      <Field label="Expiry" value={form.exp} onChange={(e) => setForm(f => ({ ...f, exp: expFmt(e.target.value) }))} placeholder="12/28" mono />
+                      <Field label="CVC" value={form.cvc} onChange={(e) => setForm(f => ({ ...f, cvc: e.target.value.replace(/\D/g, "").slice(0, 4) }))} placeholder="123" mono />
+                    </div>
+                    <p className="at-mono" style={{ fontSize: 11, color: "var(--muted)", marginTop: 4 }}>Use any 16-digit number — this is a demo gateway.</p>
+                  </>
+                ) : (
+                  <p style={{ color: "var(--ink-soft)", fontSize: 13, lineHeight: 1.6 }}>Pay in cash when your order arrives. Please have {money(total)} ready for the courier.</p>
+                )}
+              </section>
+
+              <button onClick={submit} disabled={!valid || processing} className="at-btn at-btn-primary" style={{ width: "100%", marginTop: 28, padding: "15px" }}>
+                {processing
+                  ? (payMethod === "cod" ? "Placing order…" : "Processing payment…")
+                  : payMethod === "cod" ? <>Place order · {money(total)} <ArrowRight /></> : <>Pay {money(total)} <Lock /></>}
+              </button>
+            </div>
+
+            <aside>
+              <div className="at-card" style={{ padding: 22, position: "sticky", top: 24 }}>
+                <div className="at-eyebrow" style={{ marginBottom: 16 }}>Order summary</div>
+                {cart.map(i => (
+                  <div key={i.key} style={{ display: "flex", gap: 12, marginBottom: 14 }}>
+                    <div style={{ width: 44, height: 58, flexShrink: 0, overflow: "hidden" }}><ProductImage product={i} /></div>
+                    <div style={{ flex: 1 }}>
+                      <div className="at-disp" style={{ fontSize: 13, fontWeight: 600 }}>{i.name}</div>
+                      <div className="at-mono" style={{ fontSize: 11, color: "var(--muted)" }}>{i.size} · ×{i.qty}</div>
+                    </div>
+                    <div className="at-mono" style={{ fontSize: 13 }}>{money(i.price * i.qty)}</div>
+                  </div>
+                ))}
+                <div style={{ borderTop: "1px solid var(--line)", marginTop: 8, paddingTop: 14 }}>
+                  <Row label="Subtotal" value={money(subtotal)} />
+                  <Row label="Shipping" value={money(shipping)} />
+                  <div style={{ display: "flex", justifyContent: "space-between", marginTop: 12, paddingTop: 12, borderTop: "1px solid var(--line)" }}>
+                    <span className="at-disp" style={{ fontWeight: 700 }}>Total</span>
+                    <span className="at-mono" style={{ fontWeight: 700, fontSize: 16 }}>{money(total)}</span>
+                  </div>
+                </div>
+              </div>
+            </aside>
+          </div>
+        </div>
+      );
+    }
+    const Row = ({ label, value }) => (
+      <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13, marginBottom: 6 }}>
+        <span style={{ color: "var(--muted)" }}>{label}</span><span className="at-mono">{value}</span>
+      </div>
+    );
+    const Field = ({ label, mono, ...props }) => (
+      <div style={{ marginBottom: 14 }}>
+        <label className="at-label">{label}</label>
+        <input className={"at-field" + (mono ? " at-mono" : "")} {...props} />
+      </div>
+    );
+
+    function Confirmation({ order, settings, money, onDone }) {
+      return (
+        <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
+          <div className="at-card at-rise" style={{ maxWidth: 460, width: "100%", padding: 40, textAlign: "center" }}>
+            <div style={{ width: 56, height: 56, borderRadius: "50%", background: "var(--live-tint)", color: "var(--live)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 20px", fontSize: 28 }}>
+              <Check />
+            </div>
+            <h1 className="at-disp" style={{ fontSize: 24, fontWeight: 700 }}>Order confirmed</h1>
+            <p style={{ color: "var(--ink-soft)", fontSize: 14, marginTop: 8 }}>Thanks, {order.customer.name.split(" ")[0]}. A receipt is on its way to {order.customer.email}.</p>
+            <div className="at-card" style={{ padding: 18, marginTop: 24, textAlign: "left", background: "var(--paper)" }}>
+              <Row label="Order number" value={order.id} />
+              <Row label="Items" value={order.items.reduce((s, i) => s + i.qty, 0)} />
+              <Row label={order.payment.method === "cod" ? "Due on delivery" : "Paid"} value={money(order.total)} />
+              <Row label="Payment" value={order.payment.method === "cod" ? "Cash on delivery" : `${order.payment.brand} ···· ${order.payment.last4}`} />
+            </div>
+            <button onClick={onDone} className="at-btn at-btn-dark" style={{ width: "100%", marginTop: 24 }}>Continue shopping</button>
+            <p className="at-mono" style={{ fontSize: 11, color: "var(--muted)", marginTop: 14 }}>This order is now live in the admin dashboard.</p>
+          </div>
+        </div>
+      );
+    }
+
+    function Admin({ products, setProducts, orders, setOrders, settings, setSettings, money, notify, onExit, onReset }) {
+      const [authed, setAuthed] = useState(false);
+      const [pass, setPass] = useState("");
+      const [show, setShow] = useState(false);
+      const [err, setErr] = useState("");
+      const [nav, setNav] = useState("dashboard");
+
+      if (!authed) {
+        const attempt = () => {
+          if (pass === settings.adminPass) { setAuthed(true); setErr(""); }
+          else setErr("That passcode doesn't match. Try again.");
+        };
+        return (
+          <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
+            <style>{STYLES}</style>
+            <div className="at-card at-rise" style={{ maxWidth: 380, width: "100%", padding: 36 }}>
+              {settings.logo ? (
+                <div style={{ textAlign: "center", marginBottom: 16 }}>
+                  <img src={settings.logo} alt={settings.brand} style={{ height: 64, width: "auto", maxWidth: 280, filter: "none" }} />
+                  <div className="at-disp" style={{ fontSize: 18, letterSpacing: ".24em", fontWeight: 700, marginTop: 10 }}>{settings.brand}</div>
+                </div>
+              ) : (
+                <div className="at-disp" style={{ fontSize: 20, letterSpacing: ".24em", fontWeight: 700, textAlign: "center" }}>{settings.brand}</div>
+              )}
+              <div className="at-eyebrow" style={{ textAlign: "center", marginTop: 6, marginBottom: 28 }}>Operations · Admin access</div>
+              <label className="at-label">Passcode</label>
+              <div style={{ position: "relative" }}>
+                <input type={show ? "text" : "password"} value={pass} autoFocus
+                  onChange={e => setPass(e.target.value)} onKeyDown={e => e.key === "Enter" && attempt()}
+                  className="at-field at-mono" placeholder="••••••" style={{ paddingRight: 40 }} />
+                <button onClick={() => setShow(s => !s)} style={{ position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)", color: "var(--muted)", fontSize: 16 }}>{show ? <EyeOff /> : <Eye />}</button>
+              </div>
+              {err && <p style={{ color: "var(--warn)", fontSize: 12, marginTop: 8 }}>{err}</p>}
+              <button onClick={attempt} className="at-btn at-btn-dark" style={{ width: "100%", marginTop: 20 }}>Enter dashboard</button>
+              <p className="at-mono" style={{ fontSize: 11, color: "var(--muted)", marginTop: 16, textAlign: "center" }}>Demo passcode: <b>{settings.adminPass}</b></p>
+              <button onClick={onExit} style={{ width: "100%", marginTop: 12, fontSize: 12, color: "var(--muted)" }}>← Back to storefront</button>
+            </div>
+          </div>
+        );
+      }
+
+      const NAV = [
+        { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
+        { id: "products", label: "Products", icon: Package },
+        { id: "orders", label: "Orders", icon: Receipt },
+        { id: "settings", label: "Settings", icon: SettingsIcon },
+      ];
+
+      return (
+        <div style={{ display: "flex", minHeight: "100vh" }}>
+          <aside style={{ width: 232, background: "var(--ink)", color: "var(--paper)", padding: "24px 16px", display: "flex", flexDirection: "column", position: "sticky", top: 0, height: "100vh", flexShrink: 0 }}>
+            {settings.logo ? (
+              <div style={{ marginBottom: 32, padding: "0 10px" }}>
+                <img src={settings.logo} alt={settings.brand} style={{ height: 48, width: "auto", maxWidth: 220, filter: "brightness(0) invert(1)" }} />
+                <div className="at-disp" style={{ fontSize: 14, letterSpacing: ".2em", fontWeight: 700, marginTop: 10 }}>{settings.brand}</div>
+              </div>
+            ) : (
+              <div className="at-disp" style={{ fontSize: 16, letterSpacing: ".24em", fontWeight: 700, marginBottom: 32, padding: "0 10px" }}>{settings.brand}</div>
+            )}
+            <nav style={{ flex: 1, display: "flex", flexDirection: "column", gap: 4 }}>
+              {NAV.map(n => (
+                <button key={n.id} onClick={() => setNav(n.id)} className={"at-navitem" + (nav === n.id ? " active" : "")}>
+                  <span style={{ fontSize: 18 }}><n.icon /></span>
+                  {n.label}
+                </button>
+              ))}
+            </nav>
+            <div style={{ borderTop: "1px solid rgba(255,255,255,.1)", paddingTop: 16, marginTop: 16 }}>
+              <button onClick={onExit} className="at-navitem" style={{ color: "var(--muted)" }}>
+                <span style={{ fontSize: 18 }}><LogOut /></span>
+                Exit admin
+              </button>
+            </div>
+          </aside>
+
+          <main style={{ flex: 1, padding: 32, minWidth: 0 }}>
+            {nav === "dashboard" && <Dashboard products={products} orders={orders} money={money} onReset={onReset} />}
+            {nav === "products" && <Products products={products} setProducts={setProducts} money={money} notify={notify} />}
+            {nav === "orders" && <Orders orders={orders} setOrders={setOrders} money={money} notify={notify} />}
+            {nav === "settings" && <Settings settings={settings} setSettings={setSettings} notify={notify} />}
+          </main>
+        </div>
+      );
+    }
+
+    function Dashboard({ products, orders, money, onReset }) {
+      const totalRevenue = orders.reduce((s, o) => o.status === "delivered" || o.status === "paid" ? s + o.total : s, 0);
+      const pendingOrders = orders.filter(o => o.status === "pending" || o.status === "paid").length;
+      const lowStock = products.filter(p => p.stock > 0 && p.stock <= 5).length;
+      const outOfStock = products.filter(p => p.stock === 0).length;
+
+      const daily = useMemo(() => {
+        const today = new Date(); today.setHours(0, 0, 0, 0);
+        return Array.from({ length: 7 }, (_, i) => {
+          const start = new Date(today); start.setDate(start.getDate() - (6 - i));
+          const startTs = start.getTime(), endTs = startTs + 86400000;
+          const dayOrders = orders.filter(o => o.createdAt >= startTs && o.createdAt < endTs);
+          return {
+            label: start.toLocaleDateString(undefined, { weekday: "short" }),
+            revenue: dayOrders.reduce((s, o) => s + o.total, 0),
+            count: dayOrders.length,
+          };
+        });
+      }, [orders]);
+      const weekRevenue = daily.reduce((s, d) => s + d.revenue, 0);
+      const weekOrders = daily.reduce((s, d) => s + d.count, 0);
+
+      return (
+        <div style={{ maxWidth: 1100 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 28 }}>
+            <div>
+              <h1 className="at-disp" style={{ fontSize: 28, fontWeight: 700, margin: 0 }}>Dashboard</h1>
+              <p style={{ color: "var(--muted)", marginTop: 4, fontSize: 14 }}>Overview of your store</p>
+            </div>
+            <button onClick={onReset} className="at-btn at-btn-ghost">
+              <RotateCcw /> Reset demo
+            </button>
+          </div>
+
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(200px,1fr))", gap: 16, marginBottom: 24 }}>
+            <div className="at-card" style={{ padding: 20 }}>
+              <div className="at-eyebrow" style={{ marginBottom: 8 }}>Total revenue</div>
+              <div className="at-stat-num">{money(totalRevenue)}</div>
+              <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 12, color: "var(--live)", fontSize: 13 }}>
+                <TrendingUp />
+                All time
+              </div>
+            </div>
+            <div className="at-card" style={{ padding: 20 }}>
+              <div className="at-eyebrow" style={{ marginBottom: 8 }}>Orders to fulfill</div>
+              <div className="at-stat-num">{pendingOrders}</div>
+              <div style={{ marginTop: 12, color: "var(--muted)", fontSize: 13 }}>
+                Pending + Paid
+              </div>
+            </div>
+            <div className="at-card" style={{ padding: 20 }}>
+              <div className="at-eyebrow" style={{ marginBottom: 8 }}>Low stock</div>
+              <div className="at-stat-num" style={{ color: lowStock > 0 ? "var(--warn)" : "inherit" }}>{lowStock}</div>
+              <div style={{ marginTop: 12, color: "var(--muted)", fontSize: 13 }}>
+                Products running low
+              </div>
+            </div>
+            <div className="at-card" style={{ padding: 20 }}>
+              <div className="at-eyebrow" style={{ marginBottom: 8 }}>Out of stock</div>
+              <div className="at-stat-num" style={{ color: outOfStock > 0 ? "var(--warn)" : "inherit" }}>{outOfStock}</div>
+              <div style={{ marginTop: 12, color: "var(--muted)", fontSize: 13 }}>
+                Need restocking
+              </div>
+            </div>
+          </div>
+
+          <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: 24 }}>
+            <div className="at-card" style={{ padding: 24 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
+                <div className="at-eyebrow">Revenue — last 7 days</div>
+                <div className="at-mono" style={{ fontSize: 15, fontWeight: 700 }}>{money(weekRevenue)}</div>
+              </div>
+              <div style={{ marginTop: 16 }}>
+                <TrendBars data={daily} valueKey="revenue" color="var(--accent)" format={money} />
+              </div>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginTop: 28 }}>
+                <div className="at-eyebrow">Orders — last 7 days</div>
+                <div className="at-mono" style={{ fontSize: 15, fontWeight: 700 }}>{weekOrders}</div>
+              </div>
+              <div style={{ marginTop: 16 }}>
+                <TrendBars data={daily} valueKey="count" color="var(--live)" />
+              </div>
+            </div>
+            <div className="at-card" style={{ padding: 24 }}>
+              <div className="at-eyebrow" style={{ marginBottom: 16 }}>Recent orders</div>
+              <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                {orders.slice(0, 5).map(o => (
+                  <div key={o.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", paddingBottom: 12, borderBottom: "1px solid var(--line)" }}>
+                    <div>
+                      <div className="at-mono" style={{ fontSize: 12 }}>{o.id}</div>
+                      <div style={{ fontSize: 13, color: "var(--muted)" }}>{o.customer.name}</div>
+                    </div>
+                    <div style={{ textAlign: "right" }}>
+                      <div className="at-mono">{money(o.total)}</div>
+                      <span className="at-badge" style={{ background: STATUS_META[o.status].bg, color: STATUS_META[o.status].fg, fontSize: 10 }}>
+                        {STATUS_META[o.status].label}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    function Products({ products, setProducts, money, notify }) {
+      const [editing, setEditing] = useState(null);
+      const [editForm, setEditForm] = useState({});
+
+      const updateProduct = (id, updates) => {
+        setProducts(ps => ps.map(p => p.id === id ? { ...p, ...updates } : p));
+        notify("Product updated");
+        setEditing(null);
+      };
+
+      return (
+        <div style={{ maxWidth: 1100 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 24 }}>
+            <div>
+              <h1 className="at-disp" style={{ fontSize: 28, fontWeight: 700, margin: 0 }}>Products</h1>
+              <p style={{ color: "var(--muted)", marginTop: 4, fontSize: 14 }}>{products.length} products</p>
+            </div>
+          </div>
+
+          <div className="at-card" style={{ overflow: "hidden" }}>
+            <table className="at-table">
+              <thead>
+                <tr>
+                  <th>Product</th>
+                  <th>Category</th>
+                  <th>Price</th>
+                  <th>Stock</th>
+                  <th style={{ width: 80 }}></th>
+                </tr>
+              </thead>
+              <tbody>
+                {products.map(p => (
+                  <tr key={p.id}>
+                    <td>
+                      <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                        <div style={{ width: 40, height: 54, borderRadius: 2, overflow: "hidden", background: "var(--paper)" }}>
+                          <ProductImage product={p} />
+                        </div>
+                        <div>
+                          <div style={{ fontWeight: 500 }}>{p.name}</div>
+                          <div className="at-mono" style={{ fontSize: 12, color: "var(--muted)" }}>{p.id}</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td>{p.category}</td>
+                    <td className="at-mono">{money(p.price)}</td>
+                    <td>
+                      <span style={{ color: p.stock === 0 ? "var(--warn)" : p.stock <= 5 ? "var(--warn)" : "inherit" }}>
+                        {p.stock} in stock
+                      </span>
+                    </td>
+                    <td style={{ textAlign: "right" }}>
+                      <button onClick={() => setEditing(p.id)} style={{ color: "var(--muted)", fontSize: 16 }}><Pencil /></button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {editing && (() => {
+            const p = products.find(x => x.id === editing);
+            return (
+              <>
+                <div className="at-scrim" onClick={() => setEditing(null)} />
+                <div className="at-modal">
+                  <div className="at-card at-rise" style={{ width: "100%", maxWidth: 560, padding: 24 }} onClick={e => e.stopPropagation()}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+                      <h2 className="at-disp" style={{ fontSize: 20, fontWeight: 700 }}>Edit product</h2>
+                      <button onClick={() => setEditing(null)} style={{ color: "var(--muted)", fontSize: 18 }}><X /></button>
+                    </div>
+                    <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+                      <div>
+                        <label className="at-label">Name</label>
+                        <input className="at-field" defaultValue={p.name} onChange={e => setEditForm({ ...editForm, name: e.target.value })} />
+                      </div>
+                      <div>
+                        <label className="at-label">Price</label>
+                        <input type="number" className="at-field at-mono" defaultValue={p.price} onChange={e => setEditForm({ ...editForm, price: Number(e.target.value) })} />
+                      </div>
+                      <div>
+                        <label className="at-label">Stock</label>
+                        <input type="number" className="at-field at-mono" defaultValue={p.stock} onChange={e => setEditForm({ ...editForm, stock: Number(e.target.value) })} />
+                      </div>
+                      <div style={{ display: "flex", gap: 8, marginTop: 8, justifyContent: "flex-end" }}>
+                        <button onClick={() => setEditing(null)} className="at-btn at-btn-ghost">Cancel</button>
+                        <button onClick={() => updateProduct(p.id, editForm)} className="at-btn at-btn-primary">Save changes</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </>
+            );
+          })()}
+        </div>
+      );
+    }
+
+    function Orders({ orders, setOrders, money, notify }) {
+      const updateStatus = (id, status) => {
+        setOrders(os => os.map(o => o.id === id ? { ...o, status } : o));
+        notify("Order updated");
+      };
+
+      return (
+        <div style={{ maxWidth: 1100 }}>
+          <div style={{ marginBottom: 24 }}>
+            <h1 className="at-disp" style={{ fontSize: 28, fontWeight: 700, margin: 0 }}>Orders</h1>
+            <p style={{ color: "var(--muted)", marginTop: 4, fontSize: 14 }}>{orders.length} orders</p>
+          </div>
+
+          <div className="at-card" style={{ overflow: "hidden" }}>
+            <table className="at-table">
+              <thead>
+                <tr>
+                  <th>Order</th>
+                  <th>Customer</th>
+                  <th>Date</th>
+                  <th>Total</th>
+                  <th>Status</th>
+                  <th style={{ width: 120 }}></th>
+                </tr>
+              </thead>
+              <tbody>
+                {orders.map(o => (
+                  <tr key={o.id}>
+                    <td className="at-mono" style={{ fontWeight: 500 }}>{o.id}</td>
+                    <td>
+                      <div>{o.customer.name}</div>
+                      <div style={{ fontSize: 12, color: "var(--muted)" }}>{o.customer.email}</div>
+                    </td>
+                    <td style={{ whiteSpace: "nowrap" }}>{timeAgo(o.createdAt)}</td>
+                    <td className="at-mono">{money(o.total)}</td>
+                    <td>
+                      <span className="at-badge" style={{ background: STATUS_META[o.status].bg, color: STATUS_META[o.status].fg }}>
+                        {STATUS_META[o.status].label}
+                      </span>
+                    </td>
+                    <td>
+                      <select defaultValue={o.status} onChange={e => updateStatus(o.id, e.target.value)} className="at-field" style={{ padding: "6px 10px", width: "auto" }}>
+                        <option value="pending">Pending</option>
+                        <option value="paid">Paid</option>
+                        <option value="shipped">Shipped</option>
+                        <option value="delivered">Delivered</option>
+                      </select>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      );
+    }
+
+    function Settings({ settings, setSettings, notify }) {
+      const [form, setForm] = useState(settings);
+
+      const save = () => {
+        setSettings(form);
+        notify("Settings saved");
+      };
+
+      return (
+        <div style={{ maxWidth: 600 }}>
+          <h1 className="at-disp" style={{ fontSize: 28, fontWeight: 700, margin: 0, marginBottom: 24 }}>Settings</h1>
+          <div className="at-card" style={{ padding: 24 }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+              <div>
+                <label className="at-label">Brand name</label>
+                <input className="at-field" value={form.brand} onChange={e => setForm({ ...form, brand: e.target.value })} />
+              </div>
+              <div>
+                <label className="at-label">Logo URL</label>
+                <input className="at-field" value={form.logo} onChange={e => setForm({ ...form, logo: e.target.value })} placeholder="https://example.com/logo.png" />
+              </div>
+              <div>
+                <label className="at-label">Tagline</label>
+                <input className="at-field" value={form.tagline} onChange={e => setForm({ ...form, tagline: e.target.value })} />
+              </div>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+                <div>
+                  <label className="at-label">Currency symbol</label>
+                  <input className="at-field at-mono" value={form.symbol} onChange={e => setForm({ ...form, symbol: e.target.value })} />
+                </div>
+                <div>
+                  <label className="at-label">Admin passcode</label>
+                  <input className="at-field at-mono" type="text" value={form.adminPass} onChange={e => setForm({ ...form, adminPass: e.target.value })} />
+                </div>
+              </div>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+                <div>
+                  <label className="at-label">Shipping — inside Dhaka</label>
+                  <input type="number" className="at-field at-mono" value={form.shipInsideDhaka} onChange={e => setForm({ ...form, shipInsideDhaka: Number(e.target.value) })} />
+                </div>
+                <div>
+                  <label className="at-label">Shipping — outside Dhaka</label>
+                  <input type="number" className="at-field at-mono" value={form.shipOutsideDhaka} onChange={e => setForm({ ...form, shipOutsideDhaka: Number(e.target.value) })} />
+                </div>
+              </div>
+              <div>
+                <label className="at-label">Admin panel link</label>
+                <input className="at-field at-mono" value={form.adminUrl} onChange={e => setForm({ ...form, adminUrl: e.target.value })} placeholder="https://admin.yourdomain.com" />
+              </div>
+              <div>
+                <label className="at-label">Address</label>
+                <input className="at-field" value={form.address} onChange={e => setForm({ ...form, address: e.target.value })} placeholder="Dhaka, Bangladesh" />
+              </div>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+                <div>
+                  <label className="at-label">Mobile number</label>
+                  <input className="at-field at-mono" value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} placeholder="01333707715" />
+                </div>
+                <div>
+                  <label className="at-label">WhatsApp number</label>
+                  <input className="at-field at-mono" value={form.whatsapp} onChange={e => setForm({ ...form, whatsapp: e.target.value })} placeholder="01333707715" />
+                </div>
+              </div>
+              <div>
+                <label className="at-label">Facebook page link</label>
+                <input className="at-field" value={form.facebook} onChange={e => setForm({ ...form, facebook: e.target.value })} placeholder="https://www.facebook.com/yourpage" />
+              </div>
+              <div style={{ marginTop: 8 }}>
+                <button onClick={save} className="at-btn at-btn-primary">Save settings</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
+</body>
+</html>
