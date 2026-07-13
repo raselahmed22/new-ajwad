@@ -61,10 +61,32 @@
     const RotateCcw = createIcon('↺');
     const Filter = createIcon('🔎');
     const ChevronDown = createIcon('▼');
-    const MapPin = createIcon('📍');
-    const Phone = createIcon('📞');
-    const Whatsapp = createIcon('💬');
-    const Facebook = createIcon('📘');
+    const UsersIcon = createIcon('👥');
+    const Shield = createIcon('🛡️');
+
+    const MapPin = ({ size = 18 }) => (
+      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 22s7-7.05 7-12.5A7 7 0 105 9.5C5 14.95 12 22 12 22z" stroke="currentColor" strokeWidth="1.6" fill="none" />
+        <circle cx="12" cy="9.5" r="2.4" fill="currentColor" />
+      </svg>
+    );
+    const Phone = ({ size = 18 }) => (
+      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M6.6 10.8c1.2 2.4 3.2 4.4 5.6 5.6l1.9-1.9c.24-.24.6-.32.9-.2 1 .33 2.06.5 3.14.5.55 0 1 .45 1 1V19.5c0 .55-.45 1-1 1C10.6 20.5 3.5 13.4 3.5 4.9c0-.55.45-1 1-1H8c.55 0 1 .45 1 1 0 1.08.17 2.14.5 3.14.1.3.03.65-.2.9L6.6 10.8z" fill="currentColor" />
+      </svg>
+    );
+    const Whatsapp = ({ size = 18 }) => (
+      <svg width={size} height={size} viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="12" cy="12" r="12" fill="#25D366" />
+        <path d="M12 5.5a6.4 6.4 0 00-5.5 9.7L5.5 18.5l3.4-1a6.4 6.4 0 105.1-12zm3.75 9.16c-.16.44-.9.85-1.24.9-.32.05-.7.07-1.13-.07a9.3 9.3 0 01-1.02-.38 7.5 7.5 0 01-2.9-2.57 3.2 3.2 0 01-.68-1.7c0-.5.27-.75.37-.85.1-.1.22-.13.3-.13h.2c.09 0 .2 0 .3.24.14.32.47 1.1.5 1.18.05.09.07.19.01.3-.05.1-.08.17-.16.26-.08.1-.17.21-.24.28-.08.08-.16.16-.07.32.1.16.43.72.94 1.17.65.58 1.19.76 1.36.84.16.08.26.07.36-.04.1-.11.4-.47.5-.63.1-.16.2-.13.34-.08.14.05.9.42 1.06.5.15.07.26.11.29.18.04.06.04.4-.12.83z" fill="#fff" />
+      </svg>
+    );
+    const Facebook = ({ size = 18 }) => (
+      <svg width={size} height={size} viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="12" cy="12" r="12" fill="#1877F2" />
+        <path d="M15.5 12.5h-1.9V20h-3v-7.5H9.2V10h1.4V8.6c0-1.7.8-3.4 3.3-3.4h2.2V7.6h-1.5c-.3 0-.6.2-.6.8V10h2.1l-.3 2.5z" fill="#fff" />
+      </svg>
+    );
 
     function TrendBars({ data, valueKey, color, format }) {
       const max = Math.max(...data.map(d => d[valueKey]), 1);
@@ -95,10 +117,11 @@
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap');
 
 .at-root{
-  --paper:#F1F0EC; --surface:#FFFFFF; --ink:#16161A; --ink-soft:#3B3B44;
-  --muted:#7A7A84; --line:#E4E3DD; --line-strong:#D5D4CD;
-  --accent:#2733E6; --accent-press:#1B24C4; --accent-tint:#EBEDFF;
-  --live:#188A4A; --live-tint:#E4F3EA; --warn:#B4634B; --warn-tint:#FBEFE9;
+  --paper:#F7F2E7; --surface:#FFFFFF; --ink:#201A12; --ink-soft:#4A4030;
+  --muted:#8A7F6B; --line:#E8DFC9; --line-strong:#D8CBA8;
+  --accent:#6B3FA0; --accent-press:#54307F; --accent-tint:#F1E9F7;
+  --gold:#C9932E; --gold-tint:#F8ECD3;
+  --live:#2E8B57; --live-tint:#E4F3EA; --warn:#B4634B; --warn-tint:#FBEFE9;
   --display:'Space Grotesk',system-ui,sans-serif;
   --body:'Inter',system-ui,sans-serif;
   --mono:'Space Mono',ui-monospace,monospace;
@@ -129,7 +152,7 @@
 .at-btn-sm{padding:8px 14px;font-size:12px;}
 .at-btn:disabled{opacity:.5;cursor:not-allowed;}
 
-.at-eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);}
+.at-eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);font-weight:600;}
 .at-pulse{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--live);position:relative;}
 .at-pulse::after{content:'';position:absolute;inset:0;border-radius:50%;background:var(--live);animation:atping 1.8s ease-out infinite;}
 @keyframes atping{0%{transform:scale(1);opacity:.6;}100%{transform:scale(3.2);opacity:0;}}
@@ -149,10 +172,10 @@
 /* store product card */
 .at-prod{background:var(--surface);border:1px solid var(--line);cursor:pointer;
   transition:border-color .18s ease,transform .18s ease;display:flex;flex-direction:column;}
-.at-prod:hover{border-color:var(--ink);}
+.at-prod:hover{border-color:var(--accent);}
 .at-prod:hover .at-prod-img{transform:scale(1.02);}
-.at-prod-imgwrap{overflow:hidden;aspect-ratio:3/4;background:var(--paper);}
-.at-prod-img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .5s ease;}
+.at-prod-imgwrap{overflow:hidden;aspect-ratio:1/1;background:var(--paper);}
+.at-prod-img{width:100%;height:100%;object-fit:contain;display:block;transition:transform .5s ease;}
 
 /* overlay + drawer */
 .at-scrim{position:fixed;inset:0;background:rgba(16,16,20,.5);z-index:60;animation:atfade .2s ease;}
@@ -189,7 +212,7 @@
 }
 `;
 
-    const KEYS = { products: "atelier:products", orders: "atelier:orders", settings: "atelier:settings" };
+    const KEYS = { products: "atelier:products", orders: "atelier:orders", settings: "atelier:settings", users: "atelier:users" };
 
     async function loadKey(key, fallback) {
       try {
@@ -211,8 +234,8 @@
     const CATEGORIES = ["Tops", "Knitwear", "Outerwear", "Bottoms", "Dresses", "Accessories"];
     const SWATCHES = [
       { bg: "#1B1B20", fg: "#E9E7DF" }, { bg: "#E7E3D8", fg: "#1B1B20" },
-      { bg: "#2733E6", fg: "#EDEBFF" }, { bg: "#7C8B6E", fg: "#F3F5EE" },
-      { bg: "#B4634B", fg: "#FBEFE9" }, { bg: "#46505C", fg: "#E9EEF2" },
+      { bg: "#6B3FA0", fg: "#F1E9F7" }, { bg: "#7C8B6E", fg: "#F3F5EE" },
+      { bg: "#B4634B", fg: "#FBEFE9" }, { bg: "#C9932E", fg: "#2A2013" },
       { bg: "#C9B08A", fg: "#2A2420" }, { bg: "#5B3A56", fg: "#F3E9F1" },
     ];
     const uid = (p = "id") => p + "_" + Math.random().toString(36).slice(2, 9);
@@ -266,7 +289,11 @@
       ];
     }
 
-    const DEFAULT_SETTINGS = { brand: "Ajwad Barakah", tagline: "Considered clothing, made to last.", currency: "BDT", symbol: "৳", shipInsideDhaka: 80, shipOutsideDhaka: 140, adminPass: "admin", logo: "Ajwad Logo.png", adminUrl: "index.html#admin", address: "Dhaka, Bangladesh", phone: "01333707715", whatsapp: "01333707715", facebook: "https://www.facebook.com/profile.php?id=61590579107774" };
+    const DEFAULT_SETTINGS = { brand: "Ajwad Barakah", tagline: "Considered clothing, made to last.", currency: "BDT", symbol: "৳", shipInsideDhaka: 80, shipOutsideDhaka: 140, adminPass: "12224253aiub", logo: "Ajwad Logo.png", adminUrl: "index.html#admin", address: "Dhaka, Bangladesh", phone: "01333707715", whatsapp: "01333707715", facebook: "https://www.facebook.com/profile.php?id=61590579107774" };
+
+    function seedUsers(adminPass) {
+      return [{ id: uid("user"), name: "Rasel Ahmed", username: "Rasel Ahmed", password: adminPass || "12224253aiub", role: "super_admin" }];
+    }
 
     const useMoney = (settings) => useCallback(
       (n) => settings.symbol + Number(n || 0).toLocaleString(undefined, { minimumFractionDigits: n % 1 ? 2 : 0, maximumFractionDigits: 2 }),
@@ -288,7 +315,7 @@
 
     function ProductImage({ product, className }) {
       if (product.image) {
-        return <img src={product.image} alt={product.name} className={className} style={{ width: "100%", height: "100%", objectFit: "cover" }} />;
+        return <img src={product.image} alt={product.name} className={className} style={{ width: "100%", height: "100%", objectFit: "contain" }} />;
       }
       const sw = SWATCHES[product.colorKey % SWATCHES.length];
       const words = product.name.split(" ");
@@ -304,11 +331,44 @@
       );
     }
 
+    function ImagePicker({ value, onChange, idSuffix }) {
+      return (
+        <div>
+          <label className="at-label">Product image</label>
+          {value && (
+            <div style={{ width: 100, height: 100, borderRadius: 2, overflow: "hidden", marginBottom: 10, background: "var(--paper)" }}>
+              <ProductImage product={{ image: value, name: "" }} />
+            </div>
+          )}
+          <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
+            <button type="button" onClick={() => document.getElementById("img-upload-" + idSuffix).click()} className="at-btn at-btn-ghost at-btn-sm">
+              Upload from device
+            </button>
+            <input id={"img-upload-" + idSuffix} type="file" accept="image/*" style={{ display: "none" }}
+              onChange={e => {
+                const file = e.target.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = () => onChange(reader.result);
+                reader.readAsDataURL(file);
+              }} />
+            {value && (
+              <button type="button" onClick={() => onChange("")} className="at-btn at-btn-ghost at-btn-sm">
+                Remove image
+              </button>
+            )}
+          </div>
+          <input className="at-field" style={{ marginTop: 8 }} value={value || ""} onChange={e => onChange(e.target.value)} placeholder="or paste an image URL (cloud link)" />
+        </div>
+      );
+    }
+
     function App() {
       const [ready, setReady] = useState(false);
       const [products, setProducts] = useState([]);
       const [orders, setOrders] = useState([]);
       const [settings, setSettings] = useState(DEFAULT_SETTINGS);
+      const [users, setUsers] = useState([]);
       const [mode, setMode] = useState(() => (window.location.hash === "#admin" ? "admin" : "store"));
       const [cart, setCart] = useState([]);
       const [toast, setToast] = useState(null);
@@ -318,9 +378,11 @@
           let p = await loadKey(KEYS.products, null);
           let o = await loadKey(KEYS.orders, null);
           let s = await loadKey(KEYS.settings, null);
+          let u = await loadKey(KEYS.users, null);
           if (!p) { p = seedProducts(); await saveKey(KEYS.products, p); }
           if (!o) { o = seedOrders(p); await saveKey(KEYS.orders, o); }
           if (!s) { s = DEFAULT_SETTINGS; await saveKey(KEYS.settings, s); }
+          if (!u) { u = seedUsers(s.adminPass); await saveKey(KEYS.users, u); }
           // Merge saved settings with defaults, but keep the default logo if saved logo is empty
           const mergedSettings = {
             ...DEFAULT_SETTINGS,
@@ -328,13 +390,14 @@
             logo: s?.logo || DEFAULT_SETTINGS.logo,
             brand: s?.brand || DEFAULT_SETTINGS.brand
           };
-          setProducts(p); setOrders(o); setSettings(mergedSettings); setReady(true);
+          setProducts(p); setOrders(o); setSettings(mergedSettings); setUsers(u); setReady(true);
         })();
       }, []);
 
       useEffect(() => { if (ready) saveKey(KEYS.products, products); }, [products, ready]);
       useEffect(() => { if (ready) saveKey(KEYS.orders, orders); }, [orders, ready]);
       useEffect(() => { if (ready) saveKey(KEYS.settings, settings); }, [settings, ready]);
+      useEffect(() => { if (ready) saveKey(KEYS.users, users); }, [users, ready]);
 
       const notify = useCallback((msg) => { setToast(msg); setTimeout(() => setToast(null), 2600); }, []);
 
@@ -379,6 +442,7 @@
             <Admin
               products={products} setProducts={setProducts} orders={orders} setOrders={setOrders}
               settings={settings} setSettings={setSettings} money={money}
+              users={users} setUsers={setUsers}
               notify={notify}
               onExit={() => { window.location.hash = ""; setMode("store"); }} onReset={resetAll}
             />
@@ -446,12 +510,12 @@
 
       return (
         <div>
-          <header style={{ position: "sticky", top: 0, zIndex: 40, background: "rgba(241,240,236,.9)", backdropFilter: "blur(10px)", borderBottom: "1px solid var(--line)" }}>
+          <header style={{ position: "sticky", top: 0, zIndex: 40, background: "rgba(247,242,231,.85)", backdropFilter: "blur(10px)", borderBottom: "2px solid var(--accent)" }}>
             <div style={{ maxWidth: 1240, margin: "0 auto", padding: "0 24px", height: 80, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
               <button onClick={() => { setView("home"); setCat("All"); }} style={{ display: "flex", alignItems: "center", gap: 16, border: "none", background: "transparent", cursor: "pointer", padding: 0 }}>
                 {settings.logo ? (
                   <>
-                    <img src={settings.logo} alt={settings.brand} style={{ height: 76, width: "auto", maxWidth: 320 }} />
+                    <img src={settings.logo} alt={settings.brand} style={{ height: 76, width: "auto", maxWidth: 320, borderRadius: "50%" }} />
                     <span className="at-disp" style={{ fontSize: 22, fontWeight: 700, letterSpacing: ".24em" }}>{settings.brand}</span>
                   </>
                 ) : (
@@ -467,18 +531,20 @@
             </div>
           </header>
 
-          <section style={{ maxWidth: 1240, margin: "0 auto", padding: "56px 24px 40px" }}>
-            <div className="at-eyebrow" style={{ marginBottom: 16 }}>New Season · {new Date().getFullYear()}</div>
+          <section style={{ background: "linear-gradient(135deg, var(--accent-tint) 0%, var(--gold-tint) 100%)" }}>
+          <div style={{ maxWidth: 1240, margin: "0 auto", padding: "56px 24px 40px" }}>
+            <span className="at-eyebrow" style={{ background: "var(--accent)", color: "#fff", padding: "7px 16px", borderRadius: 20, display: "inline-block", marginBottom: 18 }}>New Season · {new Date().getFullYear()}</span>
             <h1 className="at-disp" style={{ fontSize: "clamp(38px,6vw,72px)", fontWeight: 700, lineHeight: 1.02, maxWidth: 820, margin: 0 }}>
               {settings.tagline}
             </h1>
+          </div>
           </section>
 
           <div style={{ maxWidth: 1240, margin: "0 auto", padding: "0 24px" }}>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 10, alignItems: "center", paddingBottom: 20, borderBottom: "1px solid var(--line)", justifyContent: "space-between" }}>
               <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
                 {["All", ...CATEGORIES].map(c => (
-                  <button key={c} onClick={() => setCat(c)} className="at-btn at-btn-sm" style={{ background: cat === c ? "var(--ink)" : "transparent", color: cat === c ? "var(--paper)" : "var(--ink-soft)", border: cat === c ? "none" : "1px solid var(--line-strong)" }}>{c}</button>
+                  <button key={c} onClick={() => setCat(c)} className="at-btn at-btn-sm" style={{ background: cat === c ? "var(--accent)" : "transparent", color: cat === c ? "#fff" : "var(--ink-soft)", border: cat === c ? "none" : "1px solid var(--line-strong)" }}>{c}</button>
                 ))}
               </div>
               <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
@@ -520,13 +586,13 @@
             )}
           </section>
 
-          <footer style={{ borderTop: "1px solid var(--line)", background: "var(--ink)", color: "var(--paper)" }}>
+          <footer style={{ borderTop: "1px solid var(--line)", background: "linear-gradient(135deg, #1A1420 0%, #241A33 55%, #2E1F1A 100%)", color: "var(--paper)" }}>
             <div style={{ maxWidth: 1240, margin: "0 auto", padding: "56px 24px 28px" }}>
               <div style={{ display: "grid", gridTemplateColumns: "1.3fr 1fr 1fr", gap: 40 }} className="at-footer-grid">
                 <div>
                   {settings.logo ? (
                     <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                      <img src={settings.logo} alt={settings.brand} style={{ height: 44, width: "auto", maxWidth: 220, filter: "brightness(0) invert(1)" }} />
+                      <img src={settings.logo} alt={settings.brand} style={{ height: 52, width: "auto", maxWidth: 220, borderRadius: "50%" }} />
                       <span className="at-disp" style={{ fontSize: 16, letterSpacing: ".24em", fontWeight: 700 }}>{settings.brand}</span>
                     </div>
                   ) : (
@@ -539,13 +605,13 @@
                   <div className="at-eyebrow" style={{ color: "rgba(241,240,236,.5)", marginBottom: 16 }}>Contact</div>
                   <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 13, color: "rgba(241,240,236,.85)" }}>
-                      <span style={{ opacity: 0.7 }}><MapPin /></span> {settings.address}
+                      <span style={{ opacity: 0.75, color: "var(--gold)" }}><MapPin /></span> {settings.address}
                     </div>
                     <a href={`tel:+${bdIntl(settings.phone)}`} style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 13, color: "rgba(241,240,236,.85)", textDecoration: "none" }}>
-                      <span style={{ opacity: 0.7 }}><Phone /></span> {settings.phone}
+                      <span style={{ opacity: 0.75, color: "var(--gold)" }}><Phone /></span> {settings.phone}
                     </a>
                     <a href={`https://wa.me/${bdIntl(settings.whatsapp)}`} target="_blank" rel="noopener noreferrer" style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 13, color: "rgba(241,240,236,.85)", textDecoration: "none" }}>
-                      <span style={{ opacity: 0.7 }}><Whatsapp /></span> WhatsApp: {settings.whatsapp}
+                      <Whatsapp /> {settings.whatsapp}
                     </a>
                   </div>
                 </div>
@@ -553,7 +619,7 @@
                 <div>
                   <div className="at-eyebrow" style={{ color: "rgba(241,240,236,.5)", marginBottom: 16 }}>Follow us</div>
                   <a href={settings.facebook} target="_blank" rel="noopener noreferrer" style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 13, color: "rgba(241,240,236,.85)", textDecoration: "none" }}>
-                    <span style={{ opacity: 0.7 }}><Facebook /></span> Facebook Page
+                    <Facebook /> Facebook Page
                   </a>
                 </div>
               </div>
@@ -586,7 +652,7 @@
                     </div>
                   ) : cart.map(i => (
                     <div key={i.key} style={{ display: "flex", gap: 12, padding: "14px 22px", borderBottom: "1px solid var(--line)" }}>
-                      <div style={{ width: 62, height: 82, flexShrink: 0, overflow: "hidden" }}><ProductImage product={i} /></div>
+                      <div style={{ width: 72, height: 72, flexShrink: 0, overflow: "hidden", background: "var(--paper)" }}><ProductImage product={i} /></div>
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <div className="at-disp" style={{ fontSize: 13, fontWeight: 600 }}>{i.name}</div>
                         <div className="at-mono" style={{ fontSize: 11, color: "var(--muted)", marginTop: 3 }}>Size {i.size}</div>
@@ -631,7 +697,7 @@
           <div className="at-scrim" onClick={onClose} />
           <div className="at-modal" onClick={onClose}>
             <div className="at-card at-rise" onClick={e => e.stopPropagation()} style={{ maxWidth: 780, width: "100%", display: "grid", gridTemplateColumns: "1fr 1fr", overflow: "hidden", marginTop: 40 }}>
-              <div style={{ aspectRatio: "3/4", background: "var(--paper)", minWidth: 0 }}><ProductImage product={product} /></div>
+              <div style={{ aspectRatio: "1/1", background: "var(--paper)", minWidth: 0 }}><ProductImage product={product} /></div>
               <div style={{ padding: 28, display: "flex", flexDirection: "column" }}>
                 <div style={{ display: "flex", justifyContent: "space-between" }}>
                   <span className="at-eyebrow">{product.category}</span>
@@ -670,8 +736,17 @@
       const shipping = location === "dhaka" ? settings.shipInsideDhaka : settings.shipOutsideDhaka;
       const total = subtotal + shipping;
 
-      const valid = form.name && /\S+@\S+/.test(form.email) && form.address && form.city && form.zip
-        && (payMethod === "cod" || (form.card.replace(/\s/g, "").length === 16 && form.exp.length === 5 && form.cvc.length >= 3));
+      const missing = [];
+      if (!form.name.trim()) missing.push("full name");
+      if (!/\S+@\S+\.\S+/.test(form.email)) missing.push("a valid email");
+      if (!form.address.trim()) missing.push("address");
+      if (!form.city.trim()) missing.push("city");
+      if (payMethod === "card") {
+        if (form.card.replace(/\s/g, "").length !== 16) missing.push("a 16-digit card number");
+        if (form.exp.length !== 5) missing.push("card expiry (MM/YY)");
+        if (form.cvc.length < 3) missing.push("CVC");
+      }
+      const valid = missing.length === 0;
 
       const submit = () => {
         if (!valid || processing) return;
@@ -694,7 +769,7 @@
               <button onClick={onBack} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, color: "var(--muted)", border: "none", background: "transparent", cursor: "pointer" }}><ArrowLeft /> Back to store</button>
               {settings.logo ? (
                 <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                  <img src={settings.logo} alt={settings.brand} style={{ height: 48, width: "auto", maxWidth: 220 }} />
+                  <img src={settings.logo} alt={settings.brand} style={{ height: 48, width: "auto", maxWidth: 220, borderRadius: "50%" }} />
                   <span className="at-disp" style={{ fontSize: 16, letterSpacing: ".24em", fontWeight: 700 }}>{settings.brand}</span>
                 </div>
               ) : (
@@ -713,8 +788,8 @@
                 <Field label="Email" value={form.email} onChange={set("email")} placeholder="you@email.com" type="email" />
                 <Field label="Address" value={form.address} onChange={set("address")} placeholder="12 Market St" />
                 <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: 12 }}>
-                  <Field label="City" value={form.city} onChange={set("city")} placeholder="Portland" />
-                  <Field label="ZIP" value={form.zip} onChange={set("zip")} placeholder="97201" />
+                  <Field label="City" value={form.city} onChange={set("city")} placeholder="Dhaka" />
+                  <Field label="ZIP (optional)" value={form.zip} onChange={set("zip")} placeholder="1212" />
                 </div>
                 <div style={{ marginBottom: 14 }}>
                   <label className="at-label">Delivery location</label>
@@ -760,6 +835,11 @@
                   ? (payMethod === "cod" ? "Placing order…" : "Processing payment…")
                   : payMethod === "cod" ? <>Place order · {money(total)} <ArrowRight /></> : <>Pay {money(total)} <Lock /></>}
               </button>
+              {!valid && !processing && (
+                <p className="at-mono" style={{ fontSize: 11, color: "var(--warn)", marginTop: 10, textAlign: "center" }}>
+                  Still needed: {missing.join(", ")}
+                </p>
+              )}
             </div>
 
             <aside>
@@ -767,7 +847,7 @@
                 <div className="at-eyebrow" style={{ marginBottom: 16 }}>Order summary</div>
                 {cart.map(i => (
                   <div key={i.key} style={{ display: "flex", gap: 12, marginBottom: 14 }}>
-                    <div style={{ width: 44, height: 58, flexShrink: 0, overflow: "hidden" }}><ProductImage product={i} /></div>
+                    <div style={{ width: 50, height: 50, flexShrink: 0, overflow: "hidden", background: "var(--paper)" }}><ProductImage product={i} /></div>
                     <div style={{ flex: 1 }}>
                       <div className="at-disp" style={{ fontSize: 13, fontWeight: 600 }}>{i.name}</div>
                       <div className="at-mono" style={{ fontSize: 11, color: "var(--muted)" }}>{i.size} · ×{i.qty}</div>
@@ -823,17 +903,19 @@
       );
     }
 
-    function Admin({ products, setProducts, orders, setOrders, settings, setSettings, money, notify, onExit, onReset }) {
-      const [authed, setAuthed] = useState(false);
+    function Admin({ products, setProducts, orders, setOrders, settings, setSettings, money, users, setUsers, notify, onExit, onReset }) {
+      const [currentUser, setCurrentUser] = useState(null);
+      const [username, setUsername] = useState("");
       const [pass, setPass] = useState("");
       const [show, setShow] = useState(false);
       const [err, setErr] = useState("");
       const [nav, setNav] = useState("dashboard");
 
-      if (!authed) {
+      if (!currentUser) {
         const attempt = () => {
-          if (pass === settings.adminPass) { setAuthed(true); setErr(""); }
-          else setErr("That passcode doesn't match. Try again.");
+          const u = users.find(u => u.username === username.trim() && u.password === pass);
+          if (u) { setCurrentUser(u); setErr(""); }
+          else setErr("That username/password doesn't match. Try again.");
         };
         return (
           <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
@@ -841,51 +923,62 @@
             <div className="at-card at-rise" style={{ maxWidth: 380, width: "100%", padding: 36 }}>
               {settings.logo ? (
                 <div style={{ textAlign: "center", marginBottom: 16 }}>
-                  <img src={settings.logo} alt={settings.brand} style={{ height: 64, width: "auto", maxWidth: 280, filter: "none" }} />
+                  <img src={settings.logo} alt={settings.brand} style={{ height: 64, width: "auto", maxWidth: 280, borderRadius: "50%" }} />
                   <div className="at-disp" style={{ fontSize: 18, letterSpacing: ".24em", fontWeight: 700, marginTop: 10 }}>{settings.brand}</div>
                 </div>
               ) : (
                 <div className="at-disp" style={{ fontSize: 20, letterSpacing: ".24em", fontWeight: 700, textAlign: "center" }}>{settings.brand}</div>
               )}
               <div className="at-eyebrow" style={{ textAlign: "center", marginTop: 6, marginBottom: 28 }}>Operations · Admin access</div>
-              <label className="at-label">Passcode</label>
+              <label className="at-label">Username</label>
+              <input value={username} autoFocus
+                onChange={e => setUsername(e.target.value)} onKeyDown={e => e.key === "Enter" && attempt()}
+                className="at-field" placeholder="admin" style={{ marginBottom: 14 }} />
+              <label className="at-label">Password</label>
               <div style={{ position: "relative" }}>
-                <input type={show ? "text" : "password"} value={pass} autoFocus
+                <input type={show ? "text" : "password"} value={pass}
                   onChange={e => setPass(e.target.value)} onKeyDown={e => e.key === "Enter" && attempt()}
                   className="at-field at-mono" placeholder="••••••" style={{ paddingRight: 40 }} />
                 <button onClick={() => setShow(s => !s)} style={{ position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)", color: "var(--muted)", fontSize: 16 }}>{show ? <EyeOff /> : <Eye />}</button>
               </div>
               {err && <p style={{ color: "var(--warn)", fontSize: 12, marginTop: 8 }}>{err}</p>}
               <button onClick={attempt} className="at-btn at-btn-dark" style={{ width: "100%", marginTop: 20 }}>Enter dashboard</button>
-              <p className="at-mono" style={{ fontSize: 11, color: "var(--muted)", marginTop: 16, textAlign: "center" }}>Demo passcode: <b>{settings.adminPass}</b></p>
-              <button onClick={onExit} style={{ width: "100%", marginTop: 12, fontSize: 12, color: "var(--muted)" }}>← Back to storefront</button>
+              <button onClick={onExit} style={{ width: "100%", marginTop: 16, fontSize: 12, color: "var(--muted)" }}>← Back to storefront</button>
             </div>
           </div>
         );
       }
 
+      const isSuperAdmin = currentUser.role === "super_admin";
       const NAV = [
-        { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
-        { id: "products", label: "Products", icon: Package },
-        { id: "orders", label: "Orders", icon: Receipt },
-        { id: "settings", label: "Settings", icon: SettingsIcon },
+        { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, color: "#5B8DEF" },
+        { id: "products", label: "Products", icon: Package, color: "#7C8B6E" },
+        { id: "orders", label: "Orders", icon: Receipt, color: "#D6A756" },
+        { id: "settings", label: "Settings", icon: SettingsIcon, color: "#C77B9C" },
+        ...(isSuperAdmin ? [{ id: "users", label: "Users", icon: UsersIcon, color: "#5BC0BE" }] : []),
       ];
 
       return (
         <div style={{ display: "flex", minHeight: "100vh" }}>
-          <aside style={{ width: 232, background: "var(--ink)", color: "var(--paper)", padding: "24px 16px", display: "flex", flexDirection: "column", position: "sticky", top: 0, height: "100vh", flexShrink: 0 }}>
+          <aside style={{ width: 232, background: "linear-gradient(180deg, #1A1420 0%, #241A33 55%, #2E1F1A 100%)", color: "var(--paper)", padding: "24px 16px", display: "flex", flexDirection: "column", position: "sticky", top: 0, height: "100vh", flexShrink: 0 }}>
             {settings.logo ? (
-              <div style={{ marginBottom: 32, padding: "0 10px" }}>
-                <img src={settings.logo} alt={settings.brand} style={{ height: 48, width: "auto", maxWidth: 220, filter: "brightness(0) invert(1)" }} />
+              <div style={{ marginBottom: 20, padding: "0 10px" }}>
+                <img src={settings.logo} alt={settings.brand} style={{ height: 56, width: "auto", maxWidth: 220, borderRadius: "50%" }} />
                 <div className="at-disp" style={{ fontSize: 14, letterSpacing: ".2em", fontWeight: 700, marginTop: 10 }}>{settings.brand}</div>
               </div>
             ) : (
-              <div className="at-disp" style={{ fontSize: 16, letterSpacing: ".24em", fontWeight: 700, marginBottom: 32, padding: "0 10px" }}>{settings.brand}</div>
+              <div className="at-disp" style={{ fontSize: 16, letterSpacing: ".24em", fontWeight: 700, marginBottom: 20, padding: "0 10px" }}>{settings.brand}</div>
             )}
+            <div style={{ padding: "0 10px", marginBottom: 20, display: "flex", alignItems: "center", gap: 8 }}>
+              <span className="at-mono" style={{ fontSize: 12, color: "rgba(241,240,236,.7)" }}>{currentUser.name}</span>
+              <span className="at-badge" style={{ background: isSuperAdmin ? "rgba(91,192,190,.18)" : "rgba(255,255,255,.1)", color: isSuperAdmin ? "#5BC0BE" : "rgba(241,240,236,.7)", fontSize: 9 }}>
+                {isSuperAdmin ? "Super admin" : "Admin"}
+              </span>
+            </div>
             <nav style={{ flex: 1, display: "flex", flexDirection: "column", gap: 4 }}>
               {NAV.map(n => (
                 <button key={n.id} onClick={() => setNav(n.id)} className={"at-navitem" + (nav === n.id ? " active" : "")}>
-                  <span style={{ fontSize: 18 }}><n.icon /></span>
+                  <span style={{ fontSize: 15, color: nav === n.id ? "#fff" : n.color }}><n.icon /></span>
                   {n.label}
                 </button>
               ))}
@@ -899,16 +992,18 @@
           </aside>
 
           <main style={{ flex: 1, padding: 32, minWidth: 0 }}>
-            {nav === "dashboard" && <Dashboard products={products} orders={orders} money={money} onReset={onReset} />}
+            {nav === "dashboard" && <Dashboard products={products} orders={orders} money={money} onReset={onReset} isSuperAdmin={isSuperAdmin} />}
             {nav === "products" && <Products products={products} setProducts={setProducts} money={money} notify={notify} />}
-            {nav === "orders" && <Orders orders={orders} setOrders={setOrders} money={money} notify={notify} />}
+            {nav === "orders" && <Orders orders={orders} setOrders={setOrders} money={money} notify={notify} isSuperAdmin={isSuperAdmin} />}
             {nav === "settings" && <Settings settings={settings} setSettings={setSettings} notify={notify} />}
+            {nav === "users" && isSuperAdmin && <Users users={users} setUsers={setUsers} currentUser={currentUser} setCurrentUser={setCurrentUser} notify={notify} />}
           </main>
         </div>
       );
     }
 
-    function Dashboard({ products, orders, money, onReset }) {
+    function Dashboard({ products, orders, money, onReset, isSuperAdmin }) {
+      const [confirmReset, setConfirmReset] = useState(false);
       const totalRevenue = orders.reduce((s, o) => o.status === "delivered" || o.status === "paid" ? s + o.total : s, 0);
       const pendingOrders = orders.filter(o => o.status === "pending" || o.status === "paid").length;
       const lowStock = products.filter(p => p.stock > 0 && p.stock <= 5).length;
@@ -934,39 +1029,72 @@
         <div style={{ maxWidth: 1100 }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 28 }}>
             <div>
-              <h1 className="at-disp" style={{ fontSize: 28, fontWeight: 700, margin: 0 }}>Dashboard</h1>
+              <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                <span style={{ width: 40, height: 40, borderRadius: 10, background: "rgba(91,141,239,.14)", color: "#5B8DEF", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}><LayoutDashboard /></span>
+                <h1 className="at-disp" style={{ fontSize: 28, fontWeight: 700, margin: 0 }}>Dashboard</h1>
+              </div>
               <p style={{ color: "var(--muted)", marginTop: 4, fontSize: 14 }}>Overview of your store</p>
             </div>
-            <button onClick={onReset} className="at-btn at-btn-ghost">
-              <RotateCcw /> Reset demo
-            </button>
+            {isSuperAdmin && (
+              <button onClick={() => setConfirmReset(true)} className="at-btn at-btn-ghost">
+                <RotateCcw /> Reset demo
+              </button>
+            )}
           </div>
 
+          {confirmReset && (
+            <>
+              <div className="at-scrim" onClick={() => setConfirmReset(false)} />
+              <div className="at-modal">
+                <div className="at-card at-rise" style={{ width: "100%", maxWidth: 420, padding: 24 }} onClick={e => e.stopPropagation()}>
+                  <h2 className="at-disp" style={{ fontSize: 18, fontWeight: 700, marginBottom: 10 }}>Reset all store data?</h2>
+                  <p style={{ color: "var(--muted)", fontSize: 13, lineHeight: 1.6 }}>This wipes <b>all</b> your real products and orders — including anything you've deleted or added — and replaces them with fresh sample data. This can't be undone.</p>
+                  <div style={{ display: "flex", gap: 8, marginTop: 20, justifyContent: "flex-end" }}>
+                    <button onClick={() => setConfirmReset(false)} className="at-btn at-btn-ghost">Cancel</button>
+                    <button onClick={() => { onReset(); setConfirmReset(false); }} className="at-btn at-btn-primary" style={{ background: "var(--warn)" }}>Reset everything</button>
+                  </div>
+                </div>
+              </div>
+            </>
+          )}
+
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(200px,1fr))", gap: 16, marginBottom: 24 }}>
-            <div className="at-card" style={{ padding: 20 }}>
-              <div className="at-eyebrow" style={{ marginBottom: 8 }}>Total revenue</div>
+            <div className="at-card" style={{ padding: 20, borderTop: "3px solid var(--accent)" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
+                <span style={{ width: 32, height: 32, borderRadius: 8, background: "var(--accent-tint)", color: "var(--accent)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 15 }}><DollarSign /></span>
+                <div className="at-eyebrow">Total revenue</div>
+              </div>
               <div className="at-stat-num">{money(totalRevenue)}</div>
               <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 12, color: "var(--live)", fontSize: 13 }}>
                 <TrendingUp />
                 All time
               </div>
             </div>
-            <div className="at-card" style={{ padding: 20 }}>
-              <div className="at-eyebrow" style={{ marginBottom: 8 }}>Orders to fulfill</div>
+            <div className="at-card" style={{ padding: 20, borderTop: "3px solid #5B3A56" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
+                <span style={{ width: 32, height: 32, borderRadius: 8, background: "#F3E9F1", color: "#5B3A56", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 15 }}><Receipt /></span>
+                <div className="at-eyebrow">Orders to fulfill</div>
+              </div>
               <div className="at-stat-num">{pendingOrders}</div>
               <div style={{ marginTop: 12, color: "var(--muted)", fontSize: 13 }}>
                 Pending + Paid
               </div>
             </div>
-            <div className="at-card" style={{ padding: 20 }}>
-              <div className="at-eyebrow" style={{ marginBottom: 8 }}>Low stock</div>
+            <div className="at-card" style={{ padding: 20, borderTop: "3px solid var(--warn)" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
+                <span style={{ width: 32, height: 32, borderRadius: 8, background: "var(--warn-tint)", color: "var(--warn)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 15 }}><AlertTriangle /></span>
+                <div className="at-eyebrow">Low stock</div>
+              </div>
               <div className="at-stat-num" style={{ color: lowStock > 0 ? "var(--warn)" : "inherit" }}>{lowStock}</div>
               <div style={{ marginTop: 12, color: "var(--muted)", fontSize: 13 }}>
                 Products running low
               </div>
             </div>
-            <div className="at-card" style={{ padding: 20 }}>
-              <div className="at-eyebrow" style={{ marginBottom: 8 }}>Out of stock</div>
+            <div className="at-card" style={{ padding: 20, borderTop: "3px solid #46505C" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
+                <span style={{ width: 32, height: 32, borderRadius: 8, background: "#EEF0F2", color: "#46505C", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 15 }}><Boxes /></span>
+                <div className="at-eyebrow">Out of stock</div>
+              </div>
               <div className="at-stat-num" style={{ color: outOfStock > 0 ? "var(--warn)" : "inherit" }}>{outOfStock}</div>
               <div style={{ marginTop: 12, color: "var(--muted)", fontSize: 13 }}>
                 Need restocking
@@ -1018,6 +1146,8 @@
     function Products({ products, setProducts, money, notify }) {
       const [editing, setEditing] = useState(null);
       const [editForm, setEditForm] = useState({});
+      const [adding, setAdding] = useState(false);
+      const [addForm, setAddForm] = useState({});
 
       const updateProduct = (id, updates) => {
         setProducts(ps => ps.map(p => p.id === id ? { ...p, ...updates } : p));
@@ -1025,13 +1155,40 @@
         setEditing(null);
       };
 
+      const addProduct = () => {
+        if (!addForm.name) return;
+        const p = {
+          id: uid("prod"),
+          name: addForm.name,
+          category: addForm.category || CATEGORIES[0],
+          price: Number(addForm.price) || 0,
+          stock: Number(addForm.stock) || 0,
+          sizes: (addForm.sizes || "One Size").split(",").map(s => s.trim()).filter(Boolean),
+          description: addForm.description || "",
+          status: "active",
+          colorKey: products.length % SWATCHES.length,
+          image: addForm.image || "",
+          createdAt: Date.now(),
+        };
+        setProducts(ps => [p, ...ps]);
+        notify("Product added");
+        setAdding(false);
+        setAddForm({});
+      };
+
       return (
         <div style={{ maxWidth: 1100 }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 24 }}>
             <div>
-              <h1 className="at-disp" style={{ fontSize: 28, fontWeight: 700, margin: 0 }}>Products</h1>
+              <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                <span style={{ width: 40, height: 40, borderRadius: 10, background: "rgba(124,139,110,.16)", color: "#7C8B6E", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}><Package /></span>
+                <h1 className="at-disp" style={{ fontSize: 28, fontWeight: 700, margin: 0 }}>Products</h1>
+              </div>
               <p style={{ color: "var(--muted)", marginTop: 4, fontSize: 14 }}>{products.length} products</p>
             </div>
+            <button onClick={() => { setAdding(true); setAddForm({}); }} className="at-btn at-btn-primary">
+              <Plus /> Add product
+            </button>
           </div>
 
           <div className="at-card" style={{ overflow: "hidden" }}>
@@ -1050,7 +1207,7 @@
                   <tr key={p.id}>
                     <td>
                       <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                        <div style={{ width: 40, height: 54, borderRadius: 2, overflow: "hidden", background: "var(--paper)" }}>
+                        <div style={{ width: 48, height: 48, borderRadius: 2, overflow: "hidden", background: "var(--paper)" }}>
                           <ProductImage product={p} />
                         </div>
                         <div>
@@ -1067,7 +1224,7 @@
                       </span>
                     </td>
                     <td style={{ textAlign: "right" }}>
-                      <button onClick={() => setEditing(p.id)} style={{ color: "var(--muted)", fontSize: 16 }}><Pencil /></button>
+                      <button onClick={() => { setEditing(p.id); setEditForm({}); }} style={{ color: "var(--muted)", fontSize: 16 }}><Pencil /></button>
                     </td>
                   </tr>
                 ))}
@@ -1099,6 +1256,7 @@
                         <label className="at-label">Stock</label>
                         <input type="number" className="at-field at-mono" defaultValue={p.stock} onChange={e => setEditForm({ ...editForm, stock: Number(e.target.value) })} />
                       </div>
+                      <ImagePicker value={editForm.image ?? p.image} onChange={img => setEditForm({ ...editForm, image: img })} idSuffix={p.id} />
                       <div style={{ display: "flex", gap: 8, marginTop: 8, justifyContent: "flex-end" }}>
                         <button onClick={() => setEditing(null)} className="at-btn at-btn-ghost">Cancel</button>
                         <button onClick={() => updateProduct(p.id, editForm)} className="at-btn at-btn-primary">Save changes</button>
@@ -1109,38 +1267,124 @@
               </>
             );
           })()}
+
+          {adding && (
+            <>
+              <div className="at-scrim" onClick={() => setAdding(false)} />
+              <div className="at-modal">
+                <div className="at-card at-rise" style={{ width: "100%", maxWidth: 560, padding: 24 }} onClick={e => e.stopPropagation()}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+                    <h2 className="at-disp" style={{ fontSize: 20, fontWeight: 700 }}>Add product</h2>
+                    <button onClick={() => setAdding(false)} style={{ color: "var(--muted)", fontSize: 18 }}><X /></button>
+                  </div>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+                    <div>
+                      <label className="at-label">Name</label>
+                      <input className="at-field" value={addForm.name || ""} onChange={e => setAddForm({ ...addForm, name: e.target.value })} placeholder="Boxy Poplin Shirt" />
+                    </div>
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+                      <div>
+                        <label className="at-label">Category</label>
+                        <select className="at-field" value={addForm.category || CATEGORIES[0]} onChange={e => setAddForm({ ...addForm, category: e.target.value })}>
+                          {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+                        </select>
+                      </div>
+                      <div>
+                        <label className="at-label">Sizes (comma separated)</label>
+                        <input className="at-field" value={addForm.sizes || ""} onChange={e => setAddForm({ ...addForm, sizes: e.target.value })} placeholder="S, M, L, XL" />
+                      </div>
+                    </div>
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+                      <div>
+                        <label className="at-label">Price</label>
+                        <input type="number" className="at-field at-mono" value={addForm.price ?? ""} onChange={e => setAddForm({ ...addForm, price: e.target.value })} />
+                      </div>
+                      <div>
+                        <label className="at-label">Stock</label>
+                        <input type="number" className="at-field at-mono" value={addForm.stock ?? ""} onChange={e => setAddForm({ ...addForm, stock: e.target.value })} />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="at-label">Description</label>
+                      <input className="at-field" value={addForm.description || ""} onChange={e => setAddForm({ ...addForm, description: e.target.value })} />
+                    </div>
+                    <ImagePicker value={addForm.image} onChange={img => setAddForm({ ...addForm, image: img })} idSuffix="new" />
+                    <div style={{ display: "flex", gap: 8, marginTop: 8, justifyContent: "flex-end" }}>
+                      <button onClick={() => setAdding(false)} className="at-btn at-btn-ghost">Cancel</button>
+                      <button onClick={addProduct} disabled={!addForm.name} className="at-btn at-btn-primary">Add product</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </>
+          )}
         </div>
       );
     }
 
-    function Orders({ orders, setOrders, money, notify }) {
+    function Orders({ orders, setOrders, money, notify, isSuperAdmin }) {
+      const [confirmDelete, setConfirmDelete] = useState(null);
+      const [selected, setSelected] = useState([]);
       const updateStatus = (id, status) => {
         setOrders(os => os.map(o => o.id === id ? { ...o, status } : o));
         notify("Order updated");
       };
+      const toggleSelect = (id) => setSelected(s => s.includes(id) ? s.filter(x => x !== id) : [...s, id]);
+      const toggleSelectAll = () => setSelected(s => s.length === orders.length ? [] : orders.map(o => o.id));
+      const deleteOrders = (ids) => {
+        setOrders(os => os.filter(o => !ids.includes(o.id)));
+        notify(ids.length > 1 ? `${ids.length} orders removed` : "Order removed");
+        setSelected(s => s.filter(id => !ids.includes(id)));
+        setConfirmDelete(null);
+      };
 
       return (
         <div style={{ maxWidth: 1100 }}>
-          <div style={{ marginBottom: 24 }}>
-            <h1 className="at-disp" style={{ fontSize: 28, fontWeight: 700, margin: 0 }}>Orders</h1>
-            <p style={{ color: "var(--muted)", marginTop: 4, fontSize: 14 }}>{orders.length} orders</p>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 24 }}>
+            <div>
+              <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                <span style={{ width: 40, height: 40, borderRadius: 10, background: "rgba(214,167,86,.16)", color: "#D6A756", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}><Receipt /></span>
+                <h1 className="at-disp" style={{ fontSize: 28, fontWeight: 700, margin: 0 }}>Orders</h1>
+              </div>
+              <p style={{ color: "var(--muted)", marginTop: 4, fontSize: 14 }}>{orders.length} orders</p>
+            </div>
+            {isSuperAdmin && selected.length > 0 && (
+              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                <span className="at-mono" style={{ fontSize: 12, color: "var(--muted)" }}>{selected.length} selected</span>
+                <button onClick={() => setSelected([])} className="at-btn at-btn-ghost at-btn-sm">Clear</button>
+                <button onClick={() => setConfirmDelete(selected)} className="at-btn at-btn-sm" style={{ background: "var(--warn)", color: "#fff" }}>
+                  <Trash2 /> Delete selected
+                </button>
+              </div>
+            )}
           </div>
 
           <div className="at-card" style={{ overflow: "hidden" }}>
             <table className="at-table">
               <thead>
                 <tr>
+                  {isSuperAdmin && (
+                    <th style={{ width: 32 }}>
+                      <input type="checkbox" checked={orders.length > 0 && selected.length === orders.length} onChange={toggleSelectAll} />
+                    </th>
+                  )}
                   <th>Order</th>
                   <th>Customer</th>
                   <th>Date</th>
                   <th>Total</th>
                   <th>Status</th>
                   <th style={{ width: 120 }}></th>
+                  {isSuperAdmin && <th style={{ width: 40 }}></th>}
                 </tr>
               </thead>
               <tbody>
                 {orders.map(o => (
                   <tr key={o.id}>
+                    {isSuperAdmin && (
+                      <td>
+                        <input type="checkbox" checked={selected.includes(o.id)} onChange={() => toggleSelect(o.id)} />
+                      </td>
+                    )}
                     <td className="at-mono" style={{ fontWeight: 500 }}>{o.id}</td>
                     <td>
                       <div>{o.customer.name}</div>
@@ -1161,11 +1405,233 @@
                         <option value="delivered">Delivered</option>
                       </select>
                     </td>
+                    {isSuperAdmin && (
+                      <td style={{ textAlign: "right" }}>
+                        <button onClick={() => setConfirmDelete([o.id])} style={{ color: "var(--muted)", fontSize: 16 }}><Trash2 /></button>
+                      </td>
+                    )}
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
+
+          {confirmDelete && (
+            <>
+              <div className="at-scrim" onClick={() => setConfirmDelete(null)} />
+              <div className="at-modal">
+                <div className="at-card at-rise" style={{ width: "100%", maxWidth: 420, padding: 24 }} onClick={e => e.stopPropagation()}>
+                  <h2 className="at-disp" style={{ fontSize: 18, fontWeight: 700, marginBottom: 10 }}>
+                    {confirmDelete.length > 1 ? `Remove ${confirmDelete.length} orders?` : "Remove this order?"}
+                  </h2>
+                  <p style={{ color: "var(--muted)", fontSize: 13, lineHeight: 1.6 }}>
+                    {confirmDelete.length > 1
+                      ? `This permanently deletes ${confirmDelete.length} selected orders. This can't be undone.`
+                      : <>This permanently deletes order <b className="at-mono">{confirmDelete[0]}</b>. This can't be undone.</>}
+                  </p>
+                  <div style={{ display: "flex", gap: 8, marginTop: 20, justifyContent: "flex-end" }}>
+                    <button onClick={() => setConfirmDelete(null)} className="at-btn at-btn-ghost">Cancel</button>
+                    <button onClick={() => deleteOrders(confirmDelete)} className="at-btn at-btn-primary" style={{ background: "var(--warn)" }}>
+                      {confirmDelete.length > 1 ? "Delete selected" : "Delete order"}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </>
+          )}
+        </div>
+      );
+    }
+
+    function Users({ users, setUsers, currentUser, setCurrentUser, notify }) {
+      const [adding, setAdding] = useState(false);
+      const [form, setForm] = useState({});
+      const [editing, setEditing] = useState(null);
+      const [editForm, setEditForm] = useState({});
+      const [confirmDelete, setConfirmDelete] = useState(null);
+      const superAdminCount = users.filter(u => u.role === "super_admin").length;
+
+      const addUser = () => {
+        if (!form.name || !form.username || !form.password) return;
+        if (users.some(u => u.username === form.username.trim())) { notify("That username is already taken"); return; }
+        const u = { id: uid("user"), name: form.name, username: form.username.trim(), password: form.password, role: form.role || "admin" };
+        setUsers(us => [...us, u]);
+        notify("User created");
+        setAdding(false);
+        setForm({});
+      };
+
+      const updateUser = (id, updates) => {
+        setUsers(us => us.map(u => u.id === id ? { ...u, ...updates } : u));
+        if (currentUser.id === id) setCurrentUser(u => ({ ...u, ...updates }));
+        notify("User updated");
+        setEditing(null);
+      };
+
+      const deleteUser = (id) => {
+        setUsers(us => us.filter(u => u.id !== id));
+        notify("User removed");
+        setConfirmDelete(null);
+      };
+
+      return (
+        <div style={{ maxWidth: 900 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 24 }}>
+            <div>
+              <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                <span style={{ width: 40, height: 40, borderRadius: 10, background: "rgba(91,192,190,.16)", color: "#5BC0BE", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}><UsersIcon /></span>
+                <h1 className="at-disp" style={{ fontSize: 28, fontWeight: 700, margin: 0 }}>Users</h1>
+              </div>
+              <p style={{ color: "var(--muted)", marginTop: 4, fontSize: 14 }}>{users.length} accounts · super admins can do everything, admins can't delete orders or users</p>
+            </div>
+            <button onClick={() => { setAdding(true); setForm({}); }} className="at-btn at-btn-primary">
+              <Plus /> Add user
+            </button>
+          </div>
+
+          <div className="at-card" style={{ overflow: "hidden" }}>
+            <table className="at-table">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Username</th>
+                  <th>Role</th>
+                  <th style={{ width: 80 }}></th>
+                </tr>
+              </thead>
+              <tbody>
+                {users.map(u => {
+                  const isSelf = u.id === currentUser.id;
+                  const isLastSuperAdmin = u.role === "super_admin" && superAdminCount <= 1;
+                  return (
+                    <tr key={u.id}>
+                      <td style={{ fontWeight: 500 }}>
+                        {u.name}
+                        {isSelf && <span className="at-mono" style={{ fontSize: 11, color: "var(--muted)", marginLeft: 6 }}>(you)</span>}
+                      </td>
+                      <td className="at-mono">{u.username}</td>
+                      <td>
+                        <span className="at-badge" style={{ background: u.role === "super_admin" ? "rgba(91,192,190,.15)" : "var(--accent-tint)", color: u.role === "super_admin" ? "#3A9C99" : "var(--accent)" }}>
+                          {u.role === "super_admin" ? "Super admin" : "Admin"}
+                        </span>
+                      </td>
+                      <td style={{ textAlign: "right", whiteSpace: "nowrap" }}>
+                        <button onClick={() => { setEditing(u.id); setEditForm({}); }} style={{ color: "var(--muted)", fontSize: 16, marginRight: 8 }}><Pencil /></button>
+                        {!isSelf && !isLastSuperAdmin && (
+                          <button onClick={() => setConfirmDelete(u.id)} style={{ color: "var(--muted)", fontSize: 16 }}><Trash2 /></button>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+
+          {editing && (() => {
+            const u = users.find(x => x.id === editing);
+            const editIsLastSuperAdmin = u.role === "super_admin" && superAdminCount <= 1;
+            return (
+              <>
+                <div className="at-scrim" onClick={() => setEditing(null)} />
+                <div className="at-modal">
+                  <div className="at-card at-rise" style={{ width: "100%", maxWidth: 460, padding: 24 }} onClick={e => e.stopPropagation()}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+                      <h2 className="at-disp" style={{ fontSize: 20, fontWeight: 700 }}>Edit user</h2>
+                      <button onClick={() => setEditing(null)} style={{ color: "var(--muted)", fontSize: 18 }}><X /></button>
+                    </div>
+                    <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+                      <div>
+                        <label className="at-label">Name</label>
+                        <input className="at-field" defaultValue={u.name} onChange={e => setEditForm({ ...editForm, name: e.target.value })} />
+                      </div>
+                      <div>
+                        <label className="at-label">Username</label>
+                        <input className="at-field at-mono" defaultValue={u.username} onChange={e => setEditForm({ ...editForm, username: e.target.value })} />
+                      </div>
+                      <div>
+                        <label className="at-label">New password (leave blank to keep current)</label>
+                        <input className="at-field at-mono" type="text" placeholder="••••••" onChange={e => setEditForm({ ...editForm, password: e.target.value })} />
+                      </div>
+                      <div>
+                        <label className="at-label">Role</label>
+                        <select className="at-field" defaultValue={u.role} disabled={editIsLastSuperAdmin} onChange={e => setEditForm({ ...editForm, role: e.target.value })}>
+                          <option value="admin">Admin — can't delete orders/users</option>
+                          <option value="super_admin">Super admin — full access</option>
+                        </select>
+                        {editIsLastSuperAdmin && <p className="at-mono" style={{ fontSize: 11, color: "var(--muted)", marginTop: 6 }}>This is the only super admin — add another before changing this one's role.</p>}
+                      </div>
+                      <div style={{ display: "flex", gap: 8, marginTop: 8, justifyContent: "flex-end" }}>
+                        <button onClick={() => setEditing(null)} className="at-btn at-btn-ghost">Cancel</button>
+                        <button onClick={() => {
+                          if (editForm.username && editForm.username.trim() !== u.username && users.some(x => x.id !== u.id && x.username === editForm.username.trim())) { notify("That username is already taken"); return; }
+                          const updates = { ...editForm };
+                          if (updates.username) updates.username = updates.username.trim();
+                          if (!updates.password) delete updates.password;
+                          updateUser(u.id, updates);
+                        }} className="at-btn at-btn-primary">Save changes</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </>
+            );
+          })()}
+
+          {adding && (
+            <>
+              <div className="at-scrim" onClick={() => setAdding(false)} />
+              <div className="at-modal">
+                <div className="at-card at-rise" style={{ width: "100%", maxWidth: 460, padding: 24 }} onClick={e => e.stopPropagation()}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+                    <h2 className="at-disp" style={{ fontSize: 20, fontWeight: 700 }}>Add user</h2>
+                    <button onClick={() => setAdding(false)} style={{ color: "var(--muted)", fontSize: 18 }}><X /></button>
+                  </div>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+                    <div>
+                      <label className="at-label">Name</label>
+                      <input className="at-field" value={form.name || ""} onChange={e => setForm({ ...form, name: e.target.value })} placeholder="Fatima Rahman" />
+                    </div>
+                    <div>
+                      <label className="at-label">Username</label>
+                      <input className="at-field at-mono" value={form.username || ""} onChange={e => setForm({ ...form, username: e.target.value })} />
+                    </div>
+                    <div>
+                      <label className="at-label">Password</label>
+                      <input className="at-field at-mono" type="text" value={form.password || ""} onChange={e => setForm({ ...form, password: e.target.value })} />
+                    </div>
+                    <div>
+                      <label className="at-label">Role</label>
+                      <select className="at-field" value={form.role || "admin"} onChange={e => setForm({ ...form, role: e.target.value })}>
+                        <option value="admin">Admin — can't delete orders/users</option>
+                        <option value="super_admin">Super admin — full access</option>
+                      </select>
+                    </div>
+                    <div style={{ display: "flex", gap: 8, marginTop: 8, justifyContent: "flex-end" }}>
+                      <button onClick={() => setAdding(false)} className="at-btn at-btn-ghost">Cancel</button>
+                      <button onClick={addUser} disabled={!form.name || !form.username || !form.password} className="at-btn at-btn-primary">Add user</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </>
+          )}
+
+          {confirmDelete && (
+            <>
+              <div className="at-scrim" onClick={() => setConfirmDelete(null)} />
+              <div className="at-modal">
+                <div className="at-card at-rise" style={{ width: "100%", maxWidth: 420, padding: 24 }} onClick={e => e.stopPropagation()}>
+                  <h2 className="at-disp" style={{ fontSize: 18, fontWeight: 700, marginBottom: 10 }}>Remove this user?</h2>
+                  <p style={{ color: "var(--muted)", fontSize: 13, lineHeight: 1.6 }}>They'll immediately lose access to the admin panel.</p>
+                  <div style={{ display: "flex", gap: 8, marginTop: 20, justifyContent: "flex-end" }}>
+                    <button onClick={() => setConfirmDelete(null)} className="at-btn at-btn-ghost">Cancel</button>
+                    <button onClick={() => deleteUser(confirmDelete)} className="at-btn at-btn-primary" style={{ background: "var(--warn)" }}>Remove user</button>
+                  </div>
+                </div>
+              </div>
+            </>
+          )}
         </div>
       );
     }
@@ -1180,7 +1646,10 @@
 
       return (
         <div style={{ maxWidth: 600 }}>
-          <h1 className="at-disp" style={{ fontSize: 28, fontWeight: 700, margin: 0, marginBottom: 24 }}>Settings</h1>
+          <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 24 }}>
+            <span style={{ width: 40, height: 40, borderRadius: 10, background: "rgba(199,123,156,.16)", color: "#C77B9C", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}><SettingsIcon /></span>
+            <h1 className="at-disp" style={{ fontSize: 28, fontWeight: 700, margin: 0 }}>Settings</h1>
+          </div>
           <div className="at-card" style={{ padding: 24 }}>
             <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
               <div>
@@ -1195,16 +1664,11 @@
                 <label className="at-label">Tagline</label>
                 <input className="at-field" value={form.tagline} onChange={e => setForm({ ...form, tagline: e.target.value })} />
               </div>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
-                <div>
-                  <label className="at-label">Currency symbol</label>
-                  <input className="at-field at-mono" value={form.symbol} onChange={e => setForm({ ...form, symbol: e.target.value })} />
-                </div>
-                <div>
-                  <label className="at-label">Admin passcode</label>
-                  <input className="at-field at-mono" type="text" value={form.adminPass} onChange={e => setForm({ ...form, adminPass: e.target.value })} />
-                </div>
+              <div>
+                <label className="at-label">Currency symbol</label>
+                <input className="at-field at-mono" value={form.symbol} onChange={e => setForm({ ...form, symbol: e.target.value })} style={{ maxWidth: 160 }} />
               </div>
+              <p className="at-mono" style={{ fontSize: 11, color: "var(--muted)" }}>Admin logins are now managed under the <b>Users</b> tab (super admin only).</p>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
                 <div>
                   <label className="at-label">Shipping — inside Dhaka</label>
