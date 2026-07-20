@@ -413,7 +413,7 @@
           await auth.signInWithEmailAndPassword(email.trim(), password);
           return { ok: true };
         } catch (e) {
-          return { ok: false, error: "That email/password doesn't match." };
+          return { ok: false, error: `That email/password doesn't match. (${e.code})` };
         }
       }, []);
 
