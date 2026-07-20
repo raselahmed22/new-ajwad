@@ -7,17 +7,25 @@
   <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
   <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
   <script>
-    window.storage = {
-      async get(key, fallback) {
-        const value = localStorage.getItem(key);
-        return value ? { value } : null;
-      },
-      async set(key, value, persist) {
-        localStorage.setItem(key, value);
-        return true;
-      }
+    const firebaseConfig = {
+      apiKey: "AIzaSyBXx2i_4-Mbg1XeMb3CaKMtCPveImtzrAQ",
+      authDomain: "ajwad-barakah.firebaseapp.com",
+      projectId: "ajwad-barakah",
+      storageBucket: "ajwad-barakah.firebasestorage.app",
+      messagingSenderId: "239677135013",
+      appId: "1:239677135013:web:6e14b40639c635d443d54c",
     };
+    firebase.initializeApp(firebaseConfig);
+    // Secondary app instance used only to create new staff logins without
+    // signing the currently-authenticated admin out of the primary session.
+    const secondaryApp = firebase.initializeApp(firebaseConfig, "Secondary");
+    window.db = firebase.firestore();
+    window.auth = firebase.auth();
+    window.secondaryAuth = secondaryApp.auth();
   </script>
 </head>
 <body>
@@ -212,25 +220,6 @@
 }
 `;
 
-    const KEYS = { products: "atelier:products", orders: "atelier:orders", settings: "atelier:settings", users: "atelier:users", customers: "atelier:customers", session: "atelier:session" };
-
-    async function loadKey(key, fallback) {
-      try {
-        const r = await window.storage.get(key, false);
-        return r ? JSON.parse(r.value) : fallback;
-      } catch {
-        return fallback;
-      }
-    }
-    async function saveKey(key, value) {
-      try {
-        const r = await window.storage.set(key, JSON.stringify(value), false);
-        if (!r) console.error("storage.set returned null for", key);
-      } catch (e) {
-        console.error("storage error", key, e);
-      }
-    }
-
     const CATEGORIES = ["Tops", "Knitwear", "Outerwear", "Bottoms", "Dresses", "Accessories"];
     const SWATCHES = [
       { bg: "#1B1B20", fg: "#E9E7DF" }, { bg: "#E7E3D8", fg: "#1B1B20" },
@@ -289,11 +278,7 @@
       ];
     }
 
-    const DEFAULT_SETTINGS = { brand: "Ajwad Barakah", tagline: "Considered clothing, made to last.", currency: "BDT", symbol: "৳", shipInsideDhaka: 80, shipOutsideDhaka: 140, adminPass: "12224253aiub", logo: "Ajwad Logo.png", adminUrl: "index.html#admin", address: "Dhaka, Bangladesh", phone: "01333707715", whatsapp: "01333707715", facebook: "https://www.facebook.com/profile.php?id=61590579107774", bkashNumber: "01333707715", nagadNumber: "01333707715" };
-
-    function seedUsers(adminPass) {
-      return [{ id: uid("user"), name: "Rasel Ahmed", username: "Rasel Ahmed", password: adminPass || "12224253aiub", role: "super_admin" }];
-    }
+    const DEFAULT_SETTINGS = { brand: "Ajwad Barakah", tagline: "Considered clothing, made to last.", currency: "BDT", symbol: "৳", shipInsideDhaka: 80, shipOutsideDhaka: 140, logo: "Ajwad Logo.png", adminUrl: "index.html#admin", address: "Dhaka, Bangladesh", phone: "01333707715", whatsapp: "01333707715", facebook: "https://www.facebook.com/profile.php?id=61590579107774", bkashNumber: "01333707715", nagadNumber: "01333707715" };
 
     const useMoney = (settings) => useCallback(
       (n) => settings.symbol + Number(n || 0).toLocaleString(undefined, { minimumFractionDigits: n % 1 ? 2 : 0, maximumFractionDigits: 2 }),
@@ -368,84 +353,93 @@
       const [products, setProducts] = useState([]);
       const [orders, setOrders] = useState([]);
       const [settings, setSettings] = useState(DEFAULT_SETTINGS);
-      const [users, setUsers] = useState([]);
-      const [customers, setCustomers] = useState([]);
-      const [customerId, setCustomerId] = useState(null);
+      const [staff, setStaff] = useState([]);
+      const [customerProfile, setCustomerProfile] = useState(null);
+      const [staffProfile, setStaffProfile] = useState(null);
       const [mode, setMode] = useState(() => (window.location.hash === "#admin" ? "admin" : "store"));
       const [cart, setCart] = useState([]);
       const [toast, setToast] = useState(null);
 
       useEffect(() => {
-        (async () => {
-          let p = await loadKey(KEYS.products, null);
-          let o = await loadKey(KEYS.orders, null);
-          let s = await loadKey(KEYS.settings, null);
-          let u = await loadKey(KEYS.users, null);
-          let cu = await loadKey(KEYS.customers, null);
-          let sess = await loadKey(KEYS.session, null);
-          if (!p) { p = seedProducts(); await saveKey(KEYS.products, p); }
-          if (!o) { o = seedOrders(p); await saveKey(KEYS.orders, o); }
-          if (!s) { s = DEFAULT_SETTINGS; await saveKey(KEYS.settings, s); }
-          if (!u) { u = seedUsers(s.adminPass); await saveKey(KEYS.users, u); }
-          if (!cu) { cu = []; await saveKey(KEYS.customers, cu); }
-          // Merge saved settings with defaults, but keep the default logo if saved logo is empty
-          const mergedSettings = {
-            ...DEFAULT_SETTINGS,
-            ...s,
-            logo: s?.logo || DEFAULT_SETTINGS.logo,
-            brand: s?.brand || DEFAULT_SETTINGS.brand
-          };
-          setProducts(p); setOrders(o); setSettings(mergedSettings); setUsers(u);
-          setCustomers(cu); setCustomerId(sess || null); setReady(true);
-        })();
+        let productsLoaded = false, settingsLoaded = false;
+        const maybeReady = () => { if (productsLoaded && settingsLoaded) setReady(true); };
+        const unsubProducts = db.collection("products").onSnapshot(snap => {
+          setProducts(snap.docs.map(d => d.data()));
+          productsLoaded = true; maybeReady();
+        });
+        const unsubOrders = db.collection("orders").orderBy("createdAt", "desc").onSnapshot(snap => {
+          setOrders(snap.docs.map(d => d.data()));
+        });
+        const unsubSettings = db.collection("settings").doc("main").onSnapshot(doc => {
+          setSettings(doc.exists ? { ...DEFAULT_SETTINGS, ...doc.data() } : DEFAULT_SETTINGS);
+          settingsLoaded = true; maybeReady();
+        });
+        const unsubStaff = db.collection("staff").onSnapshot(snap => {
+          setStaff(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+        });
+        return () => { unsubProducts(); unsubOrders(); unsubSettings(); unsubStaff(); };
       }, []);
 
-      useEffect(() => { if (ready) saveKey(KEYS.products, products); }, [products, ready]);
-      useEffect(() => { if (ready) saveKey(KEYS.orders, orders); }, [orders, ready]);
-      useEffect(() => { if (ready) saveKey(KEYS.settings, settings); }, [settings, ready]);
-      useEffect(() => { if (ready) saveKey(KEYS.users, users); }, [users, ready]);
-      useEffect(() => { if (ready) saveKey(KEYS.customers, customers); }, [customers, ready]);
-      useEffect(() => { if (ready) saveKey(KEYS.session, customerId); }, [customerId, ready]);
+      useEffect(() => {
+        return auth.onAuthStateChanged(async (user) => {
+          if (!user) { setCustomerProfile(null); setStaffProfile(null); return; }
+          const [custSnap, staffSnap] = await Promise.all([
+            db.collection("customers").doc(user.uid).get(),
+            db.collection("staff").doc(user.uid).get(),
+          ]);
+          setCustomerProfile(custSnap.exists ? { id: user.uid, ...custSnap.data() } : null);
+          setStaffProfile(staffSnap.exists ? { id: user.uid, ...staffSnap.data() } : null);
+        });
+      }, []);
 
       const notify = useCallback((msg) => { setToast(msg); setTimeout(() => setToast(null), 2600); }, []);
 
       const money = useMoney(settings);
 
-      const currentCustomer = useMemo(() => customers.find(c => c.id === customerId) || null, [customers, customerId]);
-
-      const signUp = useCallback(({ name, email, phone, location, password }) => {
-        const emailNorm = email.trim().toLowerCase();
-        if (customers.some(c => c.email.toLowerCase() === emailNorm)) {
-          return { ok: false, error: "An account with this email already exists. Try signing in instead." };
+      const signUp = useCallback(async ({ name, email, phone, location, password }) => {
+        try {
+          const cred = await auth.createUserWithEmailAndPassword(email.trim(), password);
+          await db.collection("customers").doc(cred.user.uid).set({
+            name: name.trim(), email: email.trim(), phone: phone.trim(), location, createdAt: Date.now(),
+          });
+          return { ok: true };
+        } catch (e) {
+          return { ok: false, error: e.code === "auth/email-already-in-use" ? "An account with this email already exists. Try signing in instead." : e.message };
         }
-        const c = { id: uid("cust"), name: name.trim(), email: email.trim(), phone: phone.trim(), location, password, createdAt: Date.now() };
-        setCustomers(cs => [...cs, c]);
-        setCustomerId(c.id);
-        return { ok: true };
-      }, [customers]);
+      }, []);
 
-      const signIn = useCallback(({ email, password }) => {
-        const emailNorm = email.trim().toLowerCase();
-        const c = customers.find(c => c.email.toLowerCase() === emailNorm && c.password === password);
-        if (!c) return { ok: false, error: "That email/password doesn't match." };
-        setCustomerId(c.id);
-        return { ok: true };
-      }, [customers]);
+      const signIn = useCallback(async ({ email, password }) => {
+        try {
+          await auth.signInWithEmailAndPassword(email.trim(), password);
+          return { ok: true };
+        } catch (e) {
+          return { ok: false, error: "That email/password doesn't match." };
+        }
+      }, []);
 
-      const signOut = useCallback(() => setCustomerId(null), []);
+      const signOut = useCallback(() => auth.signOut(), []);
 
-      const placeOrder = useCallback((order) => {
-        setOrders(o => [order, ...o]);
-        setProducts(ps => ps.map(p => {
-          const bought = order.items.filter(it => it.id === p.id).reduce((s, it) => s + it.qty, 0);
-          return bought ? { ...p, stock: Math.max(0, p.stock - bought) } : p;
-        }));
+      const placeOrder = useCallback(async (order) => {
+        await db.collection("orders").doc(order.id).set(order);
+        const batch = db.batch();
+        order.items.forEach(it => {
+          batch.update(db.collection("products").doc(it.id), { stock: firebase.firestore.FieldValue.increment(-it.qty) });
+        });
+        await batch.commit();
       }, []);
 
       const resetAll = useCallback(async () => {
+        const [prodSnap, orderSnap] = await Promise.all([db.collection("products").get(), db.collection("orders").get()]);
+        const delBatch = db.batch();
+        prodSnap.forEach(d => delBatch.delete(d.ref));
+        orderSnap.forEach(d => delBatch.delete(d.ref));
+        await delBatch.commit();
         const p = seedProducts(); const o = seedOrders(p);
-        setProducts(p); setOrders(o); setSettings(DEFAULT_SETTINGS);
-        await saveKey(KEYS.products, p); await saveKey(KEYS.orders, o); await saveKey(KEYS.settings, DEFAULT_SETTINGS);
+        const addBatch = db.batch();
+        p.forEach(item => addBatch.set(db.collection("products").doc(item.id), item));
+        o.forEach(item => addBatch.set(db.collection("orders").doc(item.id), item));
+        addBatch.set(db.collection("settings").doc("main"), DEFAULT_SETTINGS);
+        await addBatch.commit();
         notify("Store reset to sample data");
       }, [notify]);
 
@@ -468,15 +462,15 @@
             <Storefront
               products={products} settings={settings} cart={cart} setCart={setCart}
               money={money} placeOrder={placeOrder} notify={notify}
-              customer={currentCustomer} onSignIn={signIn} onSignUp={signUp} onSignOut={signOut}
+              customer={customerProfile} onSignIn={signIn} onSignUp={signUp} onSignOut={signOut}
             />
           ) : (
             <Admin
-              products={products} setProducts={setProducts} orders={orders} setOrders={setOrders}
-              settings={settings} setSettings={setSettings} money={money}
-              users={users} setUsers={setUsers}
-              notify={notify} placeOrder={placeOrder}
-              onExit={() => { window.location.hash = ""; setMode("store"); }} onReset={resetAll}
+              products={products} orders={orders}
+              settings={settings} money={money}
+              staff={staff} currentUser={staffProfile}
+              notify={notify} placeOrder={placeOrder} onSignIn={signIn}
+              onExit={() => { auth.signOut(); window.location.hash = ""; setMode("store"); }} onReset={resetAll}
             />
           )}
           {toast && (
@@ -752,22 +746,28 @@
     function AccountAuth({ mode, setMode, onSignIn, onSignUp, onClose, onSuccess }) {
       const [form, setForm] = useState({ name: "", email: "", phone: "", location: "dhaka", password: "", confirm: "" });
       const [err, setErr] = useState("");
+      const [busy, setBusy] = useState(false);
       const set = (k) => (e) => setForm(f => ({ ...f, [k]: e.target.value }));
 
-      const submit = () => {
+      const submit = async () => {
+        if (busy) return;
         setErr("");
         if (mode === "signup") {
           if (!form.name.trim()) return setErr("Please enter your full name.");
           if (!/\S+@\S+\.\S+/.test(form.email)) return setErr("Please enter a valid email.");
           if (!form.phone.trim()) return setErr("Please enter your mobile number.");
-          if (form.password.length < 4) return setErr("Password must be at least 4 characters.");
+          if (form.password.length < 6) return setErr("Password must be at least 6 characters.");
           if (form.password !== form.confirm) return setErr("Passwords don't match.");
-          const result = onSignUp({ name: form.name, email: form.email, phone: form.phone, location: form.location, password: form.password });
+          setBusy(true);
+          const result = await onSignUp({ name: form.name, email: form.email, phone: form.phone, location: form.location, password: form.password });
+          setBusy(false);
           if (!result.ok) return setErr(result.error);
           onSuccess();
         } else {
           if (!form.email.trim() || !form.password) return setErr("Enter your email and password.");
-          const result = onSignIn({ email: form.email, password: form.password });
+          setBusy(true);
+          const result = await onSignIn({ email: form.email, password: form.password });
+          setBusy(false);
           if (!result.ok) return setErr(result.error);
           onSuccess();
         }
@@ -828,8 +828,8 @@
                 )}
               </div>
               {err && <p style={{ color: "var(--warn)", fontSize: 12, marginTop: 10 }}>{err}</p>}
-              <button onClick={submit} className="at-btn at-btn-dark" style={{ width: "100%", marginTop: 20 }}>
-                {mode === "signup" ? "Create account" : "Sign in"}
+              <button onClick={submit} disabled={busy} className="at-btn at-btn-dark" style={{ width: "100%", marginTop: 20 }}>
+                {busy ? "Please wait…" : mode === "signup" ? "Create account" : "Sign in"}
               </button>
               <button onClick={() => { setMode(mode === "signup" ? "signin" : "signup"); setErr(""); }} style={{ width: "100%", marginTop: 14, fontSize: 12, color: "var(--muted)" }}>
                 {mode === "signup" ? "Already have an account? Sign in" : "New here? Create an account"}
@@ -1084,19 +1084,28 @@
       );
     }
 
-    function Admin({ products, setProducts, orders, setOrders, settings, setSettings, money, users, setUsers, notify, placeOrder, onExit, onReset }) {
-      const [currentUser, setCurrentUser] = useState(null);
+    function Admin({ products, orders, settings, money, staff, currentUser, notify, placeOrder, onSignIn, onExit, onReset }) {
       const [username, setUsername] = useState("");
       const [pass, setPass] = useState("");
       const [show, setShow] = useState(false);
       const [err, setErr] = useState("");
+      const [busy, setBusy] = useState(false);
       const [nav, setNav] = useState("dashboard");
 
       if (!currentUser) {
-        const attempt = () => {
-          const u = users.find(u => u.username === username.trim() && u.password === pass);
-          if (u) { setCurrentUser(u); setErr(""); }
-          else setErr("That username/password doesn't match. Try again.");
+        const attempt = async () => {
+          if (busy) return;
+          setErr(""); setBusy(true);
+          const result = await onSignIn({ email: username, password: pass });
+          if (!result.ok) { setErr(result.error); setBusy(false); return; }
+          const staffSnap = await db.collection("staff").doc(auth.currentUser.uid).get();
+          if (!staffSnap.exists) {
+            await auth.signOut();
+            setErr("This account doesn't have admin access.");
+            setBusy(false);
+            return;
+          }
+          setBusy(false);
         };
         return (
           <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
@@ -1111,10 +1120,10 @@
                 <div className="at-disp" style={{ fontSize: 20, letterSpacing: ".24em", fontWeight: 700, textAlign: "center" }}>{settings.brand}</div>
               )}
               <div className="at-eyebrow" style={{ textAlign: "center", marginTop: 6, marginBottom: 28 }}>Operations · Admin access</div>
-              <label className="at-label">Username</label>
-              <input value={username} autoFocus
+              <label className="at-label">Email</label>
+              <input value={username} autoFocus type="email"
                 onChange={e => setUsername(e.target.value)} onKeyDown={e => e.key === "Enter" && attempt()}
-                className="at-field" placeholder="admin" style={{ marginBottom: 14 }} />
+                className="at-field" placeholder="admin@yourdomain.com" style={{ marginBottom: 14 }} />
               <label className="at-label">Password</label>
               <div style={{ position: "relative" }}>
                 <input type={show ? "text" : "password"} value={pass}
@@ -1123,7 +1132,7 @@
                 <button onClick={() => setShow(s => !s)} style={{ position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)", color: "var(--muted)", fontSize: 16 }}>{show ? <EyeOff /> : <Eye />}</button>
               </div>
               {err && <p style={{ color: "var(--warn)", fontSize: 12, marginTop: 8 }}>{err}</p>}
-              <button onClick={attempt} className="at-btn at-btn-dark" style={{ width: "100%", marginTop: 20 }}>Enter dashboard</button>
+              <button onClick={attempt} disabled={busy} className="at-btn at-btn-dark" style={{ width: "100%", marginTop: 20 }}>{busy ? "Signing in…" : "Enter dashboard"}</button>
               <button onClick={onExit} style={{ width: "100%", marginTop: 16, fontSize: 12, color: "var(--muted)" }}>← Back to storefront</button>
             </div>
           </div>
@@ -1176,10 +1185,10 @@
           <main style={{ flex: 1, padding: 32, minWidth: 0 }}>
             {nav === "dashboard" && <Dashboard products={products} orders={orders} money={money} onReset={onReset} isSuperAdmin={isSuperAdmin} />}
             {nav === "pos" && <POS products={products} settings={settings} money={money} placeOrder={placeOrder} notify={notify} currentUser={currentUser} />}
-            {nav === "products" && <Products products={products} setProducts={setProducts} money={money} notify={notify} />}
-            {nav === "orders" && <Orders orders={orders} setOrders={setOrders} money={money} notify={notify} isSuperAdmin={isSuperAdmin} />}
-            {nav === "settings" && <Settings settings={settings} setSettings={setSettings} notify={notify} />}
-            {nav === "users" && isSuperAdmin && <Users users={users} setUsers={setUsers} currentUser={currentUser} setCurrentUser={setCurrentUser} notify={notify} />}
+            {nav === "products" && <Products products={products} money={money} notify={notify} />}
+            {nav === "orders" && <Orders orders={orders} money={money} notify={notify} isSuperAdmin={isSuperAdmin} />}
+            {nav === "settings" && <Settings settings={settings} notify={notify} />}
+            {nav === "users" && isSuperAdmin && <Users staff={staff} currentUser={currentUser} notify={notify} />}
           </main>
         </div>
       );
@@ -1511,14 +1520,14 @@
       );
     }
 
-    function Products({ products, setProducts, money, notify }) {
+    function Products({ products, money, notify }) {
       const [editing, setEditing] = useState(null);
       const [editForm, setEditForm] = useState({});
       const [adding, setAdding] = useState(false);
       const [addForm, setAddForm] = useState({});
 
       const updateProduct = (id, updates) => {
-        setProducts(ps => ps.map(p => p.id === id ? { ...p, ...updates } : p));
+        db.collection("products").doc(id).update(updates);
         notify("Product updated");
         setEditing(null);
       };
@@ -1538,7 +1547,7 @@
           image: addForm.image || "",
           createdAt: Date.now(),
         };
-        setProducts(ps => [p, ...ps]);
+        db.collection("products").doc(p.id).set(p);
         notify("Product added");
         setAdding(false);
         setAddForm({});
@@ -1690,17 +1699,19 @@
       );
     }
 
-    function Orders({ orders, setOrders, money, notify, isSuperAdmin }) {
+    function Orders({ orders, money, notify, isSuperAdmin }) {
       const [confirmDelete, setConfirmDelete] = useState(null);
       const [selected, setSelected] = useState([]);
       const updateStatus = (id, status) => {
-        setOrders(os => os.map(o => o.id === id ? { ...o, status } : o));
+        db.collection("orders").doc(id).update({ status });
         notify("Order updated");
       };
       const toggleSelect = (id) => setSelected(s => s.includes(id) ? s.filter(x => x !== id) : [...s, id]);
       const toggleSelectAll = () => setSelected(s => s.length === orders.length ? [] : orders.map(o => o.id));
       const deleteOrders = (ids) => {
-        setOrders(os => os.filter(o => !ids.includes(o.id)));
+        const batch = db.batch();
+        ids.forEach(id => batch.delete(db.collection("orders").doc(id)));
+        batch.commit();
         notify(ids.length > 1 ? `${ids.length} orders removed` : "Order removed");
         setSelected(s => s.filter(id => !ids.includes(id)));
         setConfirmDelete(null);
@@ -1825,34 +1836,46 @@
       );
     }
 
-    function Users({ users, setUsers, currentUser, setCurrentUser, notify }) {
+    function Users({ staff, currentUser, notify }) {
       const [adding, setAdding] = useState(false);
       const [form, setForm] = useState({});
+      const [busy, setBusy] = useState(false);
       const [editing, setEditing] = useState(null);
       const [editForm, setEditForm] = useState({});
       const [confirmDelete, setConfirmDelete] = useState(null);
-      const superAdminCount = users.filter(u => u.role === "super_admin").length;
+      const superAdminCount = staff.filter(u => u.role === "super_admin").length;
 
-      const addUser = () => {
-        if (!form.name || !form.username || !form.password) return;
-        if (users.some(u => u.username === form.username.trim())) { notify("That username is already taken"); return; }
-        const u = { id: uid("user"), name: form.name, username: form.username.trim(), password: form.password, role: form.role || "admin" };
-        setUsers(us => [...us, u]);
-        notify("User created");
-        setAdding(false);
-        setForm({});
+      const addStaff = async () => {
+        if (!form.name || !form.email || !form.password) return;
+        setBusy(true);
+        try {
+          const cred = await secondaryAuth.createUserWithEmailAndPassword(form.email.trim(), form.password);
+          await db.collection("staff").doc(cred.user.uid).set({ name: form.name.trim(), email: form.email.trim(), role: form.role || "admin" });
+          await secondaryAuth.signOut();
+          notify("Staff account created");
+          setAdding(false);
+          setForm({});
+        } catch (e) {
+          notify(e.message);
+        }
+        setBusy(false);
       };
 
-      const updateUser = (id, updates) => {
-        setUsers(us => us.map(u => u.id === id ? { ...u, ...updates } : u));
-        if (currentUser.id === id) setCurrentUser(u => ({ ...u, ...updates }));
-        notify("User updated");
+      const updateStaff = (id, updates) => {
+        db.collection("staff").doc(id).update(updates);
+        notify("Staff updated");
         setEditing(null);
       };
 
-      const deleteUser = (id) => {
-        setUsers(us => us.filter(u => u.id !== id));
-        notify("User removed");
+      const sendReset = (email) => {
+        auth.sendPasswordResetEmail(email)
+          .then(() => notify("Password reset email sent to " + email))
+          .catch(e => notify(e.message));
+      };
+
+      const removeStaff = (id) => {
+        db.collection("staff").doc(id).delete();
+        notify("Staff access revoked");
         setConfirmDelete(null);
       };
 
@@ -1864,7 +1887,7 @@
                 <span style={{ width: 40, height: 40, borderRadius: 10, background: "rgba(91,192,190,.16)", color: "#5BC0BE", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}><UsersIcon /></span>
                 <h1 className="at-disp" style={{ fontSize: 28, fontWeight: 700, margin: 0 }}>Users</h1>
               </div>
-              <p style={{ color: "var(--muted)", marginTop: 4, fontSize: 14 }}>{users.length} accounts · super admins can do everything, admins can't delete orders or users</p>
+              <p style={{ color: "var(--muted)", marginTop: 4, fontSize: 14 }}>{staff.length} accounts · super admins can do everything, admins can't delete orders or users</p>
             </div>
             <button onClick={() => { setAdding(true); setForm({}); }} className="at-btn at-btn-primary">
               <Plus /> Add user
@@ -1876,13 +1899,13 @@
               <thead>
                 <tr>
                   <th>Name</th>
-                  <th>Username</th>
+                  <th>Email</th>
                   <th>Role</th>
-                  <th style={{ width: 80 }}></th>
+                  <th style={{ width: 140 }}></th>
                 </tr>
               </thead>
               <tbody>
-                {users.map(u => {
+                {staff.map(u => {
                   const isSelf = u.id === currentUser.id;
                   const isLastSuperAdmin = u.role === "super_admin" && superAdminCount <= 1;
                   return (
@@ -1891,13 +1914,14 @@
                         {u.name}
                         {isSelf && <span className="at-mono" style={{ fontSize: 11, color: "var(--muted)", marginLeft: 6 }}>(you)</span>}
                       </td>
-                      <td className="at-mono">{u.username}</td>
+                      <td className="at-mono">{u.email}</td>
                       <td>
                         <span className="at-badge" style={{ background: u.role === "super_admin" ? "rgba(91,192,190,.15)" : "var(--accent-tint)", color: u.role === "super_admin" ? "#3A9C99" : "var(--accent)" }}>
                           {u.role === "super_admin" ? "Super admin" : "Admin"}
                         </span>
                       </td>
                       <td style={{ textAlign: "right", whiteSpace: "nowrap" }}>
+                        <button onClick={() => sendReset(u.email)} title="Send password reset email" style={{ color: "var(--muted)", fontSize: 16, marginRight: 8 }}><Lock /></button>
                         <button onClick={() => { setEditing(u.id); setEditForm({}); }} style={{ color: "var(--muted)", fontSize: 16, marginRight: 8 }}><Pencil /></button>
                         {!isSelf && !isLastSuperAdmin && (
                           <button onClick={() => setConfirmDelete(u.id)} style={{ color: "var(--muted)", fontSize: 16 }}><Trash2 /></button>
@@ -1911,7 +1935,7 @@
           </div>
 
           {editing && (() => {
-            const u = users.find(x => x.id === editing);
+            const u = staff.find(x => x.id === editing);
             const editIsLastSuperAdmin = u.role === "super_admin" && superAdminCount <= 1;
             return (
               <>
@@ -1927,14 +1951,7 @@
                         <label className="at-label">Name</label>
                         <input className="at-field" defaultValue={u.name} onChange={e => setEditForm({ ...editForm, name: e.target.value })} />
                       </div>
-                      <div>
-                        <label className="at-label">Username</label>
-                        <input className="at-field at-mono" defaultValue={u.username} onChange={e => setEditForm({ ...editForm, username: e.target.value })} />
-                      </div>
-                      <div>
-                        <label className="at-label">New password (leave blank to keep current)</label>
-                        <input className="at-field at-mono" type="text" placeholder="••••••" onChange={e => setEditForm({ ...editForm, password: e.target.value })} />
-                      </div>
+                      <p className="at-mono" style={{ fontSize: 11, color: "var(--muted)" }}>Email: {u.email} · use the 🔒 icon to send a password reset email — passwords can't be changed here.</p>
                       <div>
                         <label className="at-label">Role</label>
                         <select className="at-field" defaultValue={u.role} disabled={editIsLastSuperAdmin} onChange={e => setEditForm({ ...editForm, role: e.target.value })}>
@@ -1945,13 +1962,7 @@
                       </div>
                       <div style={{ display: "flex", gap: 8, marginTop: 8, justifyContent: "flex-end" }}>
                         <button onClick={() => setEditing(null)} className="at-btn at-btn-ghost">Cancel</button>
-                        <button onClick={() => {
-                          if (editForm.username && editForm.username.trim() !== u.username && users.some(x => x.id !== u.id && x.username === editForm.username.trim())) { notify("That username is already taken"); return; }
-                          const updates = { ...editForm };
-                          if (updates.username) updates.username = updates.username.trim();
-                          if (!updates.password) delete updates.password;
-                          updateUser(u.id, updates);
-                        }} className="at-btn at-btn-primary">Save changes</button>
+                        <button onClick={() => updateStaff(u.id, editForm)} className="at-btn at-btn-primary">Save changes</button>
                       </div>
                     </div>
                   </div>
@@ -1975,12 +1986,12 @@
                       <input className="at-field" value={form.name || ""} onChange={e => setForm({ ...form, name: e.target.value })} placeholder="Fatima Rahman" />
                     </div>
                     <div>
-                      <label className="at-label">Username</label>
-                      <input className="at-field at-mono" value={form.username || ""} onChange={e => setForm({ ...form, username: e.target.value })} />
+                      <label className="at-label">Email</label>
+                      <input className="at-field at-mono" type="email" value={form.email || ""} onChange={e => setForm({ ...form, email: e.target.value })} placeholder="fatima@yourdomain.com" />
                     </div>
                     <div>
                       <label className="at-label">Password</label>
-                      <input className="at-field at-mono" type="text" value={form.password || ""} onChange={e => setForm({ ...form, password: e.target.value })} />
+                      <input className="at-field at-mono" type="text" value={form.password || ""} onChange={e => setForm({ ...form, password: e.target.value })} placeholder="At least 6 characters" />
                     </div>
                     <div>
                       <label className="at-label">Role</label>
@@ -1991,7 +2002,7 @@
                     </div>
                     <div style={{ display: "flex", gap: 8, marginTop: 8, justifyContent: "flex-end" }}>
                       <button onClick={() => setAdding(false)} className="at-btn at-btn-ghost">Cancel</button>
-                      <button onClick={addUser} disabled={!form.name || !form.username || !form.password} className="at-btn at-btn-primary">Add user</button>
+                      <button onClick={addStaff} disabled={busy || !form.name || !form.email || !form.password} className="at-btn at-btn-primary">{busy ? "Creating…" : "Add user"}</button>
                     </div>
                   </div>
                 </div>
@@ -2008,7 +2019,7 @@
                   <p style={{ color: "var(--muted)", fontSize: 13, lineHeight: 1.6 }}>They'll immediately lose access to the admin panel.</p>
                   <div style={{ display: "flex", gap: 8, marginTop: 20, justifyContent: "flex-end" }}>
                     <button onClick={() => setConfirmDelete(null)} className="at-btn at-btn-ghost">Cancel</button>
-                    <button onClick={() => deleteUser(confirmDelete)} className="at-btn at-btn-primary" style={{ background: "var(--warn)" }}>Remove user</button>
+                    <button onClick={() => removeStaff(confirmDelete)} className="at-btn at-btn-primary" style={{ background: "var(--warn)" }}>Remove user</button>
                   </div>
                 </div>
               </div>
@@ -2018,11 +2029,11 @@
       );
     }
 
-    function Settings({ settings, setSettings, notify }) {
+    function Settings({ settings, notify }) {
       const [form, setForm] = useState(settings);
 
       const save = () => {
-        setSettings(form);
+        db.collection("settings").doc("main").set(form);
         notify("Settings saved");
       };
 
