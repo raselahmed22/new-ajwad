@@ -289,7 +289,7 @@
       ];
     }
 
-    const DEFAULT_SETTINGS = { brand: "Ajwad Barakah", tagline: "Considered clothing, made to last.", currency: "BDT", symbol: "৳", shipInsideDhaka: 80, shipOutsideDhaka: 140, adminPass: "12224253aiub", logo: "Ajwad Logo.png", adminUrl: "index.html#admin", address: "Dhaka, Bangladesh", phone: "01333707715", whatsapp: "01333707715", facebook: "https://www.facebook.com/profile.php?id=61590579107774" };
+    const DEFAULT_SETTINGS = { brand: "Ajwad Barakah", tagline: "Considered clothing, made to last.", currency: "BDT", symbol: "৳", shipInsideDhaka: 80, shipOutsideDhaka: 140, adminPass: "12224253aiub", logo: "Ajwad Logo.png", adminUrl: "index.html#admin", address: "Dhaka, Bangladesh", phone: "01333707715", whatsapp: "01333707715", facebook: "https://www.facebook.com/profile.php?id=61590579107774", bkashNumber: "01333707715", nagadNumber: "01333707715" };
 
     function seedUsers(adminPass) {
       return [{ id: uid("user"), name: "Rasel Ahmed", username: "Rasel Ahmed", password: adminPass || "12224253aiub", role: "super_admin" }];
@@ -495,7 +495,7 @@
           createdAt: Date.now(),
           items: cart.map(({ key, ...rest }) => rest),
           subtotal, shipping, total: subtotal + shipping,
-          status: payment.method === "cod" ? "pending" : "paid", customer, payment,
+          status: payment.method === "card" ? "paid" : "pending", customer, payment,
         };
         placeOrder(order); setConfirmedOrder(order); setCart([]); setView("confirm");
       };
@@ -726,7 +726,7 @@
     }
 
     function Checkout({ cart, subtotal, settings, money, onBack, onComplete }) {
-      const [form, setForm] = useState({ name: "", email: "", address: "", city: "", zip: "", card: "", exp: "", cvc: "" });
+      const [form, setForm] = useState({ name: "", email: "", address: "", city: "", zip: "", card: "", exp: "", cvc: "", trxId: "" });
       const [location, setLocation] = useState("dhaka");
       const [payMethod, setPayMethod] = useState("card");
       const [processing, setProcessing] = useState(false);
@@ -735,6 +735,7 @@
       const expFmt = (v) => v.replace(/\D/g, "").slice(0, 4).replace(/(.{2})(.+)/, "$1/$2");
       const shipping = location === "dhaka" ? settings.shipInsideDhaka : settings.shipOutsideDhaka;
       const total = subtotal + shipping;
+      const mobileBankingNumber = payMethod === "bkash" ? settings.bkashNumber : payMethod === "nagad" ? settings.nagadNumber : "";
 
       const missing = [];
       if (!form.name.trim()) missing.push("full name");
@@ -746,17 +747,22 @@
         if (form.exp.length !== 5) missing.push("card expiry (MM/YY)");
         if (form.cvc.length < 3) missing.push("CVC");
       }
+      if ((payMethod === "bkash" || payMethod === "nagad") && form.trxId.trim().length < 6) {
+        missing.push("the Transaction ID from your " + (payMethod === "bkash" ? "bKash" : "Nagad") + " Send Money");
+      }
       const valid = missing.length === 0;
 
       const submit = () => {
         if (!valid || processing) return;
         setProcessing(true);
         setTimeout(() => {
+          let payment;
+          if (payMethod === "cod") payment = { method: "cod" };
+          else if (payMethod === "bkash" || payMethod === "nagad") payment = { method: payMethod, trxId: form.trxId.trim(), number: mobileBankingNumber };
+          else payment = { method: "card", brand: "Visa", last4: form.card.replace(/\s/g, "").slice(-4) };
           onComplete(
             { name: form.name, email: form.email, address: `${form.address}, ${form.city} ${form.zip}` },
-            payMethod === "cod"
-              ? { method: "cod" }
-              : { method: "card", brand: "Visa", last4: form.card.replace(/\s/g, "").slice(-4) },
+            payment,
             shipping
           );
         }, 1400);
@@ -815,6 +821,14 @@
                     style={{ textAlign: "left", cursor: "pointer", border: "1px solid " + (payMethod === "cod" ? "var(--ink)" : "var(--line-strong)"), background: payMethod === "cod" ? "var(--ink)" : "transparent", color: payMethod === "cod" ? "var(--paper)" : "var(--ink)" }}>
                     Cash on delivery
                   </button>
+                  <button type="button" onClick={() => setPayMethod("bkash")} className="at-field"
+                    style={{ textAlign: "left", cursor: "pointer", border: "1px solid " + (payMethod === "bkash" ? "var(--ink)" : "var(--line-strong)"), background: payMethod === "bkash" ? "var(--ink)" : "transparent", color: payMethod === "bkash" ? "var(--paper)" : "var(--ink)" }}>
+                    bKash
+                  </button>
+                  <button type="button" onClick={() => setPayMethod("nagad")} className="at-field"
+                    style={{ textAlign: "left", cursor: "pointer", border: "1px solid " + (payMethod === "nagad" ? "var(--ink)" : "var(--line-strong)"), background: payMethod === "nagad" ? "var(--ink)" : "transparent", color: payMethod === "nagad" ? "var(--paper)" : "var(--ink)" }}>
+                    Nagad
+                  </button>
                 </div>
                 {payMethod === "card" ? (
                   <>
@@ -825,15 +839,26 @@
                     </div>
                     <p className="at-mono" style={{ fontSize: 11, color: "var(--muted)", marginTop: 4 }}>Use any 16-digit number — this is a demo gateway.</p>
                   </>
-                ) : (
+                ) : payMethod === "cod" ? (
                   <p style={{ color: "var(--ink-soft)", fontSize: 13, lineHeight: 1.6 }}>Pay in cash when your order arrives. Please have {money(total)} ready for the courier.</p>
+                ) : (
+                  <div className="at-card" style={{ padding: 16, background: "var(--accent-tint)", border: "none" }}>
+                    <p style={{ color: "var(--ink-soft)", fontSize: 13, lineHeight: 1.6, marginBottom: 12 }}>
+                      Send <b className="at-mono">{money(total)}</b> to this {payMethod === "bkash" ? "bKash" : "Nagad"} number via <b>Send Money</b>:
+                    </p>
+                    <div className="at-mono" style={{ fontSize: 18, fontWeight: 700, marginBottom: 14 }}>{mobileBankingNumber}</div>
+                    <Field label="Transaction ID (TrxID)" value={form.trxId} onChange={set("trxId")} placeholder="e.g. 8N7C6X5D4E" mono />
+                    <p className="at-mono" style={{ fontSize: 11, color: "var(--muted)" }}>We'll verify this before confirming your order.</p>
+                  </div>
                 )}
               </section>
 
               <button onClick={submit} disabled={!valid || processing} className="at-btn at-btn-primary" style={{ width: "100%", marginTop: 28, padding: "15px" }}>
                 {processing
-                  ? (payMethod === "cod" ? "Placing order…" : "Processing payment…")
-                  : payMethod === "cod" ? <>Place order · {money(total)} <ArrowRight /></> : <>Pay {money(total)} <Lock /></>}
+                  ? (payMethod === "card" ? "Processing payment…" : "Placing order…")
+                  : payMethod === "card" ? <>Pay {money(total)} <Lock /></>
+                  : payMethod === "cod" ? <>Place order · {money(total)} <ArrowRight /></>
+                  : <>Confirm order · {money(total)} <ArrowRight /></>}
               </button>
               {!valid && !processing && (
                 <p className="at-mono" style={{ fontSize: 11, color: "var(--warn)", marginTop: 10, textAlign: "center" }}>
@@ -882,6 +907,11 @@
     );
 
     function Confirmation({ order, settings, money, onDone }) {
+      const method = order.payment.method;
+      const dueLabel = method === "card" ? "Paid" : method === "cod" ? "Due on delivery" : "Awaiting verification";
+      const paymentLabel = method === "cod" ? "Cash on delivery"
+        : method === "card" ? `${order.payment.brand} ···· ${order.payment.last4}`
+        : `${method === "bkash" ? "bKash" : "Nagad"} · TrxID ${order.payment.trxId}`;
       return (
         <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
           <div className="at-card at-rise" style={{ maxWidth: 460, width: "100%", padding: 40, textAlign: "center" }}>
@@ -893,8 +923,8 @@
             <div className="at-card" style={{ padding: 18, marginTop: 24, textAlign: "left", background: "var(--paper)" }}>
               <Row label="Order number" value={order.id} />
               <Row label="Items" value={order.items.reduce((s, i) => s + i.qty, 0)} />
-              <Row label={order.payment.method === "cod" ? "Due on delivery" : "Paid"} value={money(order.total)} />
-              <Row label="Payment" value={order.payment.method === "cod" ? "Cash on delivery" : `${order.payment.brand} ···· ${order.payment.last4}`} />
+              <Row label={dueLabel} value={money(order.total)} />
+              <Row label="Payment" value={paymentLabel} />
             </div>
             <button onClick={onDone} className="at-btn at-btn-dark" style={{ width: "100%", marginTop: 24 }}>Continue shopping</button>
             <p className="at-mono" style={{ fontSize: 11, color: "var(--muted)", marginTop: 14 }}>This order is now live in the admin dashboard.</p>
@@ -994,7 +1024,7 @@
 
           <main style={{ flex: 1, padding: 32, minWidth: 0 }}>
             {nav === "dashboard" && <Dashboard products={products} orders={orders} money={money} onReset={onReset} isSuperAdmin={isSuperAdmin} />}
-            {nav === "pos" && <POS products={products} money={money} placeOrder={placeOrder} notify={notify} currentUser={currentUser} />}
+            {nav === "pos" && <POS products={products} settings={settings} money={money} placeOrder={placeOrder} notify={notify} currentUser={currentUser} />}
             {nav === "products" && <Products products={products} setProducts={setProducts} money={money} notify={notify} />}
             {nav === "orders" && <Orders orders={orders} setOrders={setOrders} money={money} notify={notify} isSuperAdmin={isSuperAdmin} />}
             {nav === "settings" && <Settings settings={settings} setSettings={setSettings} notify={notify} />}
@@ -1145,13 +1175,16 @@
       );
     }
 
-    function POS({ products, money, placeOrder, notify, currentUser }) {
+    function POS({ products, settings, money, placeOrder, notify, currentUser }) {
       const [cart, setCart] = useState([]);
       const [cat, setCat] = useState("All");
       const [q, setQ] = useState("");
       const [customerName, setCustomerName] = useState("");
       const [payMethod, setPayMethod] = useState("cash");
+      const [trxId, setTrxId] = useState("");
       const [receipt, setReceipt] = useState(null);
+      const needsTrxId = payMethod === "bkash" || payMethod === "nagad";
+      const mobileBankingNumber = payMethod === "bkash" ? settings.bkashNumber : payMethod === "nagad" ? settings.nagadNumber : "";
 
       const sellable = useMemo(() => {
         let list = products.filter(p => p.status === "active" && p.stock > 0);
@@ -1178,7 +1211,7 @@
       const itemCount = cart.reduce((s, i) => s + i.qty, 0);
 
       const completeSale = () => {
-        if (!cart.length) return;
+        if (!cart.length || (needsTrxId && trxId.trim().length < 6)) return;
         const order = {
           id: "ORD-" + Math.floor(1000 + Math.random() * 9000),
           createdAt: Date.now(),
@@ -1186,17 +1219,17 @@
           subtotal, shipping: 0, total: subtotal,
           status: "paid",
           customer: { name: customerName.trim() || "Walk-in customer", email: "-", address: "In-store purchase" },
-          payment: { method: payMethod },
+          payment: needsTrxId ? { method: payMethod, trxId: trxId.trim(), number: mobileBankingNumber } : { method: payMethod },
           channel: "pos",
           cashier: currentUser?.name || "",
         };
         placeOrder(order);
         setReceipt(order);
-        setCart([]); setCustomerName(""); setPayMethod("cash");
+        setCart([]); setCustomerName(""); setPayMethod("cash"); setTrxId("");
         notify(`Sale completed · ${money(subtotal)}`);
       };
 
-      const PAY_METHODS = [{ id: "cash", label: "Cash" }, { id: "card", label: "Card" }, { id: "mobile", label: "bKash/Nagad" }];
+      const PAY_METHODS = [{ id: "cash", label: "Cash" }, { id: "card", label: "Card" }, { id: "bkash", label: "bKash" }, { id: "nagad", label: "Nagad" }];
 
       return (
         <div style={{ maxWidth: 1300 }}>
@@ -1275,11 +1308,19 @@
 
               <div style={{ marginBottom: 16 }}>
                 <label className="at-label">Payment method</label>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8 }}>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: 8 }}>
                   {PAY_METHODS.map(m => (
                     <button key={m.id} onClick={() => setPayMethod(m.id)} className="at-mono" style={{ padding: "9px 6px", fontSize: 11, border: "1px solid " + (payMethod === m.id ? "var(--ink)" : "var(--line-strong)"), background: payMethod === m.id ? "var(--ink)" : "transparent", color: payMethod === m.id ? "var(--paper)" : "var(--ink)", borderRadius: 2 }}>{m.label}</button>
                   ))}
                 </div>
+                {needsTrxId && (
+                  <div style={{ marginTop: 12 }}>
+                    <p className="at-mono" style={{ fontSize: 11, color: "var(--muted)", marginBottom: 8 }}>
+                      Check the customer sent {money(subtotal)} to {mobileBankingNumber}, then enter their TrxID:
+                    </p>
+                    <input className="at-field at-mono" value={trxId} onChange={e => setTrxId(e.target.value)} placeholder="Transaction ID (TrxID)" />
+                  </div>
+                )}
               </div>
 
               <div style={{ display: "flex", justifyContent: "space-between", fontSize: 15, marginBottom: 14, paddingTop: 14, borderTop: "1px solid var(--line)" }}>
@@ -1287,7 +1328,7 @@
                 <span className="at-mono" style={{ fontWeight: 700, fontSize: 18 }}>{money(subtotal)}</span>
               </div>
 
-              <button onClick={completeSale} disabled={!cart.length} className="at-btn at-btn-primary" style={{ width: "100%" }}>
+              <button onClick={completeSale} disabled={!cart.length || (needsTrxId && trxId.trim().length < 6)} className="at-btn at-btn-primary" style={{ width: "100%" }}>
                 Complete sale · {money(subtotal)}
               </button>
             </div>
@@ -1304,6 +1345,7 @@
                     <Row label="Order number" value={receipt.id} />
                     <Row label="Items" value={receipt.items.reduce((s, i) => s + i.qty, 0)} />
                     <Row label="Payment" value={PAY_METHODS.find(m => m.id === receipt.payment.method)?.label || receipt.payment.method} />
+                    {receipt.payment.trxId && <Row label="TrxID" value={receipt.payment.trxId} />}
                     <div style={{ display: "flex", justifyContent: "space-between", marginTop: 10, paddingTop: 10, borderTop: "1px solid var(--line)" }}>
                       <span className="at-disp" style={{ fontWeight: 700 }}>Total</span>
                       <span className="at-mono" style={{ fontWeight: 700 }}>{money(receipt.total)}</span>
@@ -1512,6 +1554,15 @@
         setSelected(s => s.filter(id => !ids.includes(id)));
         setConfirmDelete(null);
       };
+      const paymentLabel = (o) => {
+        const p = o.payment || {};
+        if (p.method === "cod") return "Cash on delivery";
+        if (p.method === "cash") return "Cash";
+        if (p.method === "card") return p.last4 ? `Card ···· ${p.last4}` : "Card";
+        if (p.method === "bkash") return "bKash" + (p.trxId ? ` · ${p.trxId}` : "");
+        if (p.method === "nagad") return "Nagad" + (p.trxId ? ` · ${p.trxId}` : "");
+        return p.method || "-";
+      };
 
       return (
         <div style={{ maxWidth: 1100 }}>
@@ -1546,6 +1597,7 @@
                   <th>Order</th>
                   <th>Customer</th>
                   <th>Date</th>
+                  <th>Payment</th>
                   <th>Total</th>
                   <th>Status</th>
                   <th style={{ width: 120 }}></th>
@@ -1569,6 +1621,7 @@
                       <div style={{ fontSize: 12, color: "var(--muted)" }}>{o.customer.email}</div>
                     </td>
                     <td style={{ whiteSpace: "nowrap" }}>{timeAgo(o.createdAt)}</td>
+                    <td className="at-mono" style={{ fontSize: 12 }}>{paymentLabel(o)}</td>
                     <td className="at-mono">{money(o.total)}</td>
                     <td>
                       <span className="at-badge" style={{ background: STATUS_META[o.status].bg, color: STATUS_META[o.status].fg }}>
@@ -1878,6 +1931,22 @@
               <div>
                 <label className="at-label">Facebook page link</label>
                 <input className="at-field" value={form.facebook} onChange={e => setForm({ ...form, facebook: e.target.value })} placeholder="https://www.facebook.com/yourpage" />
+              </div>
+              <div style={{ borderTop: "1px solid var(--line)", paddingTop: 16, marginTop: 4 }}>
+                <div className="at-eyebrow" style={{ marginBottom: 12 }}>Manual bKash / Nagad payment</div>
+                <p className="at-mono" style={{ fontSize: 11, color: "var(--muted)", marginBottom: 14 }}>
+                  These numbers are shown to customers at checkout and in POS. Customers send money themselves, then enter the Transaction ID — you verify it manually in the Orders tab before marking an order Paid.
+                </p>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+                  <div>
+                    <label className="at-label">bKash number (Send Money)</label>
+                    <input className="at-field at-mono" value={form.bkashNumber} onChange={e => setForm({ ...form, bkashNumber: e.target.value })} placeholder="01333707715" />
+                  </div>
+                  <div>
+                    <label className="at-label">Nagad number (Send Money)</label>
+                    <input className="at-field at-mono" value={form.nagadNumber} onChange={e => setForm({ ...form, nagadNumber: e.target.value })} placeholder="01333707715" />
+                  </div>
+                </div>
               </div>
               <div style={{ marginTop: 8 }}>
                 <button onClick={save} className="at-btn at-btn-primary">Save settings</button>
