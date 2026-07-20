@@ -1526,14 +1526,18 @@
       const [adding, setAdding] = useState(false);
       const [addForm, setAddForm] = useState({});
 
-      const updateProduct = (id, updates) => {
-        db.collection("products").doc(id).update(updates);
-        notify("Product updated");
-        setEditing(null);
+      const updateProduct = async (id, updates) => {
+        try {
+          await db.collection("products").doc(id).update(updates);
+          notify("Product updated");
+          setEditing(null);
+        } catch (e) {
+          notify("Couldn't save: " + e.message);
+        }
       };
 
-      const addProduct = () => {
-        if (!addForm.name) return;
+      const addProduct = async () => {
+        if (!addForm.name) { notify("Product name is required"); return; }
         const p = {
           id: uid("prod"),
           name: addForm.name,
@@ -1547,10 +1551,14 @@
           image: addForm.image || "",
           createdAt: Date.now(),
         };
-        db.collection("products").doc(p.id).set(p);
-        notify("Product added");
-        setAdding(false);
-        setAddForm({});
+        try {
+          await db.collection("products").doc(p.id).set(p);
+          notify("Product added");
+          setAdding(false);
+          setAddForm({});
+        } catch (e) {
+          notify("Couldn't add product: " + e.message);
+        }
       };
 
       return (
@@ -1702,17 +1710,25 @@
     function Orders({ orders, money, notify, isSuperAdmin }) {
       const [confirmDelete, setConfirmDelete] = useState(null);
       const [selected, setSelected] = useState([]);
-      const updateStatus = (id, status) => {
-        db.collection("orders").doc(id).update({ status });
-        notify("Order updated");
+      const updateStatus = async (id, status) => {
+        try {
+          await db.collection("orders").doc(id).update({ status });
+          notify("Order updated");
+        } catch (e) {
+          notify("Couldn't update order: " + e.message);
+        }
       };
       const toggleSelect = (id) => setSelected(s => s.includes(id) ? s.filter(x => x !== id) : [...s, id]);
       const toggleSelectAll = () => setSelected(s => s.length === orders.length ? [] : orders.map(o => o.id));
-      const deleteOrders = (ids) => {
-        const batch = db.batch();
-        ids.forEach(id => batch.delete(db.collection("orders").doc(id)));
-        batch.commit();
-        notify(ids.length > 1 ? `${ids.length} orders removed` : "Order removed");
+      const deleteOrders = async (ids) => {
+        try {
+          const batch = db.batch();
+          ids.forEach(id => batch.delete(db.collection("orders").doc(id)));
+          await batch.commit();
+          notify(ids.length > 1 ? `${ids.length} orders removed` : "Order removed");
+        } catch (e) {
+          notify("Couldn't remove: " + e.message);
+        }
         setSelected(s => s.filter(id => !ids.includes(id)));
         setConfirmDelete(null);
       };
@@ -2032,9 +2048,13 @@
     function Settings({ settings, notify }) {
       const [form, setForm] = useState(settings);
 
-      const save = () => {
-        db.collection("settings").doc("main").set(form);
-        notify("Settings saved");
+      const save = async () => {
+        try {
+          await db.collection("settings").doc("main").set(form);
+          notify("Settings saved");
+        } catch (e) {
+          notify("Couldn't save: " + e.message);
+        }
       };
 
       return (
