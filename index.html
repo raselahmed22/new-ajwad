@@ -212,7 +212,7 @@
 }
 `;
 
-    const KEYS = { products: "atelier:products", orders: "atelier:orders", settings: "atelier:settings", users: "atelier:users" };
+    const KEYS = { products: "atelier:products", orders: "atelier:orders", settings: "atelier:settings", users: "atelier:users", customers: "atelier:customers", session: "atelier:session" };
 
     async function loadKey(key, fallback) {
       try {
@@ -369,6 +369,8 @@
       const [orders, setOrders] = useState([]);
       const [settings, setSettings] = useState(DEFAULT_SETTINGS);
       const [users, setUsers] = useState([]);
+      const [customers, setCustomers] = useState([]);
+      const [customerId, setCustomerId] = useState(null);
       const [mode, setMode] = useState(() => (window.location.hash === "#admin" ? "admin" : "store"));
       const [cart, setCart] = useState([]);
       const [toast, setToast] = useState(null);
@@ -379,10 +381,13 @@
           let o = await loadKey(KEYS.orders, null);
           let s = await loadKey(KEYS.settings, null);
           let u = await loadKey(KEYS.users, null);
+          let cu = await loadKey(KEYS.customers, null);
+          let sess = await loadKey(KEYS.session, null);
           if (!p) { p = seedProducts(); await saveKey(KEYS.products, p); }
           if (!o) { o = seedOrders(p); await saveKey(KEYS.orders, o); }
           if (!s) { s = DEFAULT_SETTINGS; await saveKey(KEYS.settings, s); }
           if (!u) { u = seedUsers(s.adminPass); await saveKey(KEYS.users, u); }
+          if (!cu) { cu = []; await saveKey(KEYS.customers, cu); }
           // Merge saved settings with defaults, but keep the default logo if saved logo is empty
           const mergedSettings = {
             ...DEFAULT_SETTINGS,
@@ -390,7 +395,8 @@
             logo: s?.logo || DEFAULT_SETTINGS.logo,
             brand: s?.brand || DEFAULT_SETTINGS.brand
           };
-          setProducts(p); setOrders(o); setSettings(mergedSettings); setUsers(u); setReady(true);
+          setProducts(p); setOrders(o); setSettings(mergedSettings); setUsers(u);
+          setCustomers(cu); setCustomerId(sess || null); setReady(true);
         })();
       }, []);
 
@@ -398,10 +404,35 @@
       useEffect(() => { if (ready) saveKey(KEYS.orders, orders); }, [orders, ready]);
       useEffect(() => { if (ready) saveKey(KEYS.settings, settings); }, [settings, ready]);
       useEffect(() => { if (ready) saveKey(KEYS.users, users); }, [users, ready]);
+      useEffect(() => { if (ready) saveKey(KEYS.customers, customers); }, [customers, ready]);
+      useEffect(() => { if (ready) saveKey(KEYS.session, customerId); }, [customerId, ready]);
 
       const notify = useCallback((msg) => { setToast(msg); setTimeout(() => setToast(null), 2600); }, []);
 
       const money = useMoney(settings);
+
+      const currentCustomer = useMemo(() => customers.find(c => c.id === customerId) || null, [customers, customerId]);
+
+      const signUp = useCallback(({ name, email, phone, location, password }) => {
+        const emailNorm = email.trim().toLowerCase();
+        if (customers.some(c => c.email.toLowerCase() === emailNorm)) {
+          return { ok: false, error: "An account with this email already exists. Try signing in instead." };
+        }
+        const c = { id: uid("cust"), name: name.trim(), email: email.trim(), phone: phone.trim(), location, password, createdAt: Date.now() };
+        setCustomers(cs => [...cs, c]);
+        setCustomerId(c.id);
+        return { ok: true };
+      }, [customers]);
+
+      const signIn = useCallback(({ email, password }) => {
+        const emailNorm = email.trim().toLowerCase();
+        const c = customers.find(c => c.email.toLowerCase() === emailNorm && c.password === password);
+        if (!c) return { ok: false, error: "That email/password doesn't match." };
+        setCustomerId(c.id);
+        return { ok: true };
+      }, [customers]);
+
+      const signOut = useCallback(() => setCustomerId(null), []);
 
       const placeOrder = useCallback((order) => {
         setOrders(o => [order, ...o]);
@@ -437,6 +468,7 @@
             <Storefront
               products={products} settings={settings} cart={cart} setCart={setCart}
               money={money} placeOrder={placeOrder} notify={notify}
+              customer={currentCustomer} onSignIn={signIn} onSignUp={signUp} onSignOut={signOut}
             />
           ) : (
             <Admin
@@ -456,7 +488,7 @@
       );
     }
 
-    function Storefront({ products, settings, cart, setCart, money, placeOrder, notify }) {
+    function Storefront({ products, settings, cart, setCart, money, placeOrder, notify, customer, onSignIn, onSignUp, onSignOut }) {
       const [view, setView] = useState("home");
       const [quick, setQuick] = useState(null);
       const [cartOpen, setCartOpen] = useState(false);
@@ -464,6 +496,9 @@
       const [q, setQ] = useState("");
       const [sort, setSort] = useState("featured");
       const [confirmedOrder, setConfirmedOrder] = useState(null);
+      const [authOpen, setAuthOpen] = useState(false);
+      const [authMode, setAuthMode] = useState("signin");
+      const [afterAuth, setAfterAuth] = useState(null);
 
       const cartCount = cart.reduce((s, i) => s + i.qty, 0);
       const addToCart = (product, size) => {
@@ -489,19 +524,20 @@
 
       const subtotal = cart.reduce((s, i) => s + i.price * i.qty, 0);
 
-      const completeOrder = (customer, payment, shipping) => {
+      const completeOrder = (customerInfo, payment, shipping) => {
         const order = {
           id: "ORD-" + Math.floor(1000 + Math.random() * 9000),
           createdAt: Date.now(),
           items: cart.map(({ key, ...rest }) => rest),
           subtotal, shipping, total: subtotal + shipping,
-          status: payment.method === "card" ? "paid" : "pending", customer, payment,
+          status: payment.method === "card" ? "paid" : "pending",
+          customer: customerInfo, payment, customerId: customer?.id || null,
         };
         placeOrder(order); setConfirmedOrder(order); setCart([]); setView("confirm");
       };
 
       if (view === "checkout") {
-        return <Checkout cart={cart} subtotal={subtotal} settings={settings} money={money}
+        return <Checkout cart={cart} subtotal={subtotal} settings={settings} money={money} customer={customer}
           onBack={() => setView("home")} onComplete={completeOrder} />;
       }
       if (view === "confirm" && confirmedOrder) {
@@ -523,6 +559,14 @@
                 )}
               </button>
               <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+                {customer ? (
+                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                    <span style={{ fontSize: 13, color: "var(--ink-soft)" }}>Hi, {customer.name.split(" ")[0]}</span>
+                    <button onClick={onSignOut} className="at-btn at-btn-ghost at-btn-sm">Sign out</button>
+                  </div>
+                ) : (
+                  <button onClick={() => { setAuthMode("signin"); setAfterAuth(null); setAuthOpen(true); }} className="at-btn at-btn-ghost at-btn-sm">Sign in</button>
+                )}
                 <button onClick={() => setCartOpen(true)} style={{ position: "relative", display: "flex", alignItems: "center", gap: 8, fontSize: 24, border: "none", background: "transparent", cursor: "pointer" }}>
                   <ShoppingBag />
                   {cartCount > 0 && <span className="at-mono" style={{ position: "absolute", top: -8, right: -10, background: "var(--accent)", color: "#fff", fontSize: 10, minWidth: 17, height: 17, borderRadius: 9, display: "flex", alignItems: "center", justifyContent: "center", padding: "0 4px" }}>{cartCount}</span>}
@@ -677,7 +721,11 @@
                       <span style={{ color: "var(--muted)" }}>Subtotal</span><span className="at-mono">{money(subtotal)}</span>
                     </div>
                     <div className="at-mono" style={{ fontSize: 11, color: "var(--muted)", marginBottom: 14 }}>Shipping calculated at checkout</div>
-                    <button onClick={() => { setCartOpen(false); setView("checkout"); }} className="at-btn at-btn-primary" style={{ width: "100%" }}>
+                    <button onClick={() => {
+                      setCartOpen(false);
+                      if (!customer) { setAuthMode("signin"); setAfterAuth("checkout"); setAuthOpen(true); }
+                      else setView("checkout");
+                    }} className="at-btn at-btn-primary" style={{ width: "100%" }}>
                       Checkout · {money(subtotal)} <ArrowRight />
                     </button>
                   </div>
@@ -685,7 +733,110 @@
               </aside>
             </>
           )}
+
+          {authOpen && (
+            <AccountAuth
+              mode={authMode} setMode={setAuthMode}
+              onSignIn={onSignIn} onSignUp={onSignUp}
+              onClose={() => { setAuthOpen(false); setAfterAuth(null); }}
+              onSuccess={() => {
+                setAuthOpen(false);
+                if (afterAuth === "checkout") { setAfterAuth(null); setView("checkout"); }
+              }}
+            />
+          )}
         </div>
+      );
+    }
+
+    function AccountAuth({ mode, setMode, onSignIn, onSignUp, onClose, onSuccess }) {
+      const [form, setForm] = useState({ name: "", email: "", phone: "", location: "dhaka", password: "", confirm: "" });
+      const [err, setErr] = useState("");
+      const set = (k) => (e) => setForm(f => ({ ...f, [k]: e.target.value }));
+
+      const submit = () => {
+        setErr("");
+        if (mode === "signup") {
+          if (!form.name.trim()) return setErr("Please enter your full name.");
+          if (!/\S+@\S+\.\S+/.test(form.email)) return setErr("Please enter a valid email.");
+          if (!form.phone.trim()) return setErr("Please enter your mobile number.");
+          if (form.password.length < 4) return setErr("Password must be at least 4 characters.");
+          if (form.password !== form.confirm) return setErr("Passwords don't match.");
+          const result = onSignUp({ name: form.name, email: form.email, phone: form.phone, location: form.location, password: form.password });
+          if (!result.ok) return setErr(result.error);
+          onSuccess();
+        } else {
+          if (!form.email.trim() || !form.password) return setErr("Enter your email and password.");
+          const result = onSignIn({ email: form.email, password: form.password });
+          if (!result.ok) return setErr(result.error);
+          onSuccess();
+        }
+      };
+      const onEnter = (e) => { if (e.key === "Enter") submit(); };
+
+      return (
+        <>
+          <div className="at-scrim" onClick={onClose} />
+          <div className="at-modal">
+            <div className="at-card at-rise" style={{ maxWidth: 400, width: "100%", padding: 32 }} onClick={e => e.stopPropagation()}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+                <h2 className="at-disp" style={{ fontSize: 20, fontWeight: 700 }}>{mode === "signup" ? "Create your account" : "Sign in"}</h2>
+                <button onClick={onClose} style={{ color: "var(--muted)", fontSize: 18 }}><X /></button>
+              </div>
+              <p style={{ color: "var(--muted)", fontSize: 13, marginBottom: 20 }}>
+                {mode === "signup" ? "You'll need an account to place an order." : "Sign in to continue to checkout."}
+              </p>
+              <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                {mode === "signup" && (
+                  <div>
+                    <label className="at-label">Full name</label>
+                    <input className="at-field" value={form.name} onChange={set("name")} placeholder="Ava Lindqvist" />
+                  </div>
+                )}
+                <div>
+                  <label className="at-label">Email</label>
+                  <input className="at-field" type="email" value={form.email} onChange={set("email")} placeholder="you@email.com" />
+                </div>
+                {mode === "signup" && (
+                  <>
+                    <div>
+                      <label className="at-label">Mobile number</label>
+                      <input className="at-field at-mono" value={form.phone} onChange={set("phone")} placeholder="01XXXXXXXXX" />
+                    </div>
+                    <div>
+                      <label className="at-label">Delivery location</label>
+                      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+                        {[{ id: "dhaka", label: "Inside Dhaka" }, { id: "outside", label: "Outside Dhaka" }].map(opt => (
+                          <button key={opt.id} type="button" onClick={() => setForm(f => ({ ...f, location: opt.id }))} className="at-field"
+                            style={{ textAlign: "left", cursor: "pointer", border: "1px solid " + (form.location === opt.id ? "var(--ink)" : "var(--line-strong)"), background: form.location === opt.id ? "var(--ink)" : "transparent", color: form.location === opt.id ? "var(--paper)" : "var(--ink)" }}>
+                            {opt.label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </>
+                )}
+                <div>
+                  <label className="at-label">Password</label>
+                  <input className="at-field at-mono" type="password" value={form.password} onChange={set("password")} onKeyDown={mode === "signup" ? undefined : onEnter} placeholder="••••••" />
+                </div>
+                {mode === "signup" && (
+                  <div>
+                    <label className="at-label">Confirm password</label>
+                    <input className="at-field at-mono" type="password" value={form.confirm} onChange={set("confirm")} onKeyDown={onEnter} placeholder="••••••" />
+                  </div>
+                )}
+              </div>
+              {err && <p style={{ color: "var(--warn)", fontSize: 12, marginTop: 10 }}>{err}</p>}
+              <button onClick={submit} className="at-btn at-btn-dark" style={{ width: "100%", marginTop: 20 }}>
+                {mode === "signup" ? "Create account" : "Sign in"}
+              </button>
+              <button onClick={() => { setMode(mode === "signup" ? "signin" : "signup"); setErr(""); }} style={{ width: "100%", marginTop: 14, fontSize: 12, color: "var(--muted)" }}>
+                {mode === "signup" ? "Already have an account? Sign in" : "New here? Create an account"}
+              </button>
+            </div>
+          </div>
+        </>
       );
     }
 
@@ -725,9 +876,9 @@
       );
     }
 
-    function Checkout({ cart, subtotal, settings, money, onBack, onComplete }) {
-      const [form, setForm] = useState({ name: "", email: "", address: "", city: "", zip: "", card: "", exp: "", cvc: "", trxId: "" });
-      const [location, setLocation] = useState("dhaka");
+    function Checkout({ cart, subtotal, settings, money, customer, onBack, onComplete }) {
+      const [form, setForm] = useState({ name: customer?.name || "", email: customer?.email || "", address: "", city: "", zip: "", card: "", exp: "", cvc: "", trxId: "" });
+      const [location, setLocation] = useState(customer?.location || "dhaka");
       const [payMethod, setPayMethod] = useState("card");
       const [processing, setProcessing] = useState(false);
       const set = (k) => (e) => setForm(f => ({ ...f, [k]: e.target.value }));
