@@ -443,7 +443,7 @@
               products={products} setProducts={setProducts} orders={orders} setOrders={setOrders}
               settings={settings} setSettings={setSettings} money={money}
               users={users} setUsers={setUsers}
-              notify={notify}
+              notify={notify} placeOrder={placeOrder}
               onExit={() => { window.location.hash = ""; setMode("store"); }} onReset={resetAll}
             />
           )}
@@ -903,7 +903,7 @@
       );
     }
 
-    function Admin({ products, setProducts, orders, setOrders, settings, setSettings, money, users, setUsers, notify, onExit, onReset }) {
+    function Admin({ products, setProducts, orders, setOrders, settings, setSettings, money, users, setUsers, notify, placeOrder, onExit, onReset }) {
       const [currentUser, setCurrentUser] = useState(null);
       const [username, setUsername] = useState("");
       const [pass, setPass] = useState("");
@@ -952,6 +952,7 @@
       const isSuperAdmin = currentUser.role === "super_admin";
       const NAV = [
         { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, color: "#5B8DEF" },
+        { id: "pos", label: "POS", icon: ShoppingCart, color: "#2E8B57" },
         { id: "products", label: "Products", icon: Package, color: "#7C8B6E" },
         { id: "orders", label: "Orders", icon: Receipt, color: "#D6A756" },
         { id: "settings", label: "Settings", icon: SettingsIcon, color: "#C77B9C" },
@@ -993,6 +994,7 @@
 
           <main style={{ flex: 1, padding: 32, minWidth: 0 }}>
             {nav === "dashboard" && <Dashboard products={products} orders={orders} money={money} onReset={onReset} isSuperAdmin={isSuperAdmin} />}
+            {nav === "pos" && <POS products={products} money={money} placeOrder={placeOrder} notify={notify} currentUser={currentUser} />}
             {nav === "products" && <Products products={products} setProducts={setProducts} money={money} notify={notify} />}
             {nav === "orders" && <Orders orders={orders} setOrders={setOrders} money={money} notify={notify} isSuperAdmin={isSuperAdmin} />}
             {nav === "settings" && <Settings settings={settings} setSettings={setSettings} notify={notify} />}
@@ -1139,6 +1141,179 @@
               </div>
             </div>
           </div>
+        </div>
+      );
+    }
+
+    function POS({ products, money, placeOrder, notify, currentUser }) {
+      const [cart, setCart] = useState([]);
+      const [cat, setCat] = useState("All");
+      const [q, setQ] = useState("");
+      const [customerName, setCustomerName] = useState("");
+      const [payMethod, setPayMethod] = useState("cash");
+      const [receipt, setReceipt] = useState(null);
+
+      const sellable = useMemo(() => {
+        let list = products.filter(p => p.status === "active" && p.stock > 0);
+        if (cat !== "All") list = list.filter(p => p.category === cat);
+        if (q.trim()) list = list.filter(p => (p.name + p.category).toLowerCase().includes(q.toLowerCase()));
+        return list;
+      }, [products, cat, q]);
+
+      const addToCart = (product, size) => {
+        setCart(c => {
+          const key = product.id + "|" + size;
+          const existing = c.find(i => i.key === key);
+          if (existing) {
+            if (existing.qty + 1 > product.stock) { notify(`Only ${product.stock} left of ${product.name}`); return c; }
+            return c.map(i => i.key === key ? { ...i, qty: i.qty + 1 } : i);
+          }
+          return [...c, { key, id: product.id, name: product.name, category: product.category, size, price: product.price, colorKey: product.colorKey, image: product.image, qty: 1 }];
+        });
+      };
+      const updateQty = (key, d) => setCart(c => c.map(i => i.key === key ? { ...i, qty: Math.max(1, i.qty + d) } : i));
+      const removeItem = (key) => setCart(c => c.filter(i => i.key !== key));
+
+      const subtotal = cart.reduce((s, i) => s + i.price * i.qty, 0);
+      const itemCount = cart.reduce((s, i) => s + i.qty, 0);
+
+      const completeSale = () => {
+        if (!cart.length) return;
+        const order = {
+          id: "ORD-" + Math.floor(1000 + Math.random() * 9000),
+          createdAt: Date.now(),
+          items: cart.map(({ key, ...rest }) => rest),
+          subtotal, shipping: 0, total: subtotal,
+          status: "paid",
+          customer: { name: customerName.trim() || "Walk-in customer", email: "-", address: "In-store purchase" },
+          payment: { method: payMethod },
+          channel: "pos",
+          cashier: currentUser?.name || "",
+        };
+        placeOrder(order);
+        setReceipt(order);
+        setCart([]); setCustomerName(""); setPayMethod("cash");
+        notify(`Sale completed · ${money(subtotal)}`);
+      };
+
+      const PAY_METHODS = [{ id: "cash", label: "Cash" }, { id: "card", label: "Card" }, { id: "mobile", label: "bKash/Nagad" }];
+
+      return (
+        <div style={{ maxWidth: 1300 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 24 }}>
+            <span style={{ width: 40, height: 40, borderRadius: 10, background: "rgba(46,139,87,.14)", color: "#2E8B57", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}><ShoppingCart /></span>
+            <div>
+              <h1 className="at-disp" style={{ fontSize: 28, fontWeight: 700, margin: 0 }}>Point of Sale</h1>
+              <p style={{ color: "var(--muted)", marginTop: 4, fontSize: 14 }}>Ring up an in-store sale</p>
+            </div>
+          </div>
+
+          <div style={{ display: "grid", gridTemplateColumns: "1.6fr 1fr", gap: 20, alignItems: "flex-start" }}>
+            <div>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 10, marginBottom: 16, justifyContent: "space-between" }}>
+                <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+                  {["All", ...CATEGORIES].map(c => (
+                    <button key={c} onClick={() => setCat(c)} className="at-btn at-btn-sm" style={{ background: cat === c ? "var(--accent)" : "transparent", color: cat === c ? "#fff" : "var(--ink-soft)", border: cat === c ? "none" : "1px solid var(--line-strong)" }}>{c}</button>
+                  ))}
+                </div>
+                <div style={{ position: "relative" }}>
+                  <span style={{ position: "absolute", left: 11, top: "50%", transform: "translateY(-50%)", color: "var(--muted)", fontSize: 16 }}><Search /></span>
+                  <input value={q} onChange={e => setQ(e.target.value)} placeholder="Search products" className="at-field" style={{ paddingLeft: 34, width: 200 }} />
+                </div>
+              </div>
+
+              {sellable.length === 0 ? (
+                <div className="at-card" style={{ padding: "60px 24px", textAlign: "center", color: "var(--muted)" }}>
+                  Nothing in stock matches that.
+                </div>
+              ) : (
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(170px,1fr))", gap: 14 }}>
+                  {sellable.map(p => (
+                    <div key={p.id} className="at-card" style={{ overflow: "hidden" }}>
+                      <div style={{ aspectRatio: "1/1", background: "var(--paper)" }}><ProductImage product={p} /></div>
+                      <div style={{ padding: 10 }}>
+                        <div style={{ fontSize: 13, fontWeight: 600, lineHeight: 1.25 }}>{p.name}</div>
+                        <div className="at-mono" style={{ fontSize: 12, marginTop: 4, marginBottom: 8 }}>{money(p.price)} <span style={{ color: "var(--muted)" }}>· {p.stock} left</span></div>
+                        <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
+                          {p.sizes.map(s => (
+                            <button key={s} onClick={() => addToCart(p, s)} className="at-mono" style={{ padding: "5px 9px", fontSize: 11, border: "1px solid var(--line-strong)", borderRadius: 2, background: "transparent" }}>{s}</button>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div className="at-card" style={{ padding: 20, position: "sticky", top: 24 }}>
+              <div className="at-eyebrow" style={{ marginBottom: 14 }}>Current sale · {itemCount} item{itemCount !== 1 ? "s" : ""}</div>
+
+              <div style={{ maxHeight: 320, overflow: "auto", marginBottom: 14 }} className="at-scroll">
+                {cart.length === 0 ? (
+                  <p style={{ color: "var(--muted)", fontSize: 13, padding: "20px 0", textAlign: "center" }}>Tap a size above to add it to the sale.</p>
+                ) : cart.map(i => (
+                  <div key={i.key} style={{ display: "flex", gap: 10, padding: "10px 0", borderBottom: "1px solid var(--line)" }}>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontSize: 13, fontWeight: 600 }}>{i.name}</div>
+                      <div className="at-mono" style={{ fontSize: 11, color: "var(--muted)" }}>Size {i.size} · {money(i.price)}</div>
+                    </div>
+                    <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                      <button onClick={() => updateQty(i.key, -1)} style={{ padding: "3px 7px" }}><Minus /></button>
+                      <span className="at-mono" style={{ minWidth: 16, textAlign: "center", fontSize: 13 }}>{i.qty}</span>
+                      <button onClick={() => updateQty(i.key, 1)} style={{ padding: "3px 7px" }}><Plus /></button>
+                      <button onClick={() => removeItem(i.key)} style={{ color: "var(--muted)", marginLeft: 4 }}><Trash2 /></button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div style={{ marginBottom: 14 }}>
+                <label className="at-label">Customer (optional)</label>
+                <input className="at-field" value={customerName} onChange={e => setCustomerName(e.target.value)} placeholder="Walk-in customer" />
+              </div>
+
+              <div style={{ marginBottom: 16 }}>
+                <label className="at-label">Payment method</label>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8 }}>
+                  {PAY_METHODS.map(m => (
+                    <button key={m.id} onClick={() => setPayMethod(m.id)} className="at-mono" style={{ padding: "9px 6px", fontSize: 11, border: "1px solid " + (payMethod === m.id ? "var(--ink)" : "var(--line-strong)"), background: payMethod === m.id ? "var(--ink)" : "transparent", color: payMethod === m.id ? "var(--paper)" : "var(--ink)", borderRadius: 2 }}>{m.label}</button>
+                  ))}
+                </div>
+              </div>
+
+              <div style={{ display: "flex", justifyContent: "space-between", fontSize: 15, marginBottom: 14, paddingTop: 14, borderTop: "1px solid var(--line)" }}>
+                <span className="at-disp" style={{ fontWeight: 700 }}>Total</span>
+                <span className="at-mono" style={{ fontWeight: 700, fontSize: 18 }}>{money(subtotal)}</span>
+              </div>
+
+              <button onClick={completeSale} disabled={!cart.length} className="at-btn at-btn-primary" style={{ width: "100%" }}>
+                Complete sale · {money(subtotal)}
+              </button>
+            </div>
+          </div>
+
+          {receipt && (
+            <>
+              <div className="at-scrim" onClick={() => setReceipt(null)} />
+              <div className="at-modal">
+                <div className="at-card at-rise" style={{ width: "100%", maxWidth: 400, padding: 28, textAlign: "center" }} onClick={e => e.stopPropagation()}>
+                  <div style={{ width: 52, height: 52, borderRadius: "50%", background: "var(--live-tint)", color: "var(--live)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px", fontSize: 24 }}><Check /></div>
+                  <h2 className="at-disp" style={{ fontSize: 20, fontWeight: 700 }}>Sale complete</h2>
+                  <div className="at-card" style={{ padding: 16, marginTop: 20, textAlign: "left", background: "var(--paper)" }}>
+                    <Row label="Order number" value={receipt.id} />
+                    <Row label="Items" value={receipt.items.reduce((s, i) => s + i.qty, 0)} />
+                    <Row label="Payment" value={PAY_METHODS.find(m => m.id === receipt.payment.method)?.label || receipt.payment.method} />
+                    <div style={{ display: "flex", justifyContent: "space-between", marginTop: 10, paddingTop: 10, borderTop: "1px solid var(--line)" }}>
+                      <span className="at-disp" style={{ fontWeight: 700 }}>Total</span>
+                      <span className="at-mono" style={{ fontWeight: 700 }}>{money(receipt.total)}</span>
+                    </div>
+                  </div>
+                  <button onClick={() => setReceipt(null)} className="at-btn at-btn-dark" style={{ width: "100%", marginTop: 20 }}>Start next sale</button>
+                </div>
+              </div>
+            </>
+          )}
         </div>
       );
     }
@@ -1387,7 +1562,10 @@
                     )}
                     <td className="at-mono" style={{ fontWeight: 500 }}>{o.id}</td>
                     <td>
-                      <div>{o.customer.name}</div>
+                      <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                        {o.customer.name}
+                        {o.channel === "pos" && <span className="at-badge" style={{ background: "rgba(46,139,87,.14)", color: "#2E8B57" }}>In-store</span>}
+                      </div>
                       <div style={{ fontSize: 12, color: "var(--muted)" }}>{o.customer.email}</div>
                     </td>
                     <td style={{ whiteSpace: "nowrap" }}>{timeAgo(o.createdAt)}</td>
