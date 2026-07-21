@@ -245,7 +245,9 @@
 @media print{
   body *{visibility:hidden;}
   .invoice-print,.invoice-print *{visibility:visible;}
-  .invoice-print{position:absolute;left:0;top:0;width:100%;padding:0 !important;}
+  .invoice-modal{position:static !important;background:none !important;padding:0 !important;inset:auto !important;}
+  .invoice-card{position:static !important;overflow:visible !important;max-width:none !important;width:auto !important;box-shadow:none !important;}
+  .invoice-print{position:static !important;width:auto !important;padding:0 !important;}
   .no-print{display:none !important;}
 }
 `;
@@ -1120,8 +1122,8 @@
       return (
         <>
           <div className="at-scrim no-print" onClick={onClose} />
-          <div className="at-modal no-print" style={{ padding: "24px 16px" }}>
-            <div className="at-card at-rise" style={{ width: "100%", maxWidth: 720, overflow: "hidden" }} onClick={e => e.stopPropagation()}>
+          <div className="at-modal invoice-modal" style={{ padding: "24px 16px" }}>
+            <div className="at-card at-rise invoice-card" style={{ width: "100%", maxWidth: 720, overflow: "hidden" }} onClick={e => e.stopPropagation()}>
               <div className="no-print" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "14px 20px", borderBottom: "1px solid var(--line)", background: "var(--paper)" }}>
                 <span className="at-disp" style={{ fontWeight: 700, fontSize: 14 }}>Invoice preview</span>
                 <div style={{ display: "flex", gap: 8 }}>
