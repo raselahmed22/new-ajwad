@@ -446,22 +446,33 @@
       }, []);
 
       useEffect(() => {
-        return auth.onAuthStateChanged(async (user) => {
+        let unsubCustomer = null, unsubStaff = null;
+        const unsubAuth = auth.onAuthStateChanged((user) => {
+          if (unsubCustomer) { unsubCustomer(); unsubCustomer = null; }
+          if (unsubStaff) { unsubStaff(); unsubStaff = null; }
           if (!user) { setCustomerProfile(null); setStaffProfile(null); return; }
-          try {
-            const [custSnap, staffSnap] = await Promise.all([
-              db.collection("customers").doc(user.uid).get(),
-              db.collection("staff").doc(user.uid).get(),
-            ]);
-            setCustomerProfile(custSnap.exists ? { id: user.uid, ...custSnap.data() } : null);
-            setStaffProfile(staffSnap.exists ? { id: user.uid, ...staffSnap.data() } : null);
-          } catch (e) {
-            console.error("Failed to restore session profile", e);
-          }
+          unsubCustomer = db.collection("customers").doc(user.uid).onSnapshot(
+            snap => setCustomerProfile(snap.exists ? { id: user.uid, ...snap.data() } : null),
+            e => console.error("Failed to load customer profile", e)
+          );
+          unsubStaff = db.collection("staff").doc(user.uid).onSnapshot(
+            snap => setStaffProfile(snap.exists ? { id: user.uid, ...snap.data() } : null),
+            e => console.error("Failed to load staff profile", e)
+          );
         });
+        return () => { unsubAuth(); if (unsubCustomer) unsubCustomer(); if (unsubStaff) unsubStaff(); };
       }, []);
 
       const notify = useCallback((msg) => { setToast(msg); setTimeout(() => setToast(null), 2600); }, []);
+
+      const updateCustomerProfile = useCallback(async (updates) => {
+        try {
+          await db.collection("customers").doc(auth.currentUser.uid).update(updates);
+          return { ok: true };
+        } catch (e) {
+          return { ok: false, error: e.message };
+        }
+      }, []);
 
       const money = useMoney(settings);
 
@@ -540,7 +551,7 @@
             <Storefront
               products={products} settings={settings} cart={cart} setCart={setCart}
               money={money} placeOrder={placeOrder} notify={notify}
-              customer={customerProfile} onSignIn={signIn} onSignUp={signUp} onSignOut={signOut}
+              customer={customerProfile} onSignIn={signIn} onSignUp={signUp} onSignOut={signOut} onUpdateProfile={updateCustomerProfile}
             />
           ) : (
             <Admin
@@ -562,7 +573,7 @@
       );
     }
 
-    function Storefront({ products, settings, cart, setCart, money, placeOrder, notify, customer, onSignIn, onSignUp, onSignOut }) {
+    function Storefront({ products, settings, cart, setCart, money, placeOrder, notify, customer, onSignIn, onSignUp, onSignOut, onUpdateProfile }) {
       const [view, setView] = useState("home");
       const [quick, setQuick] = useState(null);
       const [cartOpen, setCartOpen] = useState(false);
@@ -573,6 +584,7 @@
       const [authOpen, setAuthOpen] = useState(false);
       const [authMode, setAuthMode] = useState("signin");
       const [afterAuth, setAfterAuth] = useState(null);
+      const [editingProfile, setEditingProfile] = useState(false);
 
       const cartCount = cart.reduce((s, i) => s + i.qty, 0);
       const addToCart = (product, size) => {
@@ -635,7 +647,7 @@
               <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
                 {customer ? (
                   <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                    <span style={{ fontSize: 13, color: "var(--ink-soft)" }}>Hi, {customer.name.split(" ")[0]}</span>
+                    <button onClick={() => setEditingProfile(true)} className="at-btn at-btn-ghost at-btn-sm" style={{ fontSize: 13 }}>Hi, {customer.name.split(" ")[0]}</button>
                     <button onClick={onSignOut} className="at-btn at-btn-ghost at-btn-sm">Sign out</button>
                   </div>
                 ) : (
@@ -819,7 +831,76 @@
               }}
             />
           )}
+
+          {editingProfile && customer && (
+            <EditProfile customer={customer} onSave={onUpdateProfile} notify={notify} onClose={() => setEditingProfile(false)} />
+          )}
         </div>
+      );
+    }
+
+    function EditProfile({ customer, onSave, notify, onClose }) {
+      const [form, setForm] = useState({ name: customer.name || "", phone: customer.phone || "", address: customer.address || "", location: customer.location || "dhaka" });
+      const [err, setErr] = useState("");
+      const [busy, setBusy] = useState(false);
+      const set = (k) => (e) => setForm(f => ({ ...f, [k]: e.target.value }));
+
+      const submit = async () => {
+        if (busy) return;
+        setErr("");
+        if (!form.name.trim()) return setErr("Please enter your name.");
+        if (!form.phone.trim()) return setErr("Please enter your mobile number.");
+        setBusy(true);
+        const result = await onSave({ name: form.name.trim(), phone: form.phone.trim(), address: form.address.trim(), location: form.location });
+        setBusy(false);
+        if (!result.ok) return setErr(result.error);
+        notify("Profile updated");
+        onClose();
+      };
+
+      return (
+        <>
+          <div className="at-scrim" onClick={onClose} />
+          <div className="at-modal">
+            <div className="at-card at-rise" style={{ maxWidth: 400, width: "100%", padding: 32 }} onClick={e => e.stopPropagation()}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+                <h2 className="at-disp" style={{ fontSize: 20, fontWeight: 700 }}>Your account</h2>
+                <button onClick={onClose} style={{ color: "var(--muted)", fontSize: 18 }}><X /></button>
+              </div>
+              <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                <div>
+                  <label className="at-label">Email</label>
+                  <input className="at-field at-mono" value={customer.email} disabled style={{ opacity: 0.6 }} />
+                </div>
+                <div>
+                  <label className="at-label">Full name</label>
+                  <input className="at-field" value={form.name} onChange={set("name")} />
+                </div>
+                <div>
+                  <label className="at-label">Mobile number</label>
+                  <input className="at-field at-mono" value={form.phone} onChange={set("phone")} placeholder="01XXXXXXXXX" />
+                </div>
+                <div>
+                  <label className="at-label">Delivery address</label>
+                  <input className="at-field" value={form.address} onChange={set("address")} placeholder="House, road, area" />
+                </div>
+                <div>
+                  <label className="at-label">Delivery location</label>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+                    {[{ id: "dhaka", label: "Inside Dhaka" }, { id: "outside", label: "Outside Dhaka" }].map(opt => (
+                      <button key={opt.id} type="button" onClick={() => setForm(f => ({ ...f, location: opt.id }))} className="at-field"
+                        style={{ textAlign: "left", cursor: "pointer", border: "1px solid " + (form.location === opt.id ? "var(--ink)" : "var(--line-strong)"), background: form.location === opt.id ? "var(--ink)" : "transparent", color: form.location === opt.id ? "var(--paper)" : "var(--ink)" }}>
+                        {opt.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+              {err && <p style={{ color: "var(--warn)", fontSize: 12, marginTop: 10 }}>{err}</p>}
+              <button onClick={submit} disabled={busy} className="at-btn at-btn-dark" style={{ width: "100%", marginTop: 20 }}>{busy ? "Saving…" : "Save changes"}</button>
+            </div>
+          </div>
+        </>
       );
     }
 
@@ -957,7 +1038,7 @@
     }
 
     function Checkout({ cart, subtotal, settings, money, customer, onBack, onComplete }) {
-      const [form, setForm] = useState({ name: customer?.name || "", email: customer?.email || "", address: "", city: "", zip: "", card: "", exp: "", cvc: "", trxId: "" });
+      const [form, setForm] = useState({ name: customer?.name || "", email: customer?.email || "", address: customer?.address || "", city: "", zip: "", card: "", exp: "", cvc: "", trxId: "" });
       const [location, setLocation] = useState(customer?.location || "dhaka");
       const [payMethod, setPayMethod] = useState("card");
       const [processing, setProcessing] = useState(false);
