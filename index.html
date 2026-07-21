@@ -334,7 +334,23 @@
                 const file = e.target.files[0];
                 if (!file) return;
                 const reader = new FileReader();
-                reader.onload = () => onChange(reader.result);
+                reader.onload = () => {
+                  const img = new Image();
+                  img.onload = () => {
+                    const maxDim = 640;
+                    let { width, height } = img;
+                    if (width > maxDim || height > maxDim) {
+                      const scale = maxDim / Math.max(width, height);
+                      width = Math.round(width * scale);
+                      height = Math.round(height * scale);
+                    }
+                    const canvas = document.createElement("canvas");
+                    canvas.width = width; canvas.height = height;
+                    canvas.getContext("2d").drawImage(img, 0, 0, width, height);
+                    onChange(canvas.toDataURL("image/jpeg", 0.72));
+                  };
+                  img.src = reader.result;
+                };
                 reader.readAsDataURL(file);
               }} />
             {value && (
