@@ -143,6 +143,7 @@
   background:var(--paper); width:100%; min-height:100vh; -webkit-font-smoothing:antialiased;
 }
 .at-root *{box-sizing:border-box;}
+.invoice-card, .invoice-card *{box-sizing:border-box;}
 .at-root button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit;}
 .at-root input,.at-root textarea,.at-root select{font-family:inherit;font-size:14px;color:var(--ink);}
 .at-mono{font-family:var(--mono);font-variant-numeric:tabular-nums;}
@@ -245,7 +246,7 @@
 }
 
 @media print{
-  @page{margin:14mm;}
+  @page{size:A4;margin:14mm;}
   *{-webkit-print-color-adjust:exact !important;print-color-adjust:exact !important;color-adjust:exact !important;}
   #root{display:none !important;}
   .no-print{display:none !important;}
@@ -1137,7 +1138,7 @@
                 </div>
               </div>
 
-              <div className="invoice-print" style={{ padding: 40, background: "#fff", display: "flex", flexDirection: "column", minHeight: "270mm" }}>
+              <div className="invoice-print" style={{ padding: 40, background: "#fff", display: "flex", flexDirection: "column", minHeight: "240mm" }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", borderBottom: "3px solid var(--accent)", paddingBottom: 20, marginBottom: 28 }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
                     {settings.logo && <img src={settings.logo} alt={settings.brand} style={{ height: 56, width: 56, borderRadius: "50%", objectFit: "cover" }} />}
