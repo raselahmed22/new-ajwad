@@ -372,7 +372,7 @@
       const [staff, setStaff] = useState([]);
       const [customerProfile, setCustomerProfile] = useState(null);
       const [staffProfile, setStaffProfile] = useState(null);
-      const [mode, setMode] = useState(() => (window.location.hash === "#admin" ? "admin" : "store"));
+      const [mode, setMode] = useState(() => (window.location.hash.startsWith("#admin") ? "admin" : "store"));
       const [cart, setCart] = useState([]);
       const [toast, setToast] = useState(null);
 
@@ -486,7 +486,9 @@
               settings={settings} money={money}
               staff={staff} currentUser={staffProfile}
               notify={notify} placeOrder={placeOrder} onSignIn={signIn}
-              onExit={() => { auth.signOut(); window.location.hash = ""; setMode("store"); }} onReset={resetAll}
+              onExit={() => { window.location.hash = ""; setMode("store"); }}
+              onLogout={() => { auth.signOut(); window.location.hash = ""; setMode("store"); }}
+              onReset={resetAll}
             />
           )}
           {toast && (
@@ -1100,13 +1102,17 @@
       );
     }
 
-    function Admin({ products, orders, settings, money, staff, currentUser, notify, placeOrder, onSignIn, onExit, onReset }) {
+    function Admin({ products, orders, settings, money, staff, currentUser, notify, placeOrder, onSignIn, onExit, onLogout, onReset }) {
       const [username, setUsername] = useState("");
       const [pass, setPass] = useState("");
       const [show, setShow] = useState(false);
       const [err, setErr] = useState("");
       const [busy, setBusy] = useState(false);
-      const [nav, setNav] = useState("dashboard");
+      const [nav, setNav] = useState(() => {
+        const sub = window.location.hash.split("/")[1];
+        return sub || "dashboard";
+      });
+      const goNav = (id) => { setNav(id); window.location.hash = "admin/" + id; };
 
       if (!currentUser) {
         const attempt = async () => {
@@ -1189,16 +1195,20 @@
             </div>
             <nav style={{ flex: 1, display: "flex", flexDirection: "column", gap: 4 }}>
               {NAV.map(n => (
-                <button key={n.id} onClick={() => setNav(n.id)} className={"at-navitem" + (nav === n.id ? " active" : "")}>
+                <button key={n.id} onClick={() => goNav(n.id)} className={"at-navitem" + (nav === n.id ? " active" : "")}>
                   <span style={{ fontSize: 15, color: nav === n.id ? "#fff" : n.color }}><n.icon /></span>
                   {n.label}
                 </button>
               ))}
             </nav>
-            <div style={{ borderTop: "1px solid rgba(255,255,255,.1)", paddingTop: 16, marginTop: 16 }}>
+            <div style={{ borderTop: "1px solid rgba(255,255,255,.1)", paddingTop: 16, marginTop: 16, display: "flex", flexDirection: "column", gap: 2 }}>
               <button onClick={onExit} className="at-navitem" style={{ color: "var(--muted)" }}>
+                <span style={{ fontSize: 18 }}>👁️</span>
+                View storefront
+              </button>
+              <button onClick={onLogout} className="at-navitem" style={{ color: "var(--muted)" }}>
                 <span style={{ fontSize: 18 }}><LogOut /></span>
-                Exit admin
+                Logout
               </button>
             </div>
           </aside>
