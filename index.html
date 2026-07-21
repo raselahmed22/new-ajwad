@@ -1137,7 +1137,7 @@
                 </div>
               </div>
 
-              <div className="invoice-print" style={{ padding: 40, background: "#fff" }}>
+              <div className="invoice-print" style={{ padding: 40, background: "#fff", display: "flex", flexDirection: "column", minHeight: "270mm" }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", borderBottom: "3px solid var(--accent)", paddingBottom: 20, marginBottom: 28 }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
                     {settings.logo && <img src={settings.logo} alt={settings.brand} style={{ height: 56, width: 56, borderRadius: "50%", objectFit: "cover" }} />}
@@ -1202,7 +1202,7 @@
                   </div>
                 </div>
 
-                <div style={{ textAlign: "center", color: "var(--muted)", fontSize: 12, borderTop: "1px solid var(--line)", paddingTop: 20 }}>
+                <div style={{ marginTop: "auto", textAlign: "center", color: "var(--ink-soft)", fontSize: 15, fontWeight: 600, borderTop: "1px solid var(--line)", paddingTop: 20 }}>
                   Thank you for shopping with {settings.brand}! · {settings.phone}
                 </div>
               </div>
