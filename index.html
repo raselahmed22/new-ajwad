@@ -246,8 +246,10 @@
   @page{margin:14mm;}
   body *{visibility:hidden;}
   .invoice-print,.invoice-print *{visibility:visible;}
-  .invoice-print{position:fixed !important;left:0 !important;top:0 !important;right:0 !important;
-    width:auto !important;margin:0 !important;padding:0 !important;background:#fff !important;}
+  .invoice-modal{display:block !important;position:static !important;background:none !important;padding:0 !important;inset:auto !important;}
+  .invoice-card{display:block !important;position:static !important;overflow:visible !important;
+    max-width:none !important;width:100% !important;box-shadow:none !important;border:none !important;}
+  .invoice-print{position:static !important;width:100% !important;padding:0 !important;background:none !important;}
   .invoice-print table tr{break-inside:avoid;}
   .no-print{display:none !important;}
 }
@@ -1120,7 +1122,7 @@
 
     function Invoice({ order, settings, money, onClose }) {
       const itemCount = order.items.reduce((s, i) => s + i.qty, 0);
-      return (
+      return ReactDOM.createPortal(
         <>
           <div className="at-scrim no-print" onClick={onClose} />
           <div className="at-modal invoice-modal" style={{ padding: "24px 16px" }}>
@@ -1204,7 +1206,8 @@
               </div>
             </div>
           </div>
-        </>
+        </>,
+        document.body
       );
     }
 
