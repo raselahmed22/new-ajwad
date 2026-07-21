@@ -1108,32 +1108,37 @@
           setBusy(false);
         };
         return (
-          <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
+          <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", padding: 24, background: "linear-gradient(135deg, #6B3FA0 0%, #C77B9C 35%, #C9932E 65%, #2E8B57 100%)", backgroundSize: "300% 300%" }}>
             <style>{STYLES}</style>
-            <div className="at-card at-rise" style={{ maxWidth: 380, width: "100%", padding: 36 }}>
-              {settings.logo ? (
-                <div style={{ textAlign: "center", marginBottom: 16 }}>
-                  <img src={settings.logo} alt={settings.brand} style={{ height: 64, width: "auto", maxWidth: 280, borderRadius: "50%" }} />
-                  <div className="at-disp" style={{ fontSize: 18, letterSpacing: ".24em", fontWeight: 700, marginTop: 10 }}>{settings.brand}</div>
+            <div className="at-rise" style={{ maxWidth: 380, width: "100%", borderRadius: 6, overflow: "hidden", background: "var(--surface)", boxShadow: "0 24px 60px rgba(30,10,50,.35)" }}>
+              <div style={{ height: 8, background: "linear-gradient(90deg, #6B3FA0, #C77B9C, #C9932E, #2E8B57)" }} />
+              <div style={{ padding: "32px 36px 36px" }}>
+                {settings.logo ? (
+                  <div style={{ textAlign: "center", marginBottom: 16 }}>
+                    <img src={settings.logo} alt={settings.brand} style={{ height: 64, width: "auto", maxWidth: 280, borderRadius: "50%", boxShadow: "0 0 0 4px var(--accent-tint)" }} />
+                    <div className="at-disp" style={{ fontSize: 18, letterSpacing: ".24em", fontWeight: 700, marginTop: 10 }}>{settings.brand}</div>
+                  </div>
+                ) : (
+                  <div className="at-disp" style={{ fontSize: 20, letterSpacing: ".24em", fontWeight: 700, textAlign: "center" }}>{settings.brand}</div>
+                )}
+                <div style={{ textAlign: "center", marginTop: 10, marginBottom: 28 }}>
+                  <span className="at-eyebrow" style={{ background: "linear-gradient(90deg, var(--accent), #C77B9C)", color: "#fff", padding: "6px 16px", borderRadius: 20, display: "inline-block" }}>Operations · Admin access</span>
                 </div>
-              ) : (
-                <div className="at-disp" style={{ fontSize: 20, letterSpacing: ".24em", fontWeight: 700, textAlign: "center" }}>{settings.brand}</div>
-              )}
-              <div className="at-eyebrow" style={{ textAlign: "center", marginTop: 6, marginBottom: 28 }}>Operations · Admin access</div>
-              <label className="at-label">Email</label>
-              <input value={username} autoFocus type="email"
-                onChange={e => setUsername(e.target.value)} onKeyDown={e => e.key === "Enter" && attempt()}
-                className="at-field" placeholder="admin@yourdomain.com" style={{ marginBottom: 14 }} />
-              <label className="at-label">Password</label>
-              <div style={{ position: "relative" }}>
-                <input type={show ? "text" : "password"} value={pass}
-                  onChange={e => setPass(e.target.value)} onKeyDown={e => e.key === "Enter" && attempt()}
-                  className="at-field at-mono" placeholder="••••••" style={{ paddingRight: 40 }} />
-                <button onClick={() => setShow(s => !s)} style={{ position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)", color: "var(--muted)", fontSize: 16 }}>{show ? <EyeOff /> : <Eye />}</button>
+                <label className="at-label" style={{ display: "flex", alignItems: "center", gap: 6 }}><span style={{ color: "var(--accent)" }}>✉️</span> Email</label>
+                <input value={username} autoFocus type="email"
+                  onChange={e => setUsername(e.target.value)} onKeyDown={e => e.key === "Enter" && attempt()}
+                  className="at-field" placeholder="admin@yourdomain.com" style={{ marginBottom: 14, borderColor: "var(--line-strong)", borderWidth: 2 }} />
+                <label className="at-label" style={{ display: "flex", alignItems: "center", gap: 6 }}><span style={{ color: "var(--gold)" }}><Lock /></span> Password</label>
+                <div style={{ position: "relative" }}>
+                  <input type={show ? "text" : "password"} value={pass}
+                    onChange={e => setPass(e.target.value)} onKeyDown={e => e.key === "Enter" && attempt()}
+                    className="at-field at-mono" placeholder="••••••" style={{ paddingRight: 40, borderWidth: 2 }} />
+                  <button onClick={() => setShow(s => !s)} style={{ position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)", color: "var(--muted)", fontSize: 16 }}>{show ? <EyeOff /> : <Eye />}</button>
+                </div>
+                {err && <p style={{ color: "var(--warn)", fontSize: 12, marginTop: 8 }}>{err}</p>}
+                <button onClick={attempt} disabled={busy} className="at-btn" style={{ width: "100%", marginTop: 20, background: "linear-gradient(90deg, var(--accent), #C77B9C)", color: "#fff", boxShadow: "0 8px 20px rgba(107,63,160,.35)" }}>{busy ? "Signing in…" : "Enter dashboard"}</button>
+                <button onClick={onExit} style={{ width: "100%", marginTop: 16, fontSize: 12, color: "var(--muted)" }}>← Back to storefront</button>
               </div>
-              {err && <p style={{ color: "var(--warn)", fontSize: 12, marginTop: 8 }}>{err}</p>}
-              <button onClick={attempt} disabled={busy} className="at-btn at-btn-dark" style={{ width: "100%", marginTop: 20 }}>{busy ? "Signing in…" : "Enter dashboard"}</button>
-              <button onClick={onExit} style={{ width: "100%", marginTop: 16, fontSize: 12, color: "var(--muted)" }}>← Back to storefront</button>
             </div>
           </div>
         );
