@@ -4,6 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Ajwad Barakah</title>
+  <style>
+    html, body { margin: 0; padding: 0; width: 100%; min-height: 100%; }
+    #root { width: 100%; min-height: 100vh; }
+  </style>
   <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
   <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -134,7 +138,7 @@
   --body:'Inter',system-ui,sans-serif;
   --mono:'Space Mono',ui-monospace,monospace;
   color:var(--ink); font-family:var(--body);
-  background:var(--paper); min-height:100vh; -webkit-font-smoothing:antialiased;
+  background:var(--paper); width:100%; min-height:100vh; -webkit-font-smoothing:antialiased;
 }
 .at-root *{box-sizing:border-box;}
 .at-root button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit;}
@@ -221,7 +225,7 @@
 }
 
 /* admin panel responsive shell */
-.admin-shell{display:flex;min-height:100vh;}
+.admin-shell{display:flex;width:100%;min-height:100vh;}
 .admin-sidebar{width:232px;flex-shrink:0;position:sticky;top:0;height:100vh;overflow-y:auto;}
 .admin-nav{display:flex;flex-direction:column;gap:4px;}
 .admin-main{flex:1;min-width:0;}
