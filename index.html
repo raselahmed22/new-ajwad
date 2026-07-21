@@ -241,6 +241,13 @@
   .admin-main{padding:16px !important;}
   .admin-grid-2col,.pos-grid{grid-template-columns:1fr !important;}
 }
+
+@media print{
+  body *{visibility:hidden;}
+  .invoice-print,.invoice-print *{visibility:visible;}
+  .invoice-print{position:absolute;left:0;top:0;width:100%;padding:0 !important;}
+  .no-print{display:none !important;}
+}
 `;
 
     const CATEGORIES = ["Tops", "Knitwear", "Outerwear", "Bottoms", "Dresses", "Accessories"];
@@ -320,6 +327,16 @@
       shipped: { label: "Shipped", bg: "#EEF0F2", fg: "#46505C" },
       delivered: { label: "Delivered", bg: "var(--live-tint)", fg: "var(--live)" },
     };
+    const paymentLabel = (o) => {
+      const p = o.payment || {};
+      if (p.method === "cod") return "Cash on delivery";
+      if (p.method === "cash") return "Cash";
+      if (p.method === "card") return p.last4 ? `${p.brand || "Card"} ···· ${p.last4}` : "Card";
+      if (p.method === "bkash") return "bKash" + (p.trxId ? ` · TrxID ${p.trxId}` : "");
+      if (p.method === "nagad") return "Nagad" + (p.trxId ? ` · TrxID ${p.trxId}` : "");
+      return p.method || "-";
+    };
+    const dueLabel = (o) => o.payment?.method === "card" ? "Paid" : o.payment?.method === "cod" ? "Due on delivery" : "Awaiting verification";
 
     function ProductImage({ product, className }) {
       if (product.image) {
@@ -1098,12 +1115,98 @@
       </div>
     );
 
+    function Invoice({ order, settings, money, onClose }) {
+      const itemCount = order.items.reduce((s, i) => s + i.qty, 0);
+      return (
+        <>
+          <div className="at-scrim no-print" onClick={onClose} />
+          <div className="at-modal no-print" style={{ padding: "24px 16px" }}>
+            <div className="at-card at-rise" style={{ width: "100%", maxWidth: 720, overflow: "hidden" }} onClick={e => e.stopPropagation()}>
+              <div className="no-print" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "14px 20px", borderBottom: "1px solid var(--line)", background: "var(--paper)" }}>
+                <span className="at-disp" style={{ fontWeight: 700, fontSize: 14 }}>Invoice preview</span>
+                <div style={{ display: "flex", gap: 8 }}>
+                  <button onClick={() => window.print()} className="at-btn at-btn-primary at-btn-sm">Download / Print</button>
+                  <button onClick={onClose} className="at-btn at-btn-ghost at-btn-sm"><X /></button>
+                </div>
+              </div>
+
+              <div className="invoice-print" style={{ padding: 40, background: "#fff" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", borderBottom: "3px solid var(--accent)", paddingBottom: 20, marginBottom: 28 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+                    {settings.logo && <img src={settings.logo} alt={settings.brand} style={{ height: 56, width: 56, borderRadius: "50%", objectFit: "cover" }} />}
+                    <div>
+                      <div className="at-disp" style={{ fontSize: 20, fontWeight: 700 }}>{settings.brand}</div>
+                      <div style={{ fontSize: 12, color: "var(--muted)", marginTop: 2 }}>{settings.address}</div>
+                      <div style={{ fontSize: 12, color: "var(--muted)" }}>{settings.phone}</div>
+                    </div>
+                  </div>
+                  <div style={{ textAlign: "right" }}>
+                    <div className="at-disp" style={{ fontSize: 26, fontWeight: 700, color: "var(--accent)", letterSpacing: ".08em" }}>INVOICE</div>
+                    <div className="at-mono" style={{ fontSize: 13, marginTop: 4 }}>{order.id}</div>
+                    <div style={{ fontSize: 12, color: "var(--muted)" }}>{new Date(order.createdAt).toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric" })}</div>
+                  </div>
+                </div>
+
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20, marginBottom: 28 }}>
+                  <div>
+                    <div className="at-eyebrow" style={{ marginBottom: 8 }}>Bill to</div>
+                    <div style={{ fontWeight: 600 }}>{order.customer.name}</div>
+                    {order.customer.email && order.customer.email !== "-" && <div style={{ fontSize: 13, color: "var(--muted)" }}>{order.customer.email}</div>}
+                    <div style={{ fontSize: 13, color: "var(--muted)" }}>{order.customer.address}</div>
+                  </div>
+                  <div style={{ textAlign: "right" }}>
+                    <div className="at-eyebrow" style={{ marginBottom: 8 }}>Payment</div>
+                    <div style={{ fontSize: 13, marginBottom: 6 }}>{paymentLabel(order)}</div>
+                    <span className="at-badge" style={{ background: STATUS_META[order.status].bg, color: STATUS_META[order.status].fg }}>{STATUS_META[order.status].label}</span>
+                  </div>
+                </div>
+
+                <table style={{ width: "100%", borderCollapse: "collapse", marginBottom: 24 }}>
+                  <thead>
+                    <tr style={{ background: "var(--accent)" }}>
+                      <th style={{ color: "#fff", textAlign: "left", padding: "10px 12px", fontSize: 12, letterSpacing: ".04em" }}>Item</th>
+                      <th style={{ color: "#fff", padding: "10px 12px", fontSize: 12 }}>Size</th>
+                      <th style={{ color: "#fff", padding: "10px 12px", fontSize: 12 }}>Qty</th>
+                      <th style={{ color: "#fff", textAlign: "right", padding: "10px 12px", fontSize: 12 }}>Price</th>
+                      <th style={{ color: "#fff", textAlign: "right", padding: "10px 12px", fontSize: 12 }}>Total</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {order.items.map((it, i) => (
+                      <tr key={i} style={{ borderBottom: "1px solid var(--line)" }}>
+                        <td style={{ padding: "10px 12px", fontSize: 13 }}>{it.name}</td>
+                        <td style={{ padding: "10px 12px", fontSize: 13, textAlign: "center" }}>{it.size}</td>
+                        <td style={{ padding: "10px 12px", fontSize: 13, textAlign: "center" }}>{it.qty}</td>
+                        <td className="at-mono" style={{ padding: "10px 12px", fontSize: 13, textAlign: "right" }}>{money(it.price)}</td>
+                        <td className="at-mono" style={{ padding: "10px 12px", fontSize: 13, textAlign: "right" }}>{money(it.price * it.qty)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+
+                <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 32 }}>
+                  <div style={{ width: 260 }}>
+                    <Row label="Subtotal" value={money(order.subtotal)} />
+                    <Row label="Shipping" value={money(order.shipping)} />
+                    <div style={{ display: "flex", justifyContent: "space-between", paddingTop: 10, marginTop: 10, borderTop: "2px solid var(--ink)" }}>
+                      <span className="at-disp" style={{ fontWeight: 700 }}>Total ({itemCount} item{itemCount !== 1 ? "s" : ""})</span>
+                      <span className="at-mono" style={{ fontWeight: 700 }}>{money(order.total)}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div style={{ textAlign: "center", color: "var(--muted)", fontSize: 12, borderTop: "1px solid var(--line)", paddingTop: 20 }}>
+                  Thank you for shopping with {settings.brand}! · {settings.phone}
+                </div>
+              </div>
+            </div>
+          </div>
+        </>
+      );
+    }
+
     function Confirmation({ order, settings, money, onDone }) {
-      const method = order.payment.method;
-      const dueLabel = method === "card" ? "Paid" : method === "cod" ? "Due on delivery" : "Awaiting verification";
-      const paymentLabel = method === "cod" ? "Cash on delivery"
-        : method === "card" ? `${order.payment.brand} ···· ${order.payment.last4}`
-        : `${method === "bkash" ? "bKash" : "Nagad"} · TrxID ${order.payment.trxId}`;
+      const [showInvoice, setShowInvoice] = useState(false);
       return (
         <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
           <div className="at-card at-rise" style={{ maxWidth: 460, width: "100%", padding: 40, textAlign: "center" }}>
@@ -1115,12 +1218,14 @@
             <div className="at-card" style={{ padding: 18, marginTop: 24, textAlign: "left", background: "var(--paper)" }}>
               <Row label="Order number" value={order.id} />
               <Row label="Items" value={order.items.reduce((s, i) => s + i.qty, 0)} />
-              <Row label={dueLabel} value={money(order.total)} />
-              <Row label="Payment" value={paymentLabel} />
+              <Row label={dueLabel(order)} value={money(order.total)} />
+              <Row label="Payment" value={paymentLabel(order)} />
             </div>
-            <button onClick={onDone} className="at-btn at-btn-dark" style={{ width: "100%", marginTop: 24 }}>Continue shopping</button>
+            <button onClick={() => setShowInvoice(true)} className="at-btn at-btn-primary" style={{ width: "100%", marginTop: 24 }}><Receipt /> Download invoice</button>
+            <button onClick={onDone} className="at-btn at-btn-dark" style={{ width: "100%", marginTop: 12 }}>Continue shopping</button>
             <p className="at-mono" style={{ fontSize: 11, color: "var(--muted)", marginTop: 14 }}>This order is now live in the admin dashboard.</p>
           </div>
+          {showInvoice && <Invoice order={order} settings={settings} money={money} onClose={() => setShowInvoice(false)} />}
         </div>
       );
     }
@@ -1240,7 +1345,7 @@
             {nav === "dashboard" && <Dashboard products={products} orders={orders} money={money} onReset={onReset} isSuperAdmin={isSuperAdmin} />}
             {nav === "pos" && <POS products={products} settings={settings} money={money} placeOrder={placeOrder} notify={notify} currentUser={currentUser} />}
             {nav === "products" && <Products products={products} money={money} notify={notify} />}
-            {nav === "orders" && <Orders orders={orders} money={money} notify={notify} isSuperAdmin={isSuperAdmin} />}
+            {nav === "orders" && <Orders orders={orders} settings={settings} money={money} notify={notify} isSuperAdmin={isSuperAdmin} />}
             {nav === "settings" && <Settings settings={settings} notify={notify} />}
             {nav === "users" && isSuperAdmin && <Users staff={staff} currentUser={currentUser} notify={notify} />}
           </main>
@@ -1761,9 +1866,10 @@
       );
     }
 
-    function Orders({ orders, money, notify, isSuperAdmin }) {
+    function Orders({ orders, settings, money, notify, isSuperAdmin }) {
       const [confirmDelete, setConfirmDelete] = useState(null);
       const [selected, setSelected] = useState([]);
+      const [invoiceOrder, setInvoiceOrder] = useState(null);
       const updateStatus = async (id, status) => {
         try {
           await db.collection("orders").doc(id).update({ status });
@@ -1785,15 +1891,6 @@
         }
         setSelected(s => s.filter(id => !ids.includes(id)));
         setConfirmDelete(null);
-      };
-      const paymentLabel = (o) => {
-        const p = o.payment || {};
-        if (p.method === "cod") return "Cash on delivery";
-        if (p.method === "cash") return "Cash";
-        if (p.method === "card") return p.last4 ? `Card ···· ${p.last4}` : "Card";
-        if (p.method === "bkash") return "bKash" + (p.trxId ? ` · ${p.trxId}` : "");
-        if (p.method === "nagad") return "Nagad" + (p.trxId ? ` · ${p.trxId}` : "");
-        return p.method || "-";
       };
 
       return (
@@ -1833,6 +1930,7 @@
                   <th>Total</th>
                   <th>Status</th>
                   <th style={{ width: 120 }}></th>
+                  <th style={{ width: 40 }}></th>
                   {isSuperAdmin && <th style={{ width: 40 }}></th>}
                 </tr>
               </thead>
@@ -1868,6 +1966,9 @@
                         <option value="delivered">Delivered</option>
                       </select>
                     </td>
+                    <td style={{ textAlign: "right" }}>
+                      <button onClick={() => setInvoiceOrder(o)} title="View invoice" style={{ color: "var(--muted)", fontSize: 16 }}><Receipt /></button>
+                    </td>
                     {isSuperAdmin && (
                       <td style={{ textAlign: "right" }}>
                         <button onClick={() => setConfirmDelete([o.id])} style={{ color: "var(--muted)", fontSize: 16 }}><Trash2 /></button>
@@ -1878,6 +1979,8 @@
               </tbody>
             </table>
           </div>
+
+          {invoiceOrder && <Invoice order={invoiceOrder} settings={settings} money={money} onClose={() => setInvoiceOrder(null)} />}
 
           {confirmDelete && (
             <>
