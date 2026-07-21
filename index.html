@@ -483,13 +483,22 @@
 
       const signOut = useCallback(() => auth.signOut(), []);
 
-      const placeOrder = useCallback(async (order) => {
-        await db.collection("orders").doc(order.id).set(order);
+      const placeOrder = useCallback(async (orderData) => {
+        const counterRef = db.collection("meta").doc("orderCounter");
+        const orderId = await db.runTransaction(async (tx) => {
+          const snap = await tx.get(counterRef);
+          const next = (snap.exists ? snap.data().value : 1000) + 1;
+          tx.set(counterRef, { value: next });
+          const id = "ORD-" + next;
+          tx.set(db.collection("orders").doc(id), { ...orderData, id });
+          return id;
+        });
         const batch = db.batch();
-        order.items.forEach(it => {
+        orderData.items.forEach(it => {
           batch.update(db.collection("products").doc(it.id), { stock: firebase.firestore.FieldValue.increment(-it.qty) });
         });
         await batch.commit();
+        return orderId;
       }, []);
 
       const resetAll = useCallback(async () => {
@@ -584,16 +593,16 @@
 
       const subtotal = cart.reduce((s, i) => s + i.price * i.qty, 0);
 
-      const completeOrder = (customerInfo, payment, shipping) => {
-        const order = {
-          id: "ORD-" + Math.floor(1000 + Math.random() * 9000),
+      const completeOrder = async (customerInfo, payment, shipping) => {
+        const orderData = {
           createdAt: Date.now(),
           items: cart.map(({ key, ...rest }) => rest),
           subtotal, shipping, total: subtotal + shipping,
           status: payment.method === "card" ? "paid" : "pending",
           customer: customerInfo, payment, customerId: customer?.id || null,
         };
-        placeOrder(order); setConfirmedOrder(order); setCart([]); setView("confirm");
+        const id = await placeOrder(orderData);
+        setConfirmedOrder({ ...orderData, id }); setCart([]); setView("confirm");
       };
 
       if (view === "checkout") {
@@ -1538,10 +1547,9 @@
       const subtotal = cart.reduce((s, i) => s + i.price * i.qty, 0);
       const itemCount = cart.reduce((s, i) => s + i.qty, 0);
 
-      const completeSale = () => {
+      const completeSale = async () => {
         if (!cart.length || (needsTrxId && trxId.trim().length < 6)) return;
-        const order = {
-          id: "ORD-" + Math.floor(1000 + Math.random() * 9000),
+        const orderData = {
           createdAt: Date.now(),
           items: cart.map(({ key, ...rest }) => rest),
           subtotal, shipping: 0, total: subtotal,
@@ -1551,8 +1559,8 @@
           channel: "pos",
           cashier: currentUser?.name || "",
         };
-        placeOrder(order);
-        setReceipt(order);
+        const id = await placeOrder(orderData);
+        setReceipt({ ...orderData, id });
         setCart([]); setCustomerName(""); setPayMethod("cash"); setTrxId("");
         notify(`Sale completed · ${money(subtotal)}`);
       };
