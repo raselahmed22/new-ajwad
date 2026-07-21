@@ -1182,7 +1182,7 @@
             </div>
           </aside>
 
-          <main style={{ flex: 1, padding: 32, minWidth: 0 }}>
+          <main style={{ flex: 1, padding: 32, minWidth: 0, background: "linear-gradient(135deg, #F1E9F7 0%, #FDF6EC 45%, #E9F5EE 100%)" }}>
             {nav === "dashboard" && <Dashboard products={products} orders={orders} money={money} onReset={onReset} isSuperAdmin={isSuperAdmin} />}
             {nav === "pos" && <POS products={products} settings={settings} money={money} placeOrder={placeOrder} notify={notify} currentUser={currentUser} />}
             {nav === "products" && <Products products={products} money={money} notify={notify} />}
@@ -1251,51 +1251,51 @@
           )}
 
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(200px,1fr))", gap: 16, marginBottom: 24 }}>
-            <div className="at-card" style={{ padding: 20, borderTop: "3px solid var(--accent)" }}>
+            <div style={{ padding: 20, borderRadius: 3, background: "linear-gradient(135deg, #6B3FA0 0%, #9C6ADE 100%)", boxShadow: "0 8px 20px rgba(107,63,160,.25)" }}>
               <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
-                <span style={{ width: 32, height: 32, borderRadius: 8, background: "var(--accent-tint)", color: "var(--accent)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 15 }}><DollarSign /></span>
-                <div className="at-eyebrow">Total revenue</div>
+                <span style={{ width: 32, height: 32, borderRadius: 8, background: "rgba(255,255,255,.2)", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 15 }}><DollarSign /></span>
+                <div className="at-eyebrow" style={{ color: "rgba(255,255,255,.85)" }}>Total revenue</div>
               </div>
-              <div className="at-stat-num">{money(totalRevenue)}</div>
-              <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 12, color: "var(--live)", fontSize: 13 }}>
+              <div className="at-stat-num" style={{ color: "#fff" }}>{money(totalRevenue)}</div>
+              <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 12, color: "rgba(255,255,255,.85)", fontSize: 13 }}>
                 <TrendingUp />
                 All time
               </div>
             </div>
-            <div className="at-card" style={{ padding: 20, borderTop: "3px solid #5B3A56" }}>
+            <div style={{ padding: 20, borderRadius: 3, background: "linear-gradient(135deg, #C9932E 0%, #E8B84B 100%)", boxShadow: "0 8px 20px rgba(201,147,46,.25)" }}>
               <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
-                <span style={{ width: 32, height: 32, borderRadius: 8, background: "#F3E9F1", color: "#5B3A56", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 15 }}><Receipt /></span>
-                <div className="at-eyebrow">Orders to fulfill</div>
+                <span style={{ width: 32, height: 32, borderRadius: 8, background: "rgba(255,255,255,.2)", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 15 }}><Receipt /></span>
+                <div className="at-eyebrow" style={{ color: "rgba(255,255,255,.85)" }}>Orders to fulfill</div>
               </div>
-              <div className="at-stat-num">{pendingOrders}</div>
-              <div style={{ marginTop: 12, color: "var(--muted)", fontSize: 13 }}>
+              <div className="at-stat-num" style={{ color: "#fff" }}>{pendingOrders}</div>
+              <div style={{ marginTop: 12, color: "rgba(255,255,255,.85)", fontSize: 13 }}>
                 Pending + Paid
               </div>
             </div>
-            <div className="at-card" style={{ padding: 20, borderTop: "3px solid var(--warn)" }}>
+            <div style={{ padding: 20, borderRadius: 3, background: "linear-gradient(135deg, #B4634B 0%, #E0855F 100%)", boxShadow: "0 8px 20px rgba(180,99,75,.25)" }}>
               <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
-                <span style={{ width: 32, height: 32, borderRadius: 8, background: "var(--warn-tint)", color: "var(--warn)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 15 }}><AlertTriangle /></span>
-                <div className="at-eyebrow">Low stock</div>
+                <span style={{ width: 32, height: 32, borderRadius: 8, background: "rgba(255,255,255,.2)", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 15 }}><AlertTriangle /></span>
+                <div className="at-eyebrow" style={{ color: "rgba(255,255,255,.85)" }}>Low stock</div>
               </div>
-              <div className="at-stat-num" style={{ color: lowStock > 0 ? "var(--warn)" : "inherit" }}>{lowStock}</div>
-              <div style={{ marginTop: 12, color: "var(--muted)", fontSize: 13 }}>
+              <div className="at-stat-num" style={{ color: "#fff" }}>{lowStock}</div>
+              <div style={{ marginTop: 12, color: "rgba(255,255,255,.85)", fontSize: 13 }}>
                 Products running low
               </div>
             </div>
-            <div className="at-card" style={{ padding: 20, borderTop: "3px solid #46505C" }}>
+            <div style={{ padding: 20, borderRadius: 3, background: "linear-gradient(135deg, #2E8B57 0%, #4FB37D 100%)", boxShadow: "0 8px 20px rgba(46,139,87,.25)" }}>
               <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
-                <span style={{ width: 32, height: 32, borderRadius: 8, background: "#EEF0F2", color: "#46505C", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 15 }}><Boxes /></span>
-                <div className="at-eyebrow">Out of stock</div>
+                <span style={{ width: 32, height: 32, borderRadius: 8, background: "rgba(255,255,255,.2)", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 15 }}><Boxes /></span>
+                <div className="at-eyebrow" style={{ color: "rgba(255,255,255,.85)" }}>Out of stock</div>
               </div>
-              <div className="at-stat-num" style={{ color: outOfStock > 0 ? "var(--warn)" : "inherit" }}>{outOfStock}</div>
-              <div style={{ marginTop: 12, color: "var(--muted)", fontSize: 13 }}>
+              <div className="at-stat-num" style={{ color: "#fff" }}>{outOfStock}</div>
+              <div style={{ marginTop: 12, color: "rgba(255,255,255,.85)", fontSize: 13 }}>
                 Need restocking
               </div>
             </div>
           </div>
 
           <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: 24 }}>
-            <div className="at-card" style={{ padding: 24 }}>
+            <div className="at-card" style={{ padding: 24, borderTop: "3px solid var(--accent)" }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
                 <div className="at-eyebrow">Revenue — last 7 days</div>
                 <div className="at-mono" style={{ fontSize: 15, fontWeight: 700 }}>{money(weekRevenue)}</div>
@@ -1311,7 +1311,7 @@
                 <TrendBars data={daily} valueKey="count" color="var(--live)" />
               </div>
             </div>
-            <div className="at-card" style={{ padding: 24 }}>
+            <div className="at-card" style={{ padding: 24, borderTop: "3px solid var(--gold)" }}>
               <div className="at-eyebrow" style={{ marginBottom: 16 }}>Recent orders</div>
               <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
                 {orders.slice(0, 5).map(o => (
@@ -1439,7 +1439,7 @@
               )}
             </div>
 
-            <div className="at-card" style={{ padding: 20, position: "sticky", top: 24 }}>
+            <div className="at-card" style={{ padding: 20, position: "sticky", top: 24, borderTop: "3px solid #2E8B57" }}>
               <div className="at-eyebrow" style={{ marginBottom: 14 }}>Current sale · {itemCount} item{itemCount !== 1 ? "s" : ""}</div>
 
               <div style={{ maxHeight: 320, overflow: "auto", marginBottom: 14 }} className="at-scroll">
@@ -1576,7 +1576,7 @@
             </button>
           </div>
 
-          <div className="at-card" style={{ overflow: "hidden" }}>
+          <div className="at-card" style={{ overflow: "hidden", borderTop: "3px solid #7C8B6E" }}>
             <table className="at-table">
               <thead>
                 <tr>
@@ -1763,7 +1763,7 @@
             )}
           </div>
 
-          <div className="at-card" style={{ overflow: "hidden" }}>
+          <div className="at-card" style={{ overflow: "hidden", borderTop: "3px solid #D6A756" }}>
             <table className="at-table">
               <thead>
                 <tr>
@@ -1910,7 +1910,7 @@
             </button>
           </div>
 
-          <div className="at-card" style={{ overflow: "hidden" }}>
+          <div className="at-card" style={{ overflow: "hidden", borderTop: "3px solid #5BC0BE" }}>
             <table className="at-table">
               <thead>
                 <tr>
@@ -2063,7 +2063,7 @@
             <span style={{ width: 40, height: 40, borderRadius: 10, background: "rgba(199,123,156,.16)", color: "#C77B9C", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}><SettingsIcon /></span>
             <h1 className="at-disp" style={{ fontSize: 28, fontWeight: 700, margin: 0 }}>Settings</h1>
           </div>
-          <div className="at-card" style={{ padding: 24 }}>
+          <div className="at-card" style={{ padding: 24, borderTop: "3px solid #C77B9C" }}>
             <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
               <div>
                 <label className="at-label">Brand name</label>
