@@ -243,11 +243,14 @@
 }
 
 @media print{
+  @page{margin:14mm;}
   body *{visibility:hidden;}
   .invoice-print,.invoice-print *{visibility:visible;}
-  .invoice-modal{position:static !important;background:none !important;padding:0 !important;inset:auto !important;}
-  .invoice-card{position:static !important;overflow:visible !important;max-width:none !important;width:auto !important;box-shadow:none !important;}
-  .invoice-print{position:static !important;width:auto !important;padding:0 !important;}
+  .invoice-modal{display:block !important;position:static !important;background:none !important;padding:0 !important;inset:auto !important;}
+  .invoice-card{display:block !important;position:static !important;overflow:visible !important;
+    max-width:none !important;width:100% !important;box-shadow:none !important;border:none !important;}
+  .invoice-print{position:static !important;width:100% !important;padding:0 !important;background:none !important;}
+  .invoice-print table tr{break-inside:avoid;}
   .no-print{display:none !important;}
 }
 `;
