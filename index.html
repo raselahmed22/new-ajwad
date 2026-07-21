@@ -128,7 +128,7 @@
     const STYLES = `
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap');
 
-.at-root{
+:root, .at-root{
   --paper:#F7F2E7; --surface:#FFFFFF; --ink:#201A12; --ink-soft:#4A4030;
   --muted:#8A7F6B; --line:#E8DFC9; --line-strong:#D8CBA8;
   --accent:#6B3FA0; --accent-press:#54307F; --accent-tint:#F1E9F7;
@@ -137,6 +137,8 @@
   --display:'Space Grotesk',system-ui,sans-serif;
   --body:'Inter',system-ui,sans-serif;
   --mono:'Space Mono',ui-monospace,monospace;
+}
+.at-root{
   color:var(--ink); font-family:var(--body);
   background:var(--paper); width:100%; min-height:100vh; -webkit-font-smoothing:antialiased;
 }
