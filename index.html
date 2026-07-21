@@ -623,7 +623,7 @@
       };
 
       if (view === "checkout") {
-        return <Checkout cart={cart} subtotal={subtotal} settings={settings} money={money} customer={customer}
+        return <Checkout cart={cart} subtotal={subtotal} settings={settings} money={money} customer={customer} notify={notify}
           onBack={() => setView("home")} onComplete={completeOrder} />;
       }
       if (view === "confirm" && confirmedOrder) {
@@ -1037,7 +1037,7 @@
       );
     }
 
-    function Checkout({ cart, subtotal, settings, money, customer, onBack, onComplete }) {
+    function Checkout({ cart, subtotal, settings, money, customer, notify, onBack, onComplete }) {
       const [form, setForm] = useState({ name: customer?.name || "", email: customer?.email || "", address: customer?.address || "", city: "", zip: "", card: "", exp: "", cvc: "", trxId: "" });
       const [location, setLocation] = useState(customer?.location || "dhaka");
       const [payMethod, setPayMethod] = useState("card");
@@ -1067,16 +1067,21 @@
       const submit = () => {
         if (!valid || processing) return;
         setProcessing(true);
-        setTimeout(() => {
+        setTimeout(async () => {
           let payment;
           if (payMethod === "cod") payment = { method: "cod" };
           else if (payMethod === "bkash" || payMethod === "nagad") payment = { method: payMethod, trxId: form.trxId.trim(), number: mobileBankingNumber };
           else payment = { method: "card", brand: "Visa", last4: form.card.replace(/\s/g, "").slice(-4) };
-          onComplete(
-            { name: form.name, email: form.email, address: `${form.address}, ${form.city} ${form.zip}` },
-            payment,
-            shipping
-          );
+          try {
+            await onComplete(
+              { name: form.name, email: form.email, address: `${form.address}, ${form.city} ${form.zip}` },
+              payment,
+              shipping
+            );
+          } catch (e) {
+            notify("Couldn't place order: " + e.message);
+            setProcessing(false);
+          }
         }, 1400);
       };
 
@@ -1645,10 +1650,14 @@
           channel: "pos",
           cashier: currentUser?.name || "",
         };
-        const id = await placeOrder(orderData);
-        setReceipt({ ...orderData, id });
-        setCart([]); setCustomerName(""); setPayMethod("cash"); setTrxId("");
-        notify(`Sale completed · ${money(subtotal)}`);
+        try {
+          const id = await placeOrder(orderData);
+          setReceipt({ ...orderData, id });
+          setCart([]); setCustomerName(""); setPayMethod("cash"); setTrxId("");
+          notify(`Sale completed · ${money(subtotal)}`);
+        } catch (e) {
+          notify("Couldn't complete sale: " + e.message);
+        }
       };
 
       const PAY_METHODS = [{ id: "cash", label: "Cash" }, { id: "card", label: "Card" }, { id: "bkash", label: "bKash" }, { id: "nagad", label: "Nagad" }];
