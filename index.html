@@ -217,6 +217,25 @@
 
 @media (max-width:720px){
   .at-footer-grid{grid-template-columns:1fr !important;gap:28px !important;}
+  .at-checkout-grid{grid-template-columns:1fr !important;}
+}
+
+/* admin panel responsive shell */
+.admin-shell{display:flex;min-height:100vh;}
+.admin-sidebar{width:232px;flex-shrink:0;position:sticky;top:0;height:100vh;overflow-y:auto;}
+.admin-nav{display:flex;flex-direction:column;gap:4px;}
+.admin-main{flex:1;min-width:0;}
+@media (max-width:880px){
+  .admin-shell{flex-direction:column;}
+  .admin-sidebar{width:100% !important;height:auto !important;position:relative !important;top:auto !important;
+    flex-direction:row !important;align-items:center;overflow-x:auto;overflow-y:visible;padding:12px !important;gap:12px;}
+  .admin-brand{display:none !important;}
+  .admin-nav{flex-direction:row !important;flex:1;}
+  .admin-navitem-label{display:none;}
+  .admin-bottom{border-top:none !important;border-left:1px solid rgba(255,255,255,.12);margin:0 !important;
+    padding:0 0 0 12px !important;flex-direction:row !important;}
+  .admin-main{padding:16px !important;}
+  .admin-grid-2col,.pos-grid{grid-template-columns:1fr !important;}
 }
 `;
 
@@ -952,7 +971,7 @@
               )}
             </div>
           </header>
-          <div style={{ maxWidth: 1080, margin: "0 auto", padding: "40px 24px", display: "grid", gridTemplateColumns: "1.6fr 1fr", gap: 40 }}>
+          <div className="at-checkout-grid" style={{ maxWidth: 1080, margin: "0 auto", padding: "40px 24px", display: "grid", gridTemplateColumns: "1.6fr 1fr", gap: 40 }}>
             <div>
               <h1 className="at-disp" style={{ fontSize: 28, fontWeight: 700, marginBottom: 4 }}>Checkout</h1>
               <span className="at-badge" style={{ background: "var(--accent-tint)", color: "var(--accent)", marginBottom: 24 }}>Test mode — no real charge</span>
@@ -1177,31 +1196,31 @@
       ];
 
       return (
-        <div style={{ display: "flex", minHeight: "100vh" }}>
-          <aside style={{ width: 232, background: "linear-gradient(180deg, #1A1420 0%, #241A33 55%, #2E1F1A 100%)", color: "var(--paper)", padding: "24px 16px", display: "flex", flexDirection: "column", position: "sticky", top: 0, height: "100vh", flexShrink: 0 }}>
+        <div className="admin-shell">
+          <aside className="admin-sidebar" style={{ background: "linear-gradient(180deg, #1A1420 0%, #241A33 55%, #2E1F1A 100%)", color: "var(--paper)", padding: "24px 16px", display: "flex", flexDirection: "column" }}>
             {settings.logo ? (
-              <div style={{ marginBottom: 20, padding: "0 10px" }}>
+              <div className="admin-brand" style={{ marginBottom: 20, padding: "0 10px" }}>
                 <img src={settings.logo} alt={settings.brand} style={{ height: 56, width: "auto", maxWidth: 220, borderRadius: "50%" }} />
                 <div className="at-disp" style={{ fontSize: 14, letterSpacing: ".2em", fontWeight: 700, marginTop: 10 }}>{settings.brand}</div>
               </div>
             ) : (
-              <div className="at-disp" style={{ fontSize: 16, letterSpacing: ".24em", fontWeight: 700, marginBottom: 20, padding: "0 10px" }}>{settings.brand}</div>
+              <div className="at-disp admin-brand" style={{ fontSize: 16, letterSpacing: ".24em", fontWeight: 700, marginBottom: 20, padding: "0 10px" }}>{settings.brand}</div>
             )}
-            <div style={{ padding: "0 10px", marginBottom: 20, display: "flex", alignItems: "center", gap: 8 }}>
+            <div className="admin-brand" style={{ padding: "0 10px", marginBottom: 20, display: "flex", alignItems: "center", gap: 8 }}>
               <span className="at-mono" style={{ fontSize: 12, color: "rgba(241,240,236,.7)" }}>{currentUser.name}</span>
               <span className="at-badge" style={{ background: isSuperAdmin ? "rgba(91,192,190,.18)" : "rgba(255,255,255,.1)", color: isSuperAdmin ? "#5BC0BE" : "rgba(241,240,236,.7)", fontSize: 9 }}>
                 {isSuperAdmin ? "Super admin" : "Admin"}
               </span>
             </div>
-            <nav style={{ flex: 1, display: "flex", flexDirection: "column", gap: 4 }}>
+            <nav className="admin-nav" style={{ flex: 1 }}>
               {NAV.map(n => (
                 <button key={n.id} onClick={() => goNav(n.id)} className={"at-navitem" + (nav === n.id ? " active" : "")}>
                   <span style={{ fontSize: 15, color: nav === n.id ? "#fff" : n.color }}><n.icon /></span>
-                  {n.label}
+                  <span className="admin-navitem-label">{n.label}</span>
                 </button>
               ))}
             </nav>
-            <div style={{ borderTop: "1px solid rgba(255,255,255,.1)", paddingTop: 16, marginTop: 16, display: "flex", flexDirection: "column", gap: 2 }}>
+            <div className="admin-bottom" style={{ borderTop: "1px solid rgba(255,255,255,.1)", paddingTop: 16, marginTop: 16, display: "flex", flexDirection: "column", gap: 2 }}>
               <button onClick={onExit} className="at-navitem" style={{ color: "var(--muted)" }}>
                 <span style={{ fontSize: 18 }}>👁️</span>
                 View storefront
@@ -1213,7 +1232,7 @@
             </div>
           </aside>
 
-          <main style={{ flex: 1, padding: 32, minWidth: 0, background: "linear-gradient(135deg, #F1E9F7 0%, #FDF6EC 45%, #E9F5EE 100%)" }}>
+          <main className="admin-main" style={{ padding: 32, background: "linear-gradient(135deg, #F1E9F7 0%, #FDF6EC 45%, #E9F5EE 100%)" }}>
             {nav === "dashboard" && <Dashboard products={products} orders={orders} money={money} onReset={onReset} isSuperAdmin={isSuperAdmin} />}
             {nav === "pos" && <POS products={products} settings={settings} money={money} placeOrder={placeOrder} notify={notify} currentUser={currentUser} />}
             {nav === "products" && <Products products={products} money={money} notify={notify} />}
@@ -1249,7 +1268,7 @@
       const weekOrders = daily.reduce((s, d) => s + d.count, 0);
 
       return (
-        <div style={{ maxWidth: 1100 }}>
+        <div style={{ maxWidth: 1440 }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 28 }}>
             <div>
               <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
@@ -1325,7 +1344,7 @@
             </div>
           </div>
 
-          <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: 24 }}>
+          <div className="admin-grid-2col" style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: 24 }}>
             <div className="at-card" style={{ padding: 24, borderTop: "3px solid var(--accent)" }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
                 <div className="at-eyebrow">Revenue — last 7 days</div>
@@ -1423,7 +1442,7 @@
       const PAY_METHODS = [{ id: "cash", label: "Cash" }, { id: "card", label: "Card" }, { id: "bkash", label: "bKash" }, { id: "nagad", label: "Nagad" }];
 
       return (
-        <div style={{ maxWidth: 1300 }}>
+        <div style={{ maxWidth: 1600 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 24 }}>
             <span style={{ width: 40, height: 40, borderRadius: 10, background: "rgba(46,139,87,.14)", color: "#2E8B57", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}><ShoppingCart /></span>
             <div>
@@ -1432,7 +1451,7 @@
             </div>
           </div>
 
-          <div style={{ display: "grid", gridTemplateColumns: "1.6fr 1fr", gap: 20, alignItems: "flex-start" }}>
+          <div className="pos-grid" style={{ display: "grid", gridTemplateColumns: "1.6fr 1fr", gap: 20, alignItems: "flex-start" }}>
             <div>
               <div style={{ display: "flex", flexWrap: "wrap", gap: 10, marginBottom: 16, justifyContent: "space-between" }}>
                 <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
@@ -1593,7 +1612,7 @@
       };
 
       return (
-        <div style={{ maxWidth: 1100 }}>
+        <div style={{ maxWidth: 1440 }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 24 }}>
             <div>
               <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
@@ -1607,7 +1626,7 @@
             </button>
           </div>
 
-          <div className="at-card" style={{ overflow: "hidden", borderTop: "3px solid #7C8B6E" }}>
+          <div className="at-card" style={{ overflowX: "auto", borderTop: "3px solid #7C8B6E" }}>
             <table className="at-table">
               <thead>
                 <tr>
@@ -1774,7 +1793,7 @@
       };
 
       return (
-        <div style={{ maxWidth: 1100 }}>
+        <div style={{ maxWidth: 1440 }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 24 }}>
             <div>
               <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
@@ -1794,7 +1813,7 @@
             )}
           </div>
 
-          <div className="at-card" style={{ overflow: "hidden", borderTop: "3px solid #D6A756" }}>
+          <div className="at-card" style={{ overflowX: "auto", borderTop: "3px solid #D6A756" }}>
             <table className="at-table">
               <thead>
                 <tr>
@@ -1927,7 +1946,7 @@
       };
 
       return (
-        <div style={{ maxWidth: 900 }}>
+        <div style={{ maxWidth: 1200 }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 24 }}>
             <div>
               <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
@@ -1941,7 +1960,7 @@
             </button>
           </div>
 
-          <div className="at-card" style={{ overflow: "hidden", borderTop: "3px solid #5BC0BE" }}>
+          <div className="at-card" style={{ overflowX: "auto", borderTop: "3px solid #5BC0BE" }}>
             <table className="at-table">
               <thead>
                 <tr>
@@ -2089,7 +2108,7 @@
       };
 
       return (
-        <div style={{ maxWidth: 600 }}>
+        <div style={{ maxWidth: 680 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 24 }}>
             <span style={{ width: 40, height: 40, borderRadius: 10, background: "rgba(199,123,156,.16)", color: "#C77B9C", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}><SettingsIcon /></span>
             <h1 className="at-disp" style={{ fontSize: 28, fontWeight: 700, margin: 0 }}>Settings</h1>
