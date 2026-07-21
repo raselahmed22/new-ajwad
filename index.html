@@ -30,6 +30,7 @@
     window.db = firebase.firestore();
     window.auth = firebase.auth();
     window.secondaryAuth = secondaryApp.auth();
+    window.auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
   </script>
 </head>
 <body>
@@ -447,12 +448,16 @@
       useEffect(() => {
         return auth.onAuthStateChanged(async (user) => {
           if (!user) { setCustomerProfile(null); setStaffProfile(null); return; }
-          const [custSnap, staffSnap] = await Promise.all([
-            db.collection("customers").doc(user.uid).get(),
-            db.collection("staff").doc(user.uid).get(),
-          ]);
-          setCustomerProfile(custSnap.exists ? { id: user.uid, ...custSnap.data() } : null);
-          setStaffProfile(staffSnap.exists ? { id: user.uid, ...staffSnap.data() } : null);
+          try {
+            const [custSnap, staffSnap] = await Promise.all([
+              db.collection("customers").doc(user.uid).get(),
+              db.collection("staff").doc(user.uid).get(),
+            ]);
+            setCustomerProfile(custSnap.exists ? { id: user.uid, ...custSnap.data() } : null);
+            setStaffProfile(staffSnap.exists ? { id: user.uid, ...staffSnap.data() } : null);
+          } catch (e) {
+            console.error("Failed to restore session profile", e);
+          }
         });
       }, []);
 
