@@ -665,9 +665,7 @@
           </header>
 
           {settings.bannerImage && (
-            <div style={{ maxWidth: 1240, margin: "0 auto", padding: "24px 24px 0" }}>
-              <img src={settings.bannerImage} alt={settings.brand + " banner"} style={{ width: "100%", height: "clamp(160px,32vw,420px)", objectFit: "cover", borderRadius: 4, display: "block" }} />
-            </div>
+            <img src={settings.bannerImage} alt={settings.brand + " banner"} style={{ width: "100%", height: "clamp(160px,32vw,420px)", objectFit: "cover", display: "block" }} />
           )}
 
           <section style={{ background: "linear-gradient(135deg, var(--accent-tint) 0%, var(--gold-tint) 100%)" }}>
