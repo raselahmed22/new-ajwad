@@ -317,7 +317,7 @@
       ];
     }
 
-    const DEFAULT_SETTINGS = { brand: "Ajwad Barakah", tagline: "Considered clothing, made to last.", currency: "BDT", symbol: "৳", shipInsideDhaka: 80, shipOutsideDhaka: 140, logo: "Ajwad Logo.png", adminUrl: "index.html#admin", address: "Dhaka, Bangladesh", phone: "01333707715", whatsapp: "01333707715", facebook: "https://www.facebook.com/profile.php?id=61590579107774", bkashNumber: "01333707715", nagadNumber: "01333707715" };
+    const DEFAULT_SETTINGS = { brand: "Ajwad Barakah", tagline: "Considered clothing, made to last.", bannerImage: "", currency: "BDT", symbol: "৳", shipInsideDhaka: 80, shipOutsideDhaka: 140, logo: "Ajwad Logo.png", adminUrl: "index.html#admin", address: "Dhaka, Bangladesh", phone: "01333707715", whatsapp: "01333707715", facebook: "https://www.facebook.com/profile.php?id=61590579107774", bkashNumber: "01333707715", nagadNumber: "01333707715" };
 
     const useMoney = (settings) => useCallback(
       (n) => settings.symbol + Number(n || 0).toLocaleString(undefined, { minimumFractionDigits: n % 1 ? 2 : 0, maximumFractionDigits: 2 }),
@@ -365,14 +365,18 @@
       );
     }
 
-    function ImagePicker({ value, onChange, idSuffix }) {
+    function ImagePicker({ value, onChange, idSuffix, label = "Product image", maxDim = 640, preview }) {
       return (
         <div>
-          <label className="at-label">Product image</label>
+          <label className="at-label">{label}</label>
           {value && (
-            <div style={{ width: 100, height: 100, borderRadius: 2, overflow: "hidden", marginBottom: 10, background: "var(--paper)" }}>
-              <ProductImage product={{ image: value, name: "" }} />
-            </div>
+            preview ? (
+              <div style={{ marginBottom: 10 }}>{preview(value)}</div>
+            ) : (
+              <div style={{ width: 100, height: 100, borderRadius: 2, overflow: "hidden", marginBottom: 10, background: "var(--paper)" }}>
+                <ProductImage product={{ image: value, name: "" }} />
+              </div>
+            )
           )}
           <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
             <button type="button" onClick={() => document.getElementById("img-upload-" + idSuffix).click()} className="at-btn at-btn-ghost at-btn-sm">
@@ -386,7 +390,6 @@
                 reader.onload = () => {
                   const img = new Image();
                   img.onload = () => {
-                    const maxDim = 640;
                     let { width, height } = img;
                     if (width > maxDim || height > maxDim) {
                       const scale = maxDim / Math.max(width, height);
@@ -660,6 +663,12 @@
               </div>
             </div>
           </header>
+
+          {settings.bannerImage && (
+            <div style={{ maxWidth: 1240, margin: "0 auto", padding: "24px 24px 0" }}>
+              <img src={settings.bannerImage} alt={settings.brand + " banner"} style={{ width: "100%", height: "clamp(160px,32vw,420px)", objectFit: "cover", borderRadius: 4, display: "block" }} />
+            </div>
+          )}
 
           <section style={{ background: "linear-gradient(135deg, var(--accent-tint) 0%, var(--gold-tint) 100%)" }}>
           <div style={{ maxWidth: 1240, margin: "0 auto", padding: "56px 24px 40px" }}>
@@ -2345,6 +2354,17 @@
               <div>
                 <label className="at-label">Tagline</label>
                 <input className="at-field" value={form.tagline} onChange={e => setForm({ ...form, tagline: e.target.value })} />
+              </div>
+              <div>
+                <ImagePicker
+                  label="Homepage banner"
+                  idSuffix="banner"
+                  maxDim={1600}
+                  value={form.bannerImage}
+                  onChange={v => setForm({ ...form, bannerImage: v })}
+                  preview={v => <img src={v} alt="Banner preview" style={{ width: "100%", maxWidth: 420, height: 130, objectFit: "cover", borderRadius: 4 }} />}
+                />
+                <p className="at-mono" style={{ fontSize: 11, color: "var(--muted)", marginTop: 6 }}>Shows at the top of your storefront home page, above the products.</p>
               </div>
               <div>
                 <label className="at-label">Currency symbol</label>
