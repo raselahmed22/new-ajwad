@@ -645,31 +645,31 @@
       }
 
       return (
-        <div>
-          <header style={{ position: "sticky", top: 0, zIndex: 40, background: "rgba(247,242,231,.85)", backdropFilter: "blur(10px)", borderBottom: "2px solid var(--accent)" }}>
+        <div style={{ background: "linear-gradient(180deg, var(--accent-tint) 0%, var(--gold-tint) 22%, var(--teal-tint) 46%, var(--coral-tint) 70%, var(--rose-tint) 100%)" }}>
+          <header style={{ position: "sticky", top: 0, zIndex: 40, background: "linear-gradient(90deg, var(--accent) 0%, var(--rose) 32%, var(--coral) 64%, var(--gold) 100%)", boxShadow: "0 2px 14px rgba(0,0,0,.18)" }}>
             <div style={{ maxWidth: 1240, margin: "0 auto", padding: "0 24px", height: 80, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
               <button onClick={() => { setView("home"); setCat("All"); }} style={{ display: "flex", alignItems: "center", gap: 16, border: "none", background: "transparent", cursor: "pointer", padding: 0 }}>
                 {settings.logo ? (
                   <>
-                    <img src={settings.logo} alt={settings.brand} style={{ height: 76, width: "auto", maxWidth: 320, borderRadius: "50%" }} />
-                    <span className="at-disp" style={{ fontSize: 22, fontWeight: 700, letterSpacing: ".24em" }}>{settings.brand}</span>
+                    <img src={settings.logo} alt={settings.brand} style={{ height: 76, width: "auto", maxWidth: 320, borderRadius: "50%", boxShadow: "0 0 0 3px rgba(255,255,255,.6)" }} />
+                    <span className="at-disp" style={{ fontSize: 22, fontWeight: 700, letterSpacing: ".24em", color: "#fff", textShadow: "0 1px 6px rgba(0,0,0,.25)" }}>{settings.brand}</span>
                   </>
                 ) : (
-                  <span className="at-disp" style={{ fontSize: 22, fontWeight: 700, letterSpacing: ".24em" }}>{settings.brand}</span>
+                  <span className="at-disp" style={{ fontSize: 22, fontWeight: 700, letterSpacing: ".24em", color: "#fff", textShadow: "0 1px 6px rgba(0,0,0,.25)" }}>{settings.brand}</span>
                 )}
               </button>
               <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
                 {customer ? (
                   <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                    <button onClick={() => setEditingProfile(true)} className="at-btn at-btn-ghost at-btn-sm" style={{ fontSize: 13 }}>Hi, {customer.name.split(" ")[0]}</button>
-                    <button onClick={onSignOut} className="at-btn at-btn-ghost at-btn-sm">Sign out</button>
+                    <button onClick={() => setEditingProfile(true)} className="at-btn at-btn-sm" style={{ fontSize: 13, background: "rgba(255,255,255,.22)", color: "#fff", border: "1px solid rgba(255,255,255,.6)" }}>Hi, {customer.name.split(" ")[0]}</button>
+                    <button onClick={onSignOut} className="at-btn at-btn-sm" style={{ background: "rgba(255,255,255,.22)", color: "#fff", border: "1px solid rgba(255,255,255,.6)" }}>Sign out</button>
                   </div>
                 ) : (
-                  <button onClick={() => { setAuthMode("signin"); setAfterAuth(null); setAuthOpen(true); }} className="at-btn at-btn-ghost at-btn-sm">Sign in</button>
+                  <button onClick={() => { setAuthMode("signin"); setAfterAuth(null); setAuthOpen(true); }} className="at-btn at-btn-sm" style={{ background: "rgba(255,255,255,.22)", color: "#fff", border: "1px solid rgba(255,255,255,.6)" }}>Sign in</button>
                 )}
-                <button onClick={() => setCartOpen(true)} style={{ position: "relative", display: "flex", alignItems: "center", gap: 8, fontSize: 24, border: "none", background: "transparent", cursor: "pointer" }}>
+                <button onClick={() => setCartOpen(true)} style={{ position: "relative", display: "flex", alignItems: "center", gap: 8, fontSize: 24, border: "none", background: "transparent", cursor: "pointer", color: "#fff" }}>
                   <ShoppingBag />
-                  {cartCount > 0 && <span className="at-mono" style={{ position: "absolute", top: -8, right: -10, background: "var(--accent)", color: "#fff", fontSize: 10, minWidth: 17, height: 17, borderRadius: 9, display: "flex", alignItems: "center", justifyContent: "center", padding: "0 4px" }}>{cartCount}</span>}
+                  {cartCount > 0 && <span className="at-mono" style={{ position: "absolute", top: -8, right: -10, background: "#fff", color: "var(--accent)", fontSize: 10, minWidth: 17, height: 17, borderRadius: 9, display: "flex", alignItems: "center", justifyContent: "center", padding: "0 4px", fontWeight: 700 }}>{cartCount}</span>}
                 </button>
               </div>
             </div>
@@ -700,9 +700,9 @@
               <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
                 <div style={{ position: "relative" }}>
                   <span style={{ position: "absolute", left: 11, top: "50%", transform: "translateY(-50%)", color: "var(--muted)", fontSize: 16 }}><Search /></span>
-                  <input value={q} onChange={e => setQ(e.target.value)} placeholder="Search" className="at-field" style={{ paddingLeft: 34, width: 160 }} />
+                  <input value={q} onChange={e => setQ(e.target.value)} placeholder="Search" className="at-field" style={{ paddingLeft: 34, width: 160, border: "2px solid var(--accent-tint)" }} />
                 </div>
-                <select value={sort} onChange={e => setSort(e.target.value)} className="at-field" style={{ width: 150 }}>
+                <select value={sort} onChange={e => setSort(e.target.value)} className="at-field" style={{ width: 150, border: "2px solid var(--accent-tint)" }}>
                   <option value="featured">Featured</option>
                   <option value="low">Price: Low–High</option>
                   <option value="high">Price: High–Low</option>
@@ -736,7 +736,7 @@
             )}
           </section>
 
-          <footer style={{ borderTop: "1px solid var(--line)", background: "linear-gradient(135deg, #1A1420 0%, #241A33 55%, #2E1F1A 100%)", color: "var(--paper)" }}>
+          <footer style={{ borderTop: "3px solid var(--gold)", background: "linear-gradient(135deg, #2A1740 0%, #4A2350 30%, #6B3FA0 55%, #B4634B 80%, #C9932E 100%)", color: "var(--paper)" }}>
             <div style={{ maxWidth: 1240, margin: "0 auto", padding: "56px 24px 28px" }}>
               <div style={{ display: "grid", gridTemplateColumns: "1.3fr 1fr 1fr", gap: 40 }} className="at-footer-grid">
                 <div>
@@ -789,9 +789,9 @@
             <>
               <div className="at-scrim" onClick={() => setCartOpen(false)} />
               <aside className="at-drawer at-scroll">
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "20px 22px", borderBottom: "1px solid var(--line)" }}>
-                  <div className="at-disp" style={{ fontSize: 16, fontWeight: 700 }}>Your bag · {cartCount}</div>
-                  <button onClick={() => setCartOpen(false)} style={{ fontSize: 20 }}><X /></button>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "20px 22px", background: "linear-gradient(90deg, var(--accent) 0%, var(--rose) 60%, var(--coral) 100%)" }}>
+                  <div className="at-disp" style={{ fontSize: 16, fontWeight: 700, color: "#fff" }}>Your bag · {cartCount}</div>
+                  <button onClick={() => setCartOpen(false)} style={{ fontSize: 20, color: "#fff" }}><X /></button>
                 </div>
                 <div style={{ flex: 1, overflow: "auto", padding: "8px 0" }} className="at-scroll">
                   {cart.length === 0 ? (
@@ -1028,11 +1028,11 @@
         <>
           <div className="at-scrim" onClick={onClose} />
           <div className="at-modal" onClick={onClose}>
-            <div className="at-card at-rise" onClick={e => e.stopPropagation()} style={{ maxWidth: 780, width: "100%", display: "grid", gridTemplateColumns: "1fr 1fr", overflow: "hidden", marginTop: 40 }}>
+            <div className="at-card at-rise" onClick={e => e.stopPropagation()} style={{ maxWidth: 780, width: "100%", display: "grid", gridTemplateColumns: "1fr 1fr", overflow: "hidden", marginTop: 40, borderTop: "4px solid " + (CATEGORY_COLORS[product.category]?.c || "var(--gold)") }}>
               <div style={{ aspectRatio: "1/1", background: "var(--paper)", minWidth: 0 }}><ProductImage product={product} /></div>
               <div style={{ padding: 28, display: "flex", flexDirection: "column" }}>
                 <div style={{ display: "flex", justifyContent: "space-between" }}>
-                  <span className="at-eyebrow">{product.category}</span>
+                  <span className="at-mono" style={{ fontSize: 10, fontWeight: 700, letterSpacing: ".1em", textTransform: "uppercase", color: CATEGORY_COLORS[product.category]?.c || "var(--gold)", background: CATEGORY_COLORS[product.category]?.t || "var(--gold-tint)", padding: "3px 9px", borderRadius: 20 }}>{product.category}</span>
                   <button onClick={onClose} style={{ fontSize: 18 }}><X /></button>
                 </div>
                 <h2 className="at-disp" style={{ fontSize: 26, fontWeight: 700, marginTop: 12, lineHeight: 1.1 }}>{product.name}</h2>
