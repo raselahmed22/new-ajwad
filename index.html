@@ -134,6 +134,9 @@
   --muted:#8A7F6B; --line:#E8DFC9; --line-strong:#D8CBA8;
   --accent:#6B3FA0; --accent-press:#54307F; --accent-tint:#F1E9F7;
   --gold:#C9932E; --gold-tint:#F8ECD3;
+  --teal:#1F8A76; --teal-tint:#E1F3EE;
+  --coral:#E0654A; --coral-tint:#FCE7E1;
+  --rose:#C77B9C; --rose-tint:#F8E7EF;
   --live:#2E8B57; --live-tint:#E4F3EA; --warn:#B4634B; --warn-tint:#FBEFE9;
   --display:'Space Grotesk',system-ui,sans-serif;
   --body:'Inter',system-ui,sans-serif;
@@ -260,6 +263,14 @@
 `;
 
     const CATEGORIES = ["Tops", "Knitwear", "Outerwear", "Bottoms", "Dresses", "Accessories"];
+    const CATEGORY_COLORS = {
+      Tops: { c: "var(--accent)", t: "var(--accent-tint)" },
+      Knitwear: { c: "var(--gold)", t: "var(--gold-tint)" },
+      Outerwear: { c: "var(--teal)", t: "var(--teal-tint)" },
+      Bottoms: { c: "var(--coral)", t: "var(--coral-tint)" },
+      Dresses: { c: "var(--rose)", t: "var(--rose-tint)" },
+      Accessories: { c: "var(--live)", t: "var(--live-tint)" },
+    };
     const SWATCHES = [
       { bg: "#1B1B20", fg: "#E9E7DF" }, { bg: "#E7E3D8", fg: "#1B1B20" },
       { bg: "#6B3FA0", fg: "#F1E9F7" }, { bg: "#7C8B6E", fg: "#F3F5EE" },
@@ -670,11 +681,20 @@
             </div>
           )}
 
+          <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: "10px 28px", padding: "16px 24px", background: "linear-gradient(90deg, var(--accent-tint), var(--gold-tint), var(--teal-tint), var(--coral-tint))" }}>
+            <span className="at-mono" style={{ fontSize: 12, fontWeight: 700, color: "var(--ink-soft)" }}>🚚 Fast delivery</span>
+            <span className="at-mono" style={{ fontSize: 12, fontWeight: 700, color: "var(--ink-soft)" }}>🔒 Secure payment</span>
+            <span className="at-mono" style={{ fontSize: 12, fontWeight: 700, color: "var(--ink-soft)" }}>↩ Easy returns</span>
+            <span className="at-mono" style={{ fontSize: 12, fontWeight: 700, color: "var(--ink-soft)" }}>✨ Handpicked quality</span>
+          </div>
+
           <div style={{ maxWidth: 1240, margin: "0 auto", padding: "24px 24px 0" }}>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 10, alignItems: "center", paddingBottom: 20, borderBottom: "1px solid var(--line)", justifyContent: "space-between" }}>
-              <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-                {["All", ...CATEGORIES].map(c => (
-                  <button key={c} onClick={() => setCat(c)} className="at-btn at-btn-sm" style={{ background: cat === c ? "var(--accent)" : "transparent", color: cat === c ? "#fff" : "var(--ink-soft)", border: cat === c ? "none" : "1px solid var(--line-strong)" }}>{c}</button>
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                <button onClick={() => setCat("All")} className="at-btn at-btn-sm" style={{ background: cat === "All" ? "var(--ink)" : "transparent", color: cat === "All" ? "#fff" : "var(--ink-soft)", border: cat === "All" ? "none" : "1px solid var(--line-strong)" }}>All</button>
+                {CATEGORIES.map(c => (
+                  <button key={c} onClick={() => setCat(c)} className="at-btn at-btn-sm"
+                    style={{ background: cat === c ? CATEGORY_COLORS[c].c : CATEGORY_COLORS[c].t, color: cat === c ? "#fff" : CATEGORY_COLORS[c].c, border: "none", fontWeight: 700 }}>{c}</button>
                 ))}
               </div>
               <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
@@ -699,16 +719,16 @@
             ) : (
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(230px,1fr))", gap: 20 }}>
                 {visible.map(p => (
-                  <article key={p.id} className="at-prod at-rise" onClick={() => setQuick(p)}>
+                  <article key={p.id} className="at-prod at-rise" onClick={() => setQuick(p)} style={{ borderTop: "3px solid " + (CATEGORY_COLORS[p.category]?.c || "var(--gold)") }}>
                     <div className="at-prod-imgwrap" style={{ position: "relative" }}>
                       <ProductImage product={p} className="at-prod-img" />
                       {p.stock === 0 && <span className="at-badge" style={{ position: "absolute", top: 12, left: 12, background: "var(--ink)", color: "var(--paper)" }}>Sold out</span>}
                       {p.stock > 0 && p.stock <= 5 && <span className="at-badge" style={{ position: "absolute", top: 12, left: 12, background: "var(--warn-tint)", color: "var(--warn)" }}>Low stock</span>}
                     </div>
                     <div style={{ padding: "14px 14px 16px" }}>
-                      <div className="at-eyebrow" style={{ marginBottom: 6 }}>{p.category}</div>
+                      <span className="at-mono" style={{ display: "inline-block", fontSize: 10, fontWeight: 700, letterSpacing: ".1em", textTransform: "uppercase", color: CATEGORY_COLORS[p.category]?.c || "var(--gold)", background: CATEGORY_COLORS[p.category]?.t || "var(--gold-tint)", padding: "3px 9px", borderRadius: 20, marginBottom: 8 }}>{p.category}</span>
                       <div className="at-disp" style={{ fontSize: 15, fontWeight: 600, lineHeight: 1.25 }}>{p.name}</div>
-                      <div className="at-mono" style={{ fontSize: 14, marginTop: 8 }}>{money(p.price)}</div>
+                      <div className="at-mono" style={{ fontSize: 14, marginTop: 8, fontWeight: 700, color: "var(--accent)" }}>{money(p.price)}</div>
                     </div>
                   </article>
                 ))}
