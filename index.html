@@ -127,20 +127,21 @@
 
     // --- Rest of the code from atelier-store.jsx (without imports/export) ---
     const STYLES = `
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Jost:wght@400;500;600;700&display=swap');
 
 :root, .at-root{
-  --paper:#F7F2E7; --surface:#FFFFFF; --ink:#201A12; --ink-soft:#4A4030;
-  --muted:#8A7F6B; --line:#E8DFC9; --line-strong:#D8CBA8;
-  --accent:#6B3FA0; --accent-press:#54307F; --accent-tint:#F1E9F7;
-  --gold:#C9932E; --gold-tint:#F8ECD3;
-  --teal:#1F8A76; --teal-tint:#E1F3EE;
-  --coral:#E0654A; --coral-tint:#FCE7E1;
-  --rose:#C77B9C; --rose-tint:#F8E7EF;
-  --live:#2E8B57; --live-tint:#E4F3EA; --warn:#B4634B; --warn-tint:#FBEFE9;
-  --display:'Space Grotesk',system-ui,sans-serif;
-  --body:'Inter',system-ui,sans-serif;
-  --mono:'Space Mono',ui-monospace,monospace;
+  --paper:#FAF7F2; --surface:#FFFFFF; --ink:#1A1714; --ink-soft:#4A433B;
+  --muted:#8C8378; --line:#ECE5DA; --line-strong:#DCD2C2;
+  --accent:#1A1714; --accent-press:#000000; --accent-tint:#F2ECE2;
+  --gold:#B08A3E; --gold-deep:#8A6A2C; --gold-tint:#F6EEDC;
+  --teal:#4E6B5C; --teal-tint:#E8EFEA;
+  --coral:#B0664A; --coral-tint:#F7E9E2;
+  --rose:#A8707F; --rose-tint:#F5E8EC;
+  --live:#3F7A55; --live-tint:#E6F1E9; --warn:#A8513A; --warn-tint:#F8EAE4;
+  --serif:'Cormorant Garamond',Georgia,serif;
+  --display:'Jost',system-ui,sans-serif;
+  --body:'Jost',system-ui,sans-serif;
+  --mono:'Jost',system-ui,sans-serif;
 }
 .at-root{
   color:var(--ink); font-family:var(--body);
@@ -148,28 +149,28 @@
 }
 .at-root *{box-sizing:border-box;}
 .invoice-card, .invoice-card *{box-sizing:border-box;}
-.at-root button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit;}
+:where(.at-root) button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit;}
 .at-root input,.at-root textarea,.at-root select{font-family:inherit;font-size:14px;color:var(--ink);}
-.at-mono{font-family:var(--mono);font-variant-numeric:tabular-nums;}
+.at-mono{font-family:var(--mono);font-variant-numeric:tabular-nums;font-weight:500;}
 .at-disp{font-family:var(--display);letter-spacing:-0.01em;}
 
 /* focus + motion floor */
-.at-root :focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px;}
+.at-root :focus-visible{outline:2px solid var(--gold);outline-offset:2px;border-radius:4px;}
 @media (prefers-reduced-motion:reduce){.at-root *{animation:none!important;transition:none!important;}}
 
 /* buttons */
 .at-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;
-  font-family:var(--display);font-weight:600;font-size:13px;letter-spacing:.01em;
-  padding:12px 20px;border-radius:2px;transition:transform .12s ease,background .15s ease;}
+  font-family:var(--body);font-weight:600;font-size:12.5px;letter-spacing:.12em;text-transform:uppercase;
+  padding:13px 22px;border-radius:6px;transition:transform .12s ease,background .15s ease,border-color .15s ease,color .15s ease;}
 .at-btn:active{transform:translateY(1px);}
 .at-btn-primary{background:var(--accent);color:#fff;}
 .at-btn-primary:hover{background:var(--accent-press);}
 .at-btn-dark{background:var(--ink);color:var(--paper);}
-.at-btn-dark:hover{background:#000;}
+.at-btn-dark:hover{background:#000;box-shadow:0 8px 22px rgba(26,23,20,.18);}
 .at-btn-ghost{background:transparent;color:var(--ink);border:1px solid var(--line-strong);}
 .at-btn-ghost:hover{border-color:var(--ink);}
-.at-btn-sm{padding:8px 14px;font-size:12px;}
-.at-btn:disabled{opacity:.5;cursor:not-allowed;}
+.at-btn-sm{padding:9px 16px;font-size:11.5px;}
+.at-btn:disabled{opacity:.45;cursor:not-allowed;box-shadow:none;}
 
 .at-eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);font-weight:600;}
 .at-pulse{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--live);position:relative;}
@@ -180,13 +181,13 @@
 .at-rise{animation:atrise .35s ease both;}
 
 /* form controls */
-.at-field{width:100%;padding:11px 13px;border:1px solid var(--line-strong);border-radius:2px;
-  background:var(--surface);transition:border-color .15s ease;}
-.at-field:focus{outline:none;border-color:var(--accent);}
+.at-field{width:100%;padding:12px 14px;border:1px solid var(--line-strong);border-radius:8px;
+  background:var(--surface);transition:border-color .15s ease,box-shadow .15s ease;}
+.at-field:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px rgba(176,138,62,.15);}
 .at-label{display:block;font-size:12px;font-weight:600;color:var(--ink-soft);margin-bottom:6px;}
 
 /* cards / surfaces */
-.at-card{background:var(--surface);border:1px solid var(--line);border-radius:3px;}
+.at-card{background:var(--surface);border:1px solid var(--line);border-radius:10px;}
 
 /* store product card */
 .at-prod{background:var(--surface);border:1px solid var(--line);cursor:pointer;
@@ -197,7 +198,7 @@
 .at-prod-img{width:100%;height:100%;object-fit:contain;display:block;transition:transform .5s ease;}
 
 /* overlay + drawer */
-.at-scrim{position:fixed;inset:0;background:rgba(16,16,20,.5);z-index:60;animation:atfade .2s ease;}
+.at-scrim{position:fixed;inset:0;background:rgba(26,20,12,.45);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);z-index:60;animation:atfade .2s ease;}
 .at-drawer{position:fixed;top:0;right:0;bottom:0;width:100%;max-width:420px;background:var(--paper);
   z-index:70;display:flex;flex-direction:column;box-shadow:-20px 0 60px rgba(0,0,0,.15);animation:atslide .28s cubic-bezier(.2,.8,.2,1);}
 @keyframes atslide{from{transform:translateX(100%);}to{transform:none;}}
@@ -230,6 +231,178 @@
   .at-footer-grid{grid-template-columns:1fr !important;gap:28px !important;}
   .at-checkout-grid{grid-template-columns:1fr !important;}
 }
+
+/* ---------- storefront (customer-facing) ---------- */
+.sf-serif{font-family:var(--serif);}
+.sf-eyebrow{font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:var(--gold);font-weight:600;}
+.sf-h2{font-family:var(--serif);font-size:clamp(30px,4vw,44px);font-weight:500;line-height:1.05;letter-spacing:-.01em;margin:8px 0 0;}
+.sf-wrap{max-width:1280px;margin:0 auto;padding:0 24px;}
+
+.sf-announce{background:var(--ink);color:#E9D9B4;font-size:12px;letter-spacing:.06em;text-align:center;padding:9px 16px;}
+.sf-announce b{color:#fff;font-weight:600;}
+
+.sf-header{position:sticky;top:0;z-index:40;background:rgba(250,247,242,.9);
+  -webkit-backdrop-filter:saturate(1.4) blur(14px);backdrop-filter:saturate(1.4) blur(14px);border-bottom:1px solid var(--line);}
+.sf-header-in{height:80px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:16px;}
+.sf-nav{display:flex;gap:28px;align-items:center;}
+.sf-navlink{font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-soft);font-weight:500;
+  padding:6px 0;border-bottom:1px solid transparent;transition:color .15s,border-color .15s;}
+.sf-navlink:hover,.sf-navlink.on{color:var(--ink);border-bottom-color:var(--gold);}
+.sf-brand{display:flex;align-items:center;gap:12px;padding:0;}
+.sf-brand img{height:54px;width:54px;border-radius:50%;object-fit:cover;box-shadow:0 0 0 1px var(--line-strong),0 4px 14px rgba(60,40,10,.08);}
+.sf-wordmark{font-family:var(--serif);font-size:26px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;line-height:1;text-align:left;}
+.sf-wordmark small{display:block;font-family:var(--body);font-size:9px;letter-spacing:.5em;color:var(--gold);margin-top:6px;font-weight:500;}
+.sf-actions{display:flex;justify-content:flex-end;align-items:center;gap:4px;position:relative;}
+.sf-icon-btn{position:relative;height:42px;min-width:42px;padding:0 10px;border-radius:21px;display:inline-flex;align-items:center;
+  justify-content:center;gap:8px;color:var(--ink);font-size:13px;font-weight:500;transition:background .15s;}
+.sf-icon-btn:hover{background:var(--accent-tint);}
+.sf-count{position:absolute;top:3px;right:1px;background:var(--gold);color:#fff;font-size:10px;font-weight:600;min-width:18px;height:18px;
+  border-radius:9px;display:flex;align-items:center;justify-content:center;padding:0 5px;box-shadow:0 0 0 2px var(--paper);}
+.sf-menu{position:absolute;top:52px;right:0;width:230px;background:var(--surface);border:1px solid var(--line);border-radius:12px;
+  box-shadow:0 18px 50px rgba(40,28,10,.14);padding:8px;z-index:45;animation:atrise .2s ease both;}
+.sf-menu-head{padding:10px 12px 12px;border-bottom:1px solid var(--line);margin-bottom:6px;}
+.sf-menu button{display:flex;width:100%;justify-content:space-between;align-items:center;padding:10px 12px;border-radius:8px;font-size:14px;text-align:left;}
+.sf-menu button:hover{background:var(--paper);}
+
+.sf-banner{background:#F1EBE1;border-bottom:1px solid var(--line);}
+.sf-banner img{width:100%;height:clamp(180px,34vw,520px);object-fit:contain;display:block;}
+.sf-hero{text-align:center;padding:72px 24px 64px;background:radial-gradient(ellipse at top,#F4EAD6 0%,var(--paper) 65%);border-bottom:1px solid var(--line);}
+.sf-hero img{width:120px;height:120px;border-radius:50%;object-fit:cover;box-shadow:0 0 0 1px var(--line-strong),0 14px 40px rgba(60,40,10,.12);}
+.sf-hero h1{font-family:var(--serif);font-weight:500;font-size:clamp(34px,5.4vw,64px);line-height:1.04;margin:26px auto 0;max-width:780px;letter-spacing:-.01em;}
+
+.sf-trust{border-bottom:1px solid var(--line);background:var(--surface);}
+.sf-trust-in{display:grid;grid-template-columns:repeat(4,1fr);}
+.sf-trust-item{display:flex;align-items:center;gap:14px;padding:22px 18px;}
+.sf-trust-item + .sf-trust-item{border-left:1px solid var(--line);}
+.sf-trust-ic{width:42px;height:42px;border-radius:50%;background:var(--gold-tint);color:var(--gold-deep);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.sf-trust-t{font-size:13.5px;font-weight:600;}
+.sf-trust-s{font-size:12px;color:var(--muted);margin-top:2px;}
+
+.sf-shop{padding-top:64px;padding-bottom:88px;scroll-margin-top:90px;}
+.sf-shop-head{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;flex-wrap:wrap;}
+.sf-tools{display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
+.sf-search{position:relative;}
+.sf-search svg{position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--muted);pointer-events:none;}
+.sf-search input{padding-left:40px;width:220px;border-radius:22px;background:var(--surface);}
+.sf-select{width:auto;border-radius:22px;padding-right:34px;appearance:none;-webkit-appearance:none;background:var(--surface) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238C8378' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") no-repeat right 14px center;}
+.sf-tabs{display:flex;gap:8px;margin:28px 0 32px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none;}
+.sf-tabs::-webkit-scrollbar{display:none;}
+.sf-tab{flex-shrink:0;padding:9px 18px;border-radius:22px;font-size:13px;font-weight:500;border:1px solid var(--line-strong);color:var(--ink-soft);background:transparent;transition:all .15s;}
+.sf-tab:hover{border-color:var(--ink);color:var(--ink);}
+.sf-tab.on{background:var(--ink);border-color:var(--ink);color:#fff;}
+.sf-tab span{opacity:.55;margin-left:6px;font-variant-numeric:tabular-nums;}
+
+.sf-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:40px 24px;}
+.sf-card{cursor:pointer;display:flex;flex-direction:column;text-align:left;}
+.sf-card-media{position:relative;aspect-ratio:4/5;background:#F2ECE2;border-radius:10px;overflow:hidden;}
+.sf-card-media > *:first-child{transition:transform .6s cubic-bezier(.2,.8,.2,1);}
+.sf-card:hover .sf-card-media > *:first-child{transform:scale(1.04);}
+.sf-card-badge{position:absolute;top:12px;left:12px;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;font-weight:600;padding:6px 10px;border-radius:20px;}
+.sf-card-quick{position:absolute;left:12px;right:12px;bottom:12px;padding:12px;border-radius:8px;background:rgba(26,23,20,.92);color:#fff;
+  font-size:12px;letter-spacing:.14em;text-transform:uppercase;font-weight:600;text-align:center;opacity:0;transform:translateY(10px);transition:all .25s ease;}
+.sf-card:hover .sf-card-quick{opacity:1;transform:none;}
+@media (hover:none){.sf-card-quick{display:none;}}
+.sf-card-body{padding:16px 2px 0;}
+.sf-card-cat{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);}
+.sf-card-name{font-family:var(--serif);font-size:22px;font-weight:600;line-height:1.15;margin-top:5px;}
+.sf-card-row{display:flex;justify-content:space-between;align-items:baseline;margin-top:8px;gap:10px;}
+.sf-price{font-size:16px;font-weight:600;font-variant-numeric:tabular-nums;}
+.sf-sizes{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+
+.sf-story{background:var(--ink);color:#F3EADB;position:relative;overflow:hidden;}
+.sf-story::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 85% 20%,rgba(176,138,62,.28),transparent 55%);}
+.sf-story-in{position:relative;display:grid;grid-template-columns:1.2fr 1fr;gap:56px;align-items:center;padding:80px 24px;}
+.sf-story h2{font-family:var(--serif);font-weight:500;font-size:clamp(32px,4.4vw,52px);line-height:1.06;margin:14px 0 0;}
+.sf-story p{color:rgba(243,234,219,.7);font-size:15px;line-height:1.75;margin-top:18px;max-width:520px;}
+.sf-story-list{display:flex;flex-direction:column;gap:14px;}
+.sf-story-item{display:flex;gap:14px;align-items:flex-start;padding:18px 20px;border:1px solid rgba(233,217,180,.16);border-radius:12px;background:rgba(255,255,255,.03);}
+.sf-story-item svg{color:#D9B66F;flex-shrink:0;margin-top:2px;}
+.sf-btn-gold{background:#D9B66F;color:var(--ink);}
+.sf-btn-gold:hover{background:#E6C886;}
+.sf-btn-line{border:1px solid rgba(243,234,219,.35);color:#F3EADB;}
+.sf-btn-line:hover{border-color:#F3EADB;}
+
+.sf-footer{background:#14110D;color:#E9E1D2;}
+.sf-footer-grid{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:40px;padding:64px 24px 36px;}
+.sf-footer h4{font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:#C9A55E;font-weight:600;margin:0 0 18px;}
+.sf-footer a,.sf-footer .sf-flink{display:flex;align-items:center;gap:10px;font-size:13.5px;color:rgba(233,225,210,.78);text-decoration:none;padding:5px 0;text-align:left;}
+.sf-footer a:hover,.sf-footer .sf-flink:hover{color:#fff;}
+.sf-paychip{display:inline-flex;align-items:center;padding:6px 11px;border:1px solid rgba(233,225,210,.18);border-radius:6px;font-size:11.5px;font-weight:600;letter-spacing:.04em;color:rgba(233,225,210,.85);}
+
+.sf-wa-float{position:fixed;right:20px;bottom:20px;z-index:50;border-radius:50%;box-shadow:0 10px 30px rgba(0,0,0,.22);transition:transform .2s;display:flex;}
+.sf-wa-float:hover{transform:scale(1.06);}
+
+/* drawer + modals */
+.sf-panel-head{display:flex;align-items:center;justify-content:space-between;padding:22px 24px;border-bottom:1px solid var(--line);}
+.sf-panel-title{font-family:var(--serif);font-size:26px;font-weight:600;line-height:1;}
+.sf-close{width:38px;height:38px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;color:var(--ink-soft);transition:background .15s;}
+.sf-close:hover{background:var(--accent-tint);color:var(--ink);}
+.sf-qty{display:inline-flex;align-items:center;border:1px solid var(--line-strong);border-radius:20px;}
+.sf-qty button{width:32px;height:32px;display:inline-flex;align-items:center;justify-content:center;}
+.sf-qty span{min-width:22px;text-align:center;font-size:13px;font-weight:600;font-variant-numeric:tabular-nums;}
+.sf-thumb{flex-shrink:0;overflow:hidden;background:#F2ECE2;border-radius:8px;}
+
+.sf-qv{max-width:940px;width:100%;display:grid;grid-template-columns:1.05fr 1fr;overflow:hidden;margin-top:32px;border-radius:16px;background:var(--surface);
+  box-shadow:0 30px 80px rgba(20,14,6,.25);}
+.sf-qv-media{background:#F2ECE2;aspect-ratio:4/5;min-width:0;position:relative;}
+.sf-qv-body{padding:36px 36px 32px;display:flex;flex-direction:column;min-width:0;}
+.sf-size{min-width:52px;padding:11px 14px;font-size:13px;font-weight:600;border:1px solid var(--line-strong);border-radius:8px;transition:all .15s;}
+.sf-size:hover:not(:disabled){border-color:var(--ink);}
+.sf-size.on{background:var(--ink);border-color:var(--ink);color:#fff;}
+.sf-perks{display:flex;flex-direction:column;gap:10px;margin-top:22px;padding-top:20px;border-top:1px solid var(--line);font-size:13px;color:var(--ink-soft);}
+.sf-perks div{display:flex;gap:10px;align-items:center;}
+.sf-perks svg{color:var(--gold-deep);flex-shrink:0;}
+
+.sf-choice{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:14px 16px;border:1px solid var(--line-strong);
+  border-radius:10px;background:var(--surface);transition:border-color .15s,box-shadow .15s;font-size:14px;}
+.sf-choice:hover{border-color:var(--ink-soft);}
+.sf-choice.on{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink);}
+.sf-radio{width:18px;height:18px;border-radius:50%;border:1.5px solid var(--line-strong);flex-shrink:0;position:relative;}
+.sf-choice.on .sf-radio{border-color:var(--ink);}
+.sf-choice.on .sf-radio::after{content:'';position:absolute;inset:3px;border-radius:50%;background:var(--ink);}
+.sf-choice-sub{display:block;font-size:12px;color:var(--muted);margin-top:2px;}
+
+.sf-co-head{background:var(--surface);border-bottom:1px solid var(--line);}
+.sf-co-section{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:26px;margin-top:18px;}
+.sf-step{display:flex;align-items:center;gap:12px;margin-bottom:20px;}
+.sf-step b{width:28px;height:28px;border-radius:50%;background:var(--ink);color:#fff;font-size:12px;display:flex;align-items:center;justify-content:center;}
+.sf-step span{font-family:var(--serif);font-size:24px;font-weight:600;}
+
+@media (max-width:960px){
+  .sf-nav{display:none;}
+  .sf-header-in{grid-template-columns:auto 1fr;height:68px;}
+  .sf-header-in > div:first-child{display:none;}
+  .sf-brand img{height:44px;width:44px;}
+  .sf-wordmark{font-size:20px;}
+  .sf-trust-in{grid-template-columns:1fr 1fr;}
+  .sf-trust-item:nth-child(3){border-left:none;}
+  .sf-trust-item:nth-child(n+3){border-top:1px solid var(--line);}
+  .sf-story-in{grid-template-columns:1fr;gap:36px;padding:64px 24px;}
+  .sf-footer-grid{grid-template-columns:1fr 1fr;}
+  .sf-qv{grid-template-columns:1fr;margin-top:0;}
+  .sf-qv-media{aspect-ratio:1/1;}
+  .sf-qv-body{padding:24px;}
+}
+@media (max-width:600px){
+  .sf-wrap{padding:0 16px;}
+  .sf-hide-sm{display:none !important;}
+  .sf-wordmark small{display:none;}
+  .sf-wordmark{font-size:17px;letter-spacing:.12em;}
+  .sf-trust-item{padding:16px 12px;gap:10px;}
+  .sf-trust-ic{width:34px;height:34px;}
+  .sf-shop{padding-top:40px;padding-bottom:64px;}
+  .sf-tools{width:100%;}
+  .sf-search{flex:1;}
+  .sf-search input{width:100%;}
+  .sf-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:28px 12px;}
+  .sf-card-name{font-size:17px;}
+  .sf-price{font-size:14px;}
+  .sf-sizes{display:none;}
+  .sf-footer-grid{grid-template-columns:1fr;gap:32px;padding:48px 16px 28px;}
+  .sf-co-section{padding:20px 16px;}
+  .at-modal{padding:12px;}
+}
+@media (max-width:600px){.sf-pay-grid{grid-template-columns:1fr !important;}}
 
 /* admin panel responsive shell */
 .admin-shell{display:flex;width:100%;min-height:100vh;}
@@ -272,10 +445,10 @@
       Accessories: { c: "var(--live)", t: "var(--live-tint)" },
     };
     const SWATCHES = [
-      { bg: "#1B1B20", fg: "#E9E7DF" }, { bg: "#E7E3D8", fg: "#1B1B20" },
-      { bg: "#6B3FA0", fg: "#F1E9F7" }, { bg: "#7C8B6E", fg: "#F3F5EE" },
-      { bg: "#B4634B", fg: "#FBEFE9" }, { bg: "#C9932E", fg: "#2A2013" },
-      { bg: "#C9B08A", fg: "#2A2420" }, { bg: "#5B3A56", fg: "#F3E9F1" },
+      { bg: "#1F1B16", fg: "#E9D9B4" }, { bg: "#E9E1D3", fg: "#3A3128" },
+      { bg: "#D8C3A0", fg: "#2E2519" }, { bg: "#8A9682", fg: "#F4F3EC" },
+      { bg: "#B98B74", fg: "#FBF1EA" }, { bg: "#C7A867", fg: "#2A2013" },
+      { bg: "#EFE6D6", fg: "#5A4A33" }, { bg: "#5C4A3E", fg: "#F1E6D8" },
     ];
     const uid = (p = "id") => p + "_" + Math.random().toString(36).slice(2, 9);
     const bdIntl = (n) => (n || "").replace(/\D/g, "").replace(/^0/, "880");
@@ -368,8 +541,8 @@
       const l2 = words.slice(Math.ceil(words.length / 2)).join(" ");
       return (
         <div className={className} style={{ width: "100%", height: "100%", background: sw.bg, display: "flex", flexDirection: "column", justifyContent: "flex-end", padding: 24 }}>
-          <div style={{ fontFamily: "'Space Mono',monospace", fontSize: 11, letterSpacing: 2, color: sw.fg, opacity: 0.7 }}>{product.category.toUpperCase()}</div>
-          <div style={{ fontFamily: "'Space Grotesk',sans-serif", fontSize: 26, fontWeight: 600, color: sw.fg, marginTop: "auto" }}>
+          <div style={{ fontFamily: "'Jost',sans-serif", fontSize: 11, letterSpacing: 2, color: sw.fg, opacity: 0.7 }}>{product.category.toUpperCase()}</div>
+          <div style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: 26, fontWeight: 600, overflowWrap: "anywhere", lineHeight: 1.1, color: sw.fg, marginTop: "auto" }}>
             {l1}<br/>{l2}
           </div>
         </div>
@@ -563,8 +736,8 @@
           <div className="at-root" style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100vh" }}>
             <style>{STYLES}</style>
             <div style={{ textAlign: "center" }}>
-              <div className="at-disp" style={{ fontSize: 22, letterSpacing: ".3em" }}>{DEFAULT_SETTINGS.brand}</div>
-              <div className="at-mono" style={{ fontSize: 12, color: "var(--muted)", marginTop: 10 }}>loading your store…</div>
+              <img src={DEFAULT_SETTINGS.logo} alt="" style={{ width: 96, height: 96, borderRadius: "50%", objectFit: "cover", boxShadow: "0 0 0 1px var(--line-strong)" }} />
+              <div style={{ fontSize: 11, letterSpacing: ".3em", textTransform: "uppercase", color: "var(--gold)", marginTop: 18 }}>Loading</div>
             </div>
           </div>
         );
@@ -600,6 +773,41 @@
       );
     }
 
+    // Line icons for the customer-facing storefront (admin keeps its emoji set).
+    const Ico = ({ size = 20, sw = 1.5, children }) => (
+      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={sw} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{children}</svg>
+    );
+    const IcBag = (p) => <Ico {...p}><path d="M5 8h14l-1.2 12.2a1 1 0 01-1 .8H7.2a1 1 0 01-1-.8L5 8z" /><path d="M9 10V6.5a3 3 0 016 0V10" /></Ico>;
+    const IcSearch = (p) => <Ico {...p}><circle cx="11" cy="11" r="6.5" /><path d="M20 20l-4.2-4.2" /></Ico>;
+    const IcUser = (p) => <Ico {...p}><circle cx="12" cy="8" r="4" /><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6" /></Ico>;
+    const IcClose = (p) => <Ico {...p}><path d="M6 6l12 12M18 6L6 18" /></Ico>;
+    const IcTruck = (p) => <Ico {...p}><path d="M3 6.5h11v9.5H3z" /><path d="M14 10h4l3 3.2V16h-7" /><circle cx="7" cy="18" r="1.8" /><circle cx="17" cy="18" r="1.8" /></Ico>;
+    const IcCash = (p) => <Ico {...p}><rect x="3" y="6" width="18" height="12" rx="2" /><circle cx="12" cy="12" r="2.5" /><path d="M6.5 9.5h.01M17.5 14.5h.01" /></Ico>;
+    const IcMobile = (p) => <Ico {...p}><rect x="7" y="3" width="10" height="18" rx="2.2" /><path d="M11 17.5h2" /></Ico>;
+    const IcSpark = (p) => <Ico {...p}><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z" /><path d="M18.5 16.5l.7 1.8 1.8.7-1.8.7-.7 1.8-.7-1.8-1.8-.7 1.8-.7z" /></Ico>;
+    const IcArrowR = (p) => <Ico {...p}><path d="M5 12h14M13 6l6 6-6 6" /></Ico>;
+    const IcArrowL = (p) => <Ico {...p}><path d="M19 12H5M11 6l-6 6 6 6" /></Ico>;
+    const IcPlus = (p) => <Ico {...p}><path d="M12 5v14M5 12h14" /></Ico>;
+    const IcMinus = (p) => <Ico {...p}><path d="M5 12h14" /></Ico>;
+    const IcTrash = (p) => <Ico {...p}><path d="M4 7h16M9 7V4.5h6V7M6.5 7l1 13h9l1-13" /></Ico>;
+    const IcCheck = (p) => <Ico {...p}><path d="M5 12.5l4.5 4.5L19 7.5" /></Ico>;
+    const IcLock = (p) => <Ico {...p}><rect x="5" y="11" width="14" height="9.5" rx="2" /><path d="M8 11V8a4 4 0 018 0v3" /></Ico>;
+    const IcReceipt = (p) => <Ico {...p}><path d="M6 3h12v18l-3-2-3 2-3-2-3 2z" /><path d="M9 8h6M9 12h6" /></Ico>;
+    const IcRuler = (p) => <Ico {...p}><rect x="2.5" y="8" width="19" height="8" rx="1.5" /><path d="M7 8v3M11 8v4M15 8v3M19 8v4" /></Ico>;
+
+    const Choice = ({ on, onClick, label, sub, right }) => (
+      <button type="button" onClick={onClick} className={"sf-choice" + (on ? " on" : "")}>
+        <span className="sf-radio" />
+        <span style={{ flex: 1, minWidth: 0 }}>
+          <span style={{ fontWeight: 600 }}>{label}</span>
+          {sub && <span className="sf-choice-sub">{sub}</span>}
+        </span>
+        {right}
+      </button>
+    );
+
+    const waLink = (settings, text) => `https://wa.me/${bdIntl(settings.whatsapp)}` + (text ? `?text=${encodeURIComponent(text)}` : "");
+
     function Storefront({ products, settings, cart, setCart, money, placeOrder, notify, customer, onSignIn, onSignUp, onSignOut, onUpdateProfile, myOrders, myOrdersError }) {
       const [view, setView] = useState("home");
       const [quick, setQuick] = useState(null);
@@ -613,6 +821,9 @@
       const [ordersOpen, setOrdersOpen] = useState(false);
       const [afterAuth, setAfterAuth] = useState(null);
       const [editingProfile, setEditingProfile] = useState(false);
+      const [menuOpen, setMenuOpen] = useState(false);
+      const shopRef = useRef(null);
+      const footerRef = useRef(null);
 
       const cartCount = cart.reduce((s, i) => s + i.qty, 0);
       const addToCart = (product, size) => {
@@ -627,16 +838,21 @@
       const updateQty = (key, d) => setCart(c => c.map(i => i.key === key ? { ...i, qty: Math.max(1, i.qty + d) } : i));
       const removeItem = (key) => setCart(c => c.filter(i => i.key !== key));
 
+      const active = useMemo(() => products.filter(p => p.status === "active"), [products]);
+      const cats = useMemo(() => CATEGORIES.filter(c => active.some(p => p.category === c)), [active]);
       const visible = useMemo(() => {
-        let list = products.filter(p => p.status === "active");
+        let list = active;
         if (cat !== "All") list = list.filter(p => p.category === cat);
         if (q.trim()) list = list.filter(p => (p.name + p.category).toLowerCase().includes(q.toLowerCase()));
         if (sort === "low") list = [...list].sort((a, b) => a.price - b.price);
         if (sort === "high") list = [...list].sort((a, b) => b.price - a.price);
         return list;
-      }, [products, cat, q, sort]);
+      }, [active, cat, q, sort]);
 
       const subtotal = cart.reduce((s, i) => s + i.price * i.qty, 0);
+      const toShop = () => shopRef.current && shopRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+      const pickCat = (c) => { setCat(c); toShop(); };
+      const openSignIn = () => { setAuthMode("signin"); setAfterAuth(null); setAuthOpen(true); };
 
       const completeOrder = async (customerInfo, payment, shipping) => {
         const orderData = {
@@ -658,92 +874,151 @@
         return <Confirmation order={confirmedOrder} settings={settings} money={money} onDone={() => { setView("home"); setConfirmedOrder(null); }} />;
       }
 
+      const brandParts = settings.brand.split(" ");
+      const Wordmark = () => (
+        <span className="sf-wordmark">
+          {brandParts[0]}
+          {brandParts.length > 1 && <small>{brandParts.slice(1).join(" ")}</small>}
+        </span>
+      );
+
       return (
-        <div style={{ background: "linear-gradient(180deg, var(--accent-tint) 0%, var(--gold-tint) 22%, var(--teal-tint) 46%, var(--coral-tint) 70%, var(--rose-tint) 100%)" }}>
-          <header style={{ position: "sticky", top: 0, zIndex: 40, background: "linear-gradient(90deg, var(--accent) 0%, var(--rose) 32%, var(--coral) 64%, var(--gold) 100%)", boxShadow: "0 2px 14px rgba(0,0,0,.18)" }}>
-            <div style={{ maxWidth: 1240, margin: "0 auto", padding: "0 24px", height: 80, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-              <button onClick={() => { setView("home"); setCat("All"); }} style={{ display: "flex", alignItems: "center", gap: 16, border: "none", background: "transparent", cursor: "pointer", padding: 0 }}>
-                {settings.logo ? (
-                  <>
-                    <img src={settings.logo} alt={settings.brand} style={{ height: 76, width: "auto", maxWidth: 320, borderRadius: "50%", boxShadow: "0 0 0 3px rgba(255,255,255,.6)" }} />
-                    <span className="at-disp" style={{ fontSize: 22, fontWeight: 700, letterSpacing: ".24em", color: "#fff", textShadow: "0 1px 6px rgba(0,0,0,.25)" }}>{settings.brand}</span>
-                  </>
-                ) : (
-                  <span className="at-disp" style={{ fontSize: 22, fontWeight: 700, letterSpacing: ".24em", color: "#fff", textShadow: "0 1px 6px rgba(0,0,0,.25)" }}>{settings.brand}</span>
-                )}
+        <div>
+          <div className="sf-announce">
+            Cash on delivery all over Bangladesh <span className="sf-hide-sm">· Inside Dhaka <b>{money(settings.shipInsideDhaka)}</b> · Outside Dhaka <b>{money(settings.shipOutsideDhaka)}</b></span>
+          </div>
+
+          <header className="sf-header">
+            <div className="sf-wrap sf-header-in">
+              <div className="sf-nav">
+                <button className={"sf-navlink" + (cat === "All" ? " on" : "")} onClick={() => pickCat("All")}>Shop all</button>
+                {cats.slice(0, 3).map(c => (
+                  <button key={c} className={"sf-navlink" + (cat === c ? " on" : "")} onClick={() => pickCat(c)}>{c}</button>
+                ))}
+                <button className="sf-navlink" onClick={() => footerRef.current?.scrollIntoView({ behavior: "smooth" })}>Contact</button>
+              </div>
+
+              <button className="sf-brand" onClick={() => { setView("home"); setCat("All"); setQ(""); window.scrollTo({ top: 0, behavior: "smooth" }); }} aria-label={settings.brand + " home"}>
+                {settings.logo && <img src={settings.logo} alt="" />}
+                <Wordmark />
               </button>
-              <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+
+              <div className="sf-actions">
+                <button className="sf-icon-btn" aria-label="Search" onClick={() => { toShop(); setTimeout(() => document.getElementById("sf-search")?.focus({ preventScroll: true }), 400); }}><IcSearch /></button>
                 {customer ? (
-                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                    <button onClick={() => setOrdersOpen(true)} className="at-btn at-btn-sm" style={{ fontSize: 13, background: "rgba(255,255,255,.22)", color: "#fff", border: "1px solid rgba(255,255,255,.6)" }}>My orders{myOrders.length > 0 ? ` (${myOrders.length})` : ""}</button>
-                    <button onClick={() => setEditingProfile(true)} className="at-btn at-btn-sm" style={{ fontSize: 13, background: "rgba(255,255,255,.22)", color: "#fff", border: "1px solid rgba(255,255,255,.6)" }}>Hi, {customer.name.split(" ")[0]}</button>
-                    <button onClick={onSignOut} className="at-btn at-btn-sm" style={{ background: "rgba(255,255,255,.22)", color: "#fff", border: "1px solid rgba(255,255,255,.6)" }}>Sign out</button>
-                  </div>
+                  <button className="sf-icon-btn" aria-label="Account" onClick={() => setMenuOpen(o => !o)}>
+                    <IcUser /><span className="sf-hide-sm">{customer.name.split(" ")[0]}</span>
+                  </button>
                 ) : (
-                  <button onClick={() => { setAuthMode("signin"); setAfterAuth(null); setAuthOpen(true); }} className="at-btn at-btn-sm" style={{ background: "rgba(255,255,255,.22)", color: "#fff", border: "1px solid rgba(255,255,255,.6)" }}>Sign in</button>
+                  <button className="sf-icon-btn" aria-label="Sign in" onClick={openSignIn}>
+                    <IcUser /><span className="sf-hide-sm">Sign in</span>
+                  </button>
                 )}
-                <button onClick={() => setCartOpen(true)} style={{ position: "relative", display: "flex", alignItems: "center", gap: 8, fontSize: 24, border: "none", background: "transparent", cursor: "pointer", color: "#fff" }}>
-                  <ShoppingBag />
-                  {cartCount > 0 && <span className="at-mono" style={{ position: "absolute", top: -8, right: -10, background: "#fff", color: "var(--accent)", fontSize: 10, minWidth: 17, height: 17, borderRadius: 9, display: "flex", alignItems: "center", justifyContent: "center", padding: "0 4px", fontWeight: 700 }}>{cartCount}</span>}
+                <button className="sf-icon-btn" aria-label="Shopping bag" onClick={() => setCartOpen(true)}>
+                  <IcBag />
+                  {cartCount > 0 && <span className="sf-count">{cartCount}</span>}
                 </button>
+
+                {menuOpen && customer && (
+                  <>
+                    <div style={{ position: "fixed", inset: 0, zIndex: 44 }} onClick={() => setMenuOpen(false)} />
+                    <div className="sf-menu">
+                      <div className="sf-menu-head">
+                        <div style={{ fontWeight: 600, fontSize: 14 }}>{customer.name}</div>
+                        <div style={{ fontSize: 12, color: "var(--muted)", marginTop: 2, overflow: "hidden", textOverflow: "ellipsis" }}>{customer.email}</div>
+                      </div>
+                      <button onClick={() => { setMenuOpen(false); setOrdersOpen(true); }}>My orders {myOrders.length > 0 && <span style={{ color: "var(--muted)", fontSize: 12 }}>{myOrders.length}</span>}</button>
+                      <button onClick={() => { setMenuOpen(false); setEditingProfile(true); }}>Profile & address</button>
+                      <button onClick={() => { setMenuOpen(false); onSignOut(); }} style={{ color: "var(--warn)" }}>Sign out</button>
+                    </div>
+                  </>
+                )}
               </div>
             </div>
           </header>
 
-          {settings.bannerImage && (
-            <div style={{ width: "100%", height: "clamp(160px,28vw,360px)", background: "var(--paper)" }}>
-              <img src={settings.bannerImage} alt={settings.brand + " banner"} style={{ width: "100%", height: "100%", objectFit: "contain", display: "block" }} />
+          {settings.bannerImage ? (
+            <div className="sf-banner">
+              <img src={settings.bannerImage} alt={settings.brand + " banner"} />
             </div>
+          ) : (
+            <section className="sf-hero">
+              {settings.logo && <img src={settings.logo} alt="" />}
+              <h1>{settings.tagline}</h1>
+              <button onClick={toShop} className="at-btn at-btn-dark" style={{ marginTop: 30 }}>Shop the collection <IcArrowR size={16} /></button>
+            </section>
           )}
 
-          <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: "10px 28px", padding: "16px 24px", background: "linear-gradient(90deg, var(--accent-tint), var(--gold-tint), var(--teal-tint), var(--coral-tint))" }}>
-            <span className="at-mono" style={{ fontSize: 12, fontWeight: 700, color: "var(--ink-soft)" }}>🚚 Fast delivery</span>
-            <span className="at-mono" style={{ fontSize: 12, fontWeight: 700, color: "var(--ink-soft)" }}>🔒 Secure payment</span>
-            <span className="at-mono" style={{ fontSize: 12, fontWeight: 700, color: "var(--ink-soft)" }}>↩ Easy returns</span>
-            <span className="at-mono" style={{ fontSize: 12, fontWeight: 700, color: "var(--ink-soft)" }}>✨ Handpicked quality</span>
+          <div className="sf-trust">
+            <div className="sf-wrap sf-trust-in">
+              {[
+                { ic: <IcCash />, t: "Cash on delivery", s: "Pay when it arrives" },
+                { ic: <IcTruck />, t: "Nationwide delivery", s: `Dhaka ${money(settings.shipInsideDhaka)} · Outside ${money(settings.shipOutsideDhaka)}` },
+                { ic: <IcMobile />, t: "bKash & Nagad", s: "Pay by mobile banking" },
+                { ic: <IcSpark />, t: "Handpicked quality", s: "Every piece chosen with care" },
+              ].map(x => (
+                <div key={x.t} className="sf-trust-item">
+                  <span className="sf-trust-ic">{x.ic}</span>
+                  <div style={{ minWidth: 0 }}><div className="sf-trust-t">{x.t}</div><div className="sf-trust-s">{x.s}</div></div>
+                </div>
+              ))}
+            </div>
           </div>
 
-          <div style={{ maxWidth: 1240, margin: "0 auto", padding: "24px 24px 0" }}>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 10, alignItems: "center", paddingBottom: 20, borderBottom: "1px solid var(--line)", justifyContent: "space-between" }}>
-              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                <button onClick={() => setCat("All")} className="at-btn at-btn-sm" style={{ background: cat === "All" ? "var(--ink)" : "transparent", color: cat === "All" ? "#fff" : "var(--ink-soft)", border: cat === "All" ? "none" : "1px solid var(--line-strong)" }}>All</button>
-                {CATEGORIES.map(c => (
-                  <button key={c} onClick={() => setCat(c)} className="at-btn at-btn-sm"
-                    style={{ background: cat === c ? CATEGORY_COLORS[c].c : CATEGORY_COLORS[c].t, color: cat === c ? "#fff" : CATEGORY_COLORS[c].c, border: "none", fontWeight: 700 }}>{c}</button>
-                ))}
+          <section ref={shopRef} className="sf-wrap sf-shop">
+            <div className="sf-shop-head">
+              <div>
+                <div className="sf-eyebrow">The collection</div>
+                <h2 className="sf-h2">{cat === "All" ? "Shop all" : cat}</h2>
               </div>
-              <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
-                <div style={{ position: "relative" }}>
-                  <span style={{ position: "absolute", left: 11, top: "50%", transform: "translateY(-50%)", color: "var(--muted)", fontSize: 16 }}><Search /></span>
-                  <input value={q} onChange={e => setQ(e.target.value)} placeholder="Search" className="at-field" style={{ paddingLeft: 34, width: 160, border: "2px solid var(--accent-tint)" }} />
+              <div className="sf-tools">
+                <div className="sf-search">
+                  <IcSearch size={17} />
+                  <input id="sf-search" value={q} onChange={e => setQ(e.target.value)} placeholder="Search products" className="at-field" />
                 </div>
-                <select value={sort} onChange={e => setSort(e.target.value)} className="at-field" style={{ width: 150, border: "2px solid var(--accent-tint)" }}>
+                <select value={sort} onChange={e => setSort(e.target.value)} className="at-field sf-select" aria-label="Sort">
                   <option value="featured">Featured</option>
-                  <option value="low">Price: Low–High</option>
-                  <option value="high">Price: High–Low</option>
+                  <option value="low">Price: low to high</option>
+                  <option value="high">Price: high to low</option>
                 </select>
               </div>
             </div>
-          </div>
 
-          <section style={{ maxWidth: 1240, margin: "0 auto", padding: "28px 24px 80px" }}>
+            {cats.length > 1 && (
+              <div className="sf-tabs">
+                <button className={"sf-tab" + (cat === "All" ? " on" : "")} onClick={() => setCat("All")}>All<span>{active.length}</span></button>
+                {cats.map(c => (
+                  <button key={c} className={"sf-tab" + (cat === c ? " on" : "")} onClick={() => setCat(c)}>
+                    {c}<span>{active.filter(p => p.category === c).length}</span>
+                  </button>
+                ))}
+              </div>
+            )}
+            {cats.length <= 1 && <div style={{ height: 32 }} />}
+
             {visible.length === 0 ? (
-              <div style={{ textAlign: "center", padding: "80px 0", color: "var(--muted)" }}>
-                <p style={{ fontSize: 15 }}>Nothing matches that yet. Try another category or clear your search.</p>
+              <div style={{ textAlign: "center", padding: "72px 20px", background: "var(--surface)", border: "1px dashed var(--line-strong)", borderRadius: 14 }}>
+                <div className="sf-serif" style={{ fontSize: 26, fontWeight: 600 }}>Nothing here yet</div>
+                <p style={{ fontSize: 14, color: "var(--muted)", marginTop: 8 }}>Try another category or clear your search.</p>
+                {(q || cat !== "All") && <button onClick={() => { setQ(""); setCat("All"); }} className="at-btn at-btn-ghost at-btn-sm" style={{ marginTop: 18 }}>Clear filters</button>}
               </div>
             ) : (
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(230px,1fr))", gap: 20 }}>
+              <div className="sf-grid">
                 {visible.map(p => (
-                  <article key={p.id} className="at-prod at-rise" onClick={() => setQuick(p)} style={{ borderTop: "3px solid " + (CATEGORY_COLORS[p.category]?.c || "var(--gold)") }}>
-                    <div className="at-prod-imgwrap" style={{ position: "relative" }}>
-                      <ProductImage product={p} className="at-prod-img" />
-                      {p.stock === 0 && <span className="at-badge" style={{ position: "absolute", top: 12, left: 12, background: "var(--ink)", color: "var(--paper)" }}>Sold out</span>}
-                      {p.stock > 0 && p.stock <= 5 && <span className="at-badge" style={{ position: "absolute", top: 12, left: 12, background: "var(--warn-tint)", color: "var(--warn)" }}>Low stock</span>}
+                  <article key={p.id} className="sf-card at-rise" onClick={() => setQuick(p)} tabIndex={0} onKeyDown={e => { if (e.key === "Enter") setQuick(p); }}>
+                    <div className="sf-card-media">
+                      <ProductImage product={p} />
+                      {p.stock === 0 && <span className="sf-card-badge" style={{ background: "var(--ink)", color: "#fff" }}>Sold out</span>}
+                      {p.stock > 0 && p.stock <= 5 && <span className="sf-card-badge" style={{ background: "#fff", color: "var(--warn)" }}>Only {p.stock} left</span>}
+                      <div className="sf-card-quick">{p.stock === 0 ? "View details" : "Quick add"}</div>
                     </div>
-                    <div style={{ padding: "14px 14px 16px" }}>
-                      <span className="at-mono" style={{ display: "inline-block", fontSize: 10, fontWeight: 700, letterSpacing: ".1em", textTransform: "uppercase", color: CATEGORY_COLORS[p.category]?.c || "var(--gold)", background: CATEGORY_COLORS[p.category]?.t || "var(--gold-tint)", padding: "3px 9px", borderRadius: 20, marginBottom: 8 }}>{p.category}</span>
-                      <div className="at-disp" style={{ fontSize: 15, fontWeight: 600, lineHeight: 1.25 }}>{p.name}</div>
-                      <div className="at-mono" style={{ fontSize: 14, marginTop: 8, fontWeight: 700, color: "var(--accent)" }}>{money(p.price)}</div>
+                    <div className="sf-card-body">
+                      <div className="sf-card-cat">{p.category}</div>
+                      <div className="sf-card-name">{p.name}</div>
+                      <div className="sf-card-row">
+                        <span className="sf-price">{money(p.price)}</span>
+                        {p.sizes?.length > 0 && <span className="sf-sizes">{p.sizes.join(" · ")}</span>}
+                      </div>
                     </div>
                   </article>
                 ))}
@@ -751,104 +1026,130 @@
             )}
           </section>
 
-          <footer style={{ borderTop: "3px solid var(--gold)", background: "linear-gradient(135deg, #2A1740 0%, #4A2350 30%, #6B3FA0 55%, #B4634B 80%, #C9932E 100%)", color: "var(--paper)" }}>
-            <div style={{ maxWidth: 1240, margin: "0 auto", padding: "56px 24px 28px" }}>
-              <div style={{ display: "grid", gridTemplateColumns: "1.3fr 1fr 1fr", gap: 40 }} className="at-footer-grid">
-                <div>
-                  {settings.logo ? (
-                    <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                      <img src={settings.logo} alt={settings.brand} style={{ height: 52, width: "auto", maxWidth: 220, borderRadius: "50%" }} />
-                      <span className="at-disp" style={{ fontSize: 16, letterSpacing: ".24em", fontWeight: 700 }}>{settings.brand}</span>
-                    </div>
-                  ) : (
-                    <div className="at-disp" style={{ fontSize: 18, letterSpacing: ".24em", fontWeight: 700 }}>{settings.brand}</div>
-                  )}
-                  <p style={{ color: "rgba(241,240,236,.6)", fontSize: 13, lineHeight: 1.7, marginTop: 14, maxWidth: 280 }}>{settings.tagline}</p>
-                </div>
-
-                <div>
-                  <div className="at-eyebrow" style={{ color: "rgba(241,240,236,.5)", marginBottom: 16 }}>Contact</div>
-                  <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 13, color: "rgba(241,240,236,.85)" }}>
-                      <span style={{ opacity: 0.75, color: "var(--gold)" }}><MapPin /></span> {settings.address}
-                    </div>
-                    <a href={`tel:+${bdIntl(settings.phone)}`} style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 13, color: "rgba(241,240,236,.85)", textDecoration: "none" }}>
-                      <span style={{ opacity: 0.75, color: "var(--gold)" }}><Phone /></span> {settings.phone}
-                    </a>
-                    <a href={`https://wa.me/${bdIntl(settings.whatsapp)}`} target="_blank" rel="noopener noreferrer" style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 13, color: "rgba(241,240,236,.85)", textDecoration: "none" }}>
-                      <Whatsapp /> {settings.whatsapp}
-                    </a>
-                  </div>
-                </div>
-
-                <div>
-                  <div className="at-eyebrow" style={{ color: "rgba(241,240,236,.5)", marginBottom: 16 }}>Follow us</div>
-                  <a href={settings.facebook} target="_blank" rel="noopener noreferrer" style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 13, color: "rgba(241,240,236,.85)", textDecoration: "none" }}>
-                    <Facebook /> Facebook Page
+          <section className="sf-story">
+            <div className="sf-wrap sf-story-in">
+              <div>
+                <div className="sf-eyebrow" style={{ color: "#D9B66F" }}>Why {settings.brand}</div>
+                <h2>{settings.tagline}</h2>
+                <p>Not sure about a size or want to see more photos? Message us on WhatsApp and we'll help you choose before you order.</p>
+                <div style={{ display: "flex", gap: 12, marginTop: 28, flexWrap: "wrap" }}>
+                  <a href={waLink(settings, `Hi ${settings.brand}, I have a question about an item.`)} target="_blank" rel="noopener noreferrer" className="at-btn sf-btn-gold" style={{ textDecoration: "none" }}>
+                    <Whatsapp size={18} /> Chat on WhatsApp
                   </a>
+                  <button onClick={toShop} className="at-btn sf-btn-line">Browse the shop</button>
                 </div>
               </div>
-
-              <div style={{ borderTop: "1px solid rgba(255,255,255,.12)", marginTop: 44, paddingTop: 20, display: "flex", flexWrap: "wrap", gap: 14, justifyContent: "space-between", alignItems: "center" }}>
-                <div className="at-mono" style={{ fontSize: 11, color: "rgba(241,240,236,.55)" }}>© {new Date().getFullYear()} {settings.brand} — All rights reserved</div>
-                <a href={settings.adminUrl} target="_blank" rel="noopener noreferrer" className="at-btn at-btn-sm" style={{ background: "rgba(255,255,255,.08)", color: "var(--paper)", textDecoration: "none" }}>
-                  <Lock /> Admin panel
-                </a>
+              <div className="sf-story-list">
+                {[
+                  { ic: <IcRuler />, t: "Help with sizing", s: "Tell us your usual size and we'll guide you to the right fit." },
+                  { ic: <IcCash />, t: "Pay the way you like", s: "Cash on delivery, bKash, Nagad or card." },
+                  { ic: <IcReceipt />, t: "Track every order", s: "Sign in to see your order history and download invoices." },
+                ].map(x => (
+                  <div key={x.t} className="sf-story-item">
+                    {x.ic}
+                    <div><div style={{ fontWeight: 600, fontSize: 15 }}>{x.t}</div><div style={{ fontSize: 13, color: "rgba(243,234,219,.65)", marginTop: 4, lineHeight: 1.55 }}>{x.s}</div></div>
+                  </div>
+                ))}
               </div>
             </div>
+          </section>
+
+          <footer ref={footerRef} className="sf-footer">
+            <div className="sf-wrap sf-footer-grid">
+              <div>
+                <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                  {settings.logo && <img src={settings.logo} alt="" style={{ height: 52, width: 52, borderRadius: "50%", objectFit: "cover" }} />}
+                  <span className="sf-wordmark" style={{ color: "#fff" }}>{brandParts[0]}{brandParts.length > 1 && <small>{brandParts.slice(1).join(" ")}</small>}</span>
+                </div>
+                <p style={{ color: "rgba(233,225,210,.6)", fontSize: 13.5, lineHeight: 1.7, marginTop: 18, maxWidth: 280 }}>{settings.tagline}</p>
+                <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 20 }}>
+                  {["Cash on delivery", "bKash", "Nagad", "Card"].map(x => <span key={x} className="sf-paychip">{x}</span>)}
+                </div>
+              </div>
+              <div>
+                <h4>Shop</h4>
+                <button className="sf-flink" onClick={() => pickCat("All")}>All products</button>
+                {cats.map(c => <button key={c} className="sf-flink" onClick={() => pickCat(c)}>{c}</button>)}
+              </div>
+              <div>
+                <h4>Contact</h4>
+                <div className="sf-flink" style={{ cursor: "default" }}><span style={{ color: "#C9A55E" }}><MapPin /></span>{settings.address}</div>
+                <a href={`tel:+${bdIntl(settings.phone)}`}><span style={{ color: "#C9A55E" }}><Phone /></span>{settings.phone}</a>
+                <a href={waLink(settings)} target="_blank" rel="noopener noreferrer"><Whatsapp />{settings.whatsapp}</a>
+              </div>
+              <div>
+                <h4>Follow us</h4>
+                <a href={settings.facebook} target="_blank" rel="noopener noreferrer"><Facebook /> Facebook page</a>
+                {customer ? (
+                  <button className="sf-flink" onClick={() => setOrdersOpen(true)}><IcReceipt size={18} /> My orders</button>
+                ) : (
+                  <button className="sf-flink" onClick={openSignIn}><IcUser size={18} /> Sign in / Register</button>
+                )}
+              </div>
+            </div>
+            <div className="sf-wrap" style={{ borderTop: "1px solid rgba(255,255,255,.08)", padding: "20px 24px 26px", display: "flex", flexWrap: "wrap", gap: 14, justifyContent: "space-between", alignItems: "center" }}>
+              <div style={{ fontSize: 12, color: "rgba(233,225,210,.5)" }}>© {new Date().getFullYear()} {settings.brand}. All rights reserved.</div>
+              <a href={settings.adminUrl} target="_blank" rel="noopener noreferrer" style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 12, color: "rgba(233,225,210,.45)", textDecoration: "none" }}>
+                <IcLock size={14} /> Admin
+              </a>
+            </div>
           </footer>
+
+          <a href={waLink(settings, `Hi ${settings.brand}!`)} target="_blank" rel="noopener noreferrer" className="sf-wa-float" aria-label="Chat on WhatsApp"><Whatsapp size={54} /></a>
 
           {quick && <QuickView product={quick} settings={settings} money={money} onClose={() => setQuick(null)} onAdd={addToCart} />}
 
           {cartOpen && (
             <>
               <div className="at-scrim" onClick={() => setCartOpen(false)} />
-              <aside className="at-drawer at-scroll">
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "20px 22px", background: "linear-gradient(90deg, var(--accent) 0%, var(--rose) 60%, var(--coral) 100%)" }}>
-                  <div className="at-disp" style={{ fontSize: 16, fontWeight: 700, color: "#fff" }}>Your bag · {cartCount}</div>
-                  <button onClick={() => setCartOpen(false)} style={{ fontSize: 20, color: "#fff" }}><X /></button>
+              <aside className="at-drawer at-scroll" style={{ background: "var(--surface)" }}>
+                <div className="sf-panel-head">
+                  <div className="sf-panel-title">Your bag <span style={{ fontFamily: "var(--body)", fontSize: 14, color: "var(--muted)", fontWeight: 500 }}>({cartCount})</span></div>
+                  <button className="sf-close" onClick={() => setCartOpen(false)} aria-label="Close"><IcClose /></button>
                 </div>
-                <div style={{ flex: 1, overflow: "auto", padding: "8px 0" }} className="at-scroll">
+                <div style={{ flex: 1, overflow: "auto" }} className="at-scroll">
                   {cart.length === 0 ? (
-                    <div style={{ textAlign: "center", padding: "60px 24px", color: "var(--muted)" }}>
-                      <span style={{ fontSize: 32, opacity: 0.4 }}><ShoppingBag /></span>
-                      <p style={{ marginTop: 14, fontSize: 14 }}>Your bag is empty.</p>
-                      <button onClick={() => setCartOpen(false)} className="at-btn at-btn-ghost at-btn-sm" style={{ marginTop: 16 }}>Continue shopping</button>
+                    <div style={{ textAlign: "center", padding: "80px 24px", color: "var(--muted)" }}>
+                      <span style={{ display: "inline-flex", width: 72, height: 72, borderRadius: "50%", background: "var(--gold-tint)", color: "var(--gold-deep)", alignItems: "center", justifyContent: "center" }}><IcBag size={30} /></span>
+                      <div className="sf-serif" style={{ marginTop: 18, fontSize: 24, fontWeight: 600, color: "var(--ink)" }}>Your bag is empty</div>
+                      <p style={{ fontSize: 13, marginTop: 6 }}>Find something you love in the collection.</p>
+                      <button onClick={() => { setCartOpen(false); toShop(); }} className="at-btn at-btn-dark at-btn-sm" style={{ marginTop: 20 }}>Start shopping</button>
                     </div>
                   ) : cart.map(i => (
-                    <div key={i.key} style={{ display: "flex", gap: 12, padding: "14px 22px", borderBottom: "1px solid var(--line)" }}>
-                      <div style={{ width: 72, height: 72, flexShrink: 0, overflow: "hidden", background: "var(--paper)" }}><ProductImage product={i} /></div>
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <div className="at-disp" style={{ fontSize: 13, fontWeight: 600 }}>{i.name}</div>
-                        <div className="at-mono" style={{ fontSize: 11, color: "var(--muted)", marginTop: 3 }}>Size {i.size}</div>
-                        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 10 }}>
-                          <div style={{ display: "flex", alignItems: "center", border: "1px solid var(--line-strong)", borderRadius: 2 }}>
-                            <button onClick={() => updateQty(i.key, -1)} style={{ padding: "6px 9px", fontSize: 18 }}><Minus /></button>
-                            <span className="at-mono" style={{ fontSize: 13, minWidth: 22, textAlign: "center" }}>{i.qty}</span>
-                            <button onClick={() => updateQty(i.key, 1)} style={{ padding: "6px 9px", fontSize: 18 }}><Plus /></button>
+                    <div key={i.key} style={{ display: "flex", gap: 14, padding: "18px 24px", borderBottom: "1px solid var(--line)" }}>
+                      <div className="sf-thumb" style={{ width: 84, height: 104 }}><ProductImage product={i} /></div>
+                      <div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column" }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", gap: 8 }}>
+                          <div className="sf-serif" style={{ fontSize: 19, fontWeight: 600, lineHeight: 1.15 }}>{i.name}</div>
+                          <button onClick={() => removeItem(i.key)} style={{ color: "var(--muted)", flexShrink: 0 }} aria-label="Remove"><IcTrash size={17} /></button>
+                        </div>
+                        <div style={{ fontSize: 12, color: "var(--muted)", marginTop: 4 }}>Size {i.size} · {money(i.price)}</div>
+                        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: "auto", paddingTop: 10 }}>
+                          <div className="sf-qty">
+                            <button onClick={() => updateQty(i.key, -1)} aria-label="Decrease"><IcMinus size={14} /></button>
+                            <span>{i.qty}</span>
+                            <button onClick={() => updateQty(i.key, 1)} aria-label="Increase"><IcPlus size={14} /></button>
                           </div>
-                          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                            <span className="at-mono" style={{ fontSize: 13 }}>{money(i.price * i.qty)}</span>
-                            <button onClick={() => removeItem(i.key)} style={{ color: "var(--muted)", fontSize: 18 }}><Trash2 /></button>
-                          </div>
+                          <span className="sf-price" style={{ fontSize: 15 }}>{money(i.price * i.qty)}</span>
                         </div>
                       </div>
                     </div>
                   ))}
                 </div>
                 {cart.length > 0 && (
-                  <div style={{ borderTop: "1px solid var(--line)", padding: "18px 22px" }}>
-                    <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13, marginBottom: 8 }}>
-                      <span style={{ color: "var(--muted)" }}>Subtotal</span><span className="at-mono">{money(subtotal)}</span>
+                  <div style={{ borderTop: "1px solid var(--line)", padding: "20px 24px 24px", background: "var(--paper)" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", fontSize: 15, fontWeight: 600 }}>
+                      <span>Subtotal</span><span className="sf-price">{money(subtotal)}</span>
                     </div>
-                    <div className="at-mono" style={{ fontSize: 11, color: "var(--muted)", marginBottom: 14 }}>Shipping calculated at checkout</div>
+                    <div style={{ fontSize: 12, color: "var(--muted)", margin: "4px 0 16px" }}>Delivery charge is added at checkout.</div>
                     <button onClick={() => {
                       setCartOpen(false);
                       if (!customer) { setAuthMode("signin"); setAfterAuth("checkout"); setAuthOpen(true); }
                       else setView("checkout");
-                    }} className="at-btn at-btn-primary" style={{ width: "100%" }}>
-                      Checkout · {money(subtotal)} <ArrowRight />
+                    }} className="at-btn at-btn-dark" style={{ width: "100%", padding: 16 }}>
+                      Checkout <IcArrowR size={16} />
                     </button>
+                    <button onClick={() => setCartOpen(false)} style={{ width: "100%", marginTop: 12, fontSize: 13, color: "var(--ink-soft)", textDecoration: "underline", textUnderlineOffset: 3 }}>Continue shopping</button>
                   </div>
                 )}
               </aside>
@@ -878,6 +1179,33 @@
       );
     }
 
+    const ModalShell = ({ title, sub, onClose, maxWidth = 440, children }) => (
+      <>
+        <div className="at-scrim" onClick={onClose} />
+        <div className="at-modal" onClick={onClose}>
+          <div className="at-card at-rise" style={{ maxWidth, width: "100%", padding: 0, marginTop: 32, borderRadius: 16, overflow: "hidden", boxShadow: "0 30px 80px rgba(20,14,6,.25)" }} onClick={e => e.stopPropagation()}>
+            <div className="sf-panel-head" style={{ alignItems: "flex-start" }}>
+              <div>
+                <div className="sf-panel-title">{title}</div>
+                {sub && <p style={{ color: "var(--muted)", fontSize: 13, marginTop: 8 }}>{sub}</p>}
+              </div>
+              <button className="sf-close" onClick={onClose} aria-label="Close" style={{ marginTop: -6, marginRight: -8 }}><IcClose /></button>
+            </div>
+            {children}
+          </div>
+        </div>
+      </>
+    );
+
+    const LocationChoice = ({ value, onChange, settings, money }) => (
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+        {[{ id: "dhaka", label: "Inside Dhaka", rate: settings?.shipInsideDhaka }, { id: "outside", label: "Outside Dhaka", rate: settings?.shipOutsideDhaka }].map(opt => (
+          <Choice key={opt.id} on={value === opt.id} onClick={() => onChange(opt.id)} label={opt.label}
+            sub={settings && money ? "Delivery " + money(opt.rate) : null} />
+        ))}
+      </div>
+    );
+
     function EditProfile({ customer, onSave, notify, onClose }) {
       const [form, setForm] = useState({ name: customer.name || "", phone: customer.phone || "", address: customer.address || "", location: customer.location || "dhaka" });
       const [err, setErr] = useState("");
@@ -898,98 +1226,56 @@
       };
 
       return (
-        <>
-          <div className="at-scrim" onClick={onClose} />
-          <div className="at-modal">
-            <div className="at-card at-rise" style={{ maxWidth: 400, width: "100%", padding: 32 }} onClick={e => e.stopPropagation()}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
-                <h2 className="at-disp" style={{ fontSize: 20, fontWeight: 700 }}>Your account</h2>
-                <button onClick={onClose} style={{ color: "var(--muted)", fontSize: 18 }}><X /></button>
-              </div>
-              <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-                <div>
-                  <label className="at-label">Email</label>
-                  <input className="at-field at-mono" value={customer.email} disabled style={{ opacity: 0.6 }} />
-                </div>
-                <div>
-                  <label className="at-label">Full name</label>
-                  <input className="at-field" value={form.name} onChange={set("name")} />
-                </div>
-                <div>
-                  <label className="at-label">Mobile number</label>
-                  <input className="at-field at-mono" value={form.phone} onChange={set("phone")} placeholder="01XXXXXXXXX" />
-                </div>
-                <div>
-                  <label className="at-label">Delivery address</label>
-                  <input className="at-field" value={form.address} onChange={set("address")} placeholder="House, road, area" />
-                </div>
-                <div>
-                  <label className="at-label">Delivery location</label>
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
-                    {[{ id: "dhaka", label: "Inside Dhaka" }, { id: "outside", label: "Outside Dhaka" }].map(opt => (
-                      <button key={opt.id} type="button" onClick={() => setForm(f => ({ ...f, location: opt.id }))} className="at-field"
-                        style={{ textAlign: "left", cursor: "pointer", border: "1px solid " + (form.location === opt.id ? "var(--ink)" : "var(--line-strong)"), background: form.location === opt.id ? "var(--ink)" : "transparent", color: form.location === opt.id ? "var(--paper)" : "var(--ink)" }}>
-                        {opt.label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              </div>
-              {err && <p style={{ color: "var(--warn)", fontSize: 12, marginTop: 10 }}>{err}</p>}
-              <button onClick={submit} disabled={busy} className="at-btn at-btn-dark" style={{ width: "100%", marginTop: 20 }}>{busy ? "Saving…" : "Save changes"}</button>
-            </div>
+        <ModalShell title="Your account" sub="We'll use these details to prefill checkout." onClose={onClose}>
+          <div style={{ padding: "22px 24px 26px" }}>
+            <Field label="Email" value={customer.email} disabled style={{ opacity: 0.6 }} />
+            <Field label="Full name" value={form.name} onChange={set("name")} />
+            <Field label="Mobile number" value={form.phone} onChange={set("phone")} placeholder="01XXXXXXXXX" />
+            <Field label="Delivery address" value={form.address} onChange={set("address")} placeholder="House, road, area" />
+            <label className="at-label">Delivery location</label>
+            <LocationChoice value={form.location} onChange={(v) => setForm(f => ({ ...f, location: v }))} />
+            {err && <p style={{ color: "var(--warn)", fontSize: 13, marginTop: 12 }}>{err}</p>}
+            <button onClick={submit} disabled={busy} className="at-btn at-btn-dark" style={{ width: "100%", marginTop: 22, padding: 15 }}>{busy ? "Saving…" : "Save changes"}</button>
           </div>
-        </>
+        </ModalShell>
       );
     }
 
     function MyOrders({ orders, error, money, onClose }) {
       return (
-        <>
-          <div className="at-scrim" onClick={onClose} />
-          <div className="at-modal">
-            <div className="at-card at-rise" style={{ maxWidth: 640, width: "100%", maxHeight: "85vh", display: "flex", flexDirection: "column", overflow: "hidden" }} onClick={e => e.stopPropagation()}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "20px 24px", background: "linear-gradient(90deg, var(--accent) 0%, var(--rose) 60%, var(--coral) 100%)", flexShrink: 0 }}>
-                <h2 className="at-disp" style={{ fontSize: 18, fontWeight: 700, color: "#fff" }}>Your orders · {orders.length}</h2>
-                <button onClick={onClose} style={{ color: "#fff", fontSize: 18 }}><X /></button>
+        <ModalShell title="My orders" sub={orders.length ? `${orders.length} order${orders.length !== 1 ? "s" : ""}` : null} onClose={onClose} maxWidth={640}>
+          <div style={{ maxHeight: "70vh", overflow: "auto", padding: "8px 24px 24px" }} className="at-scroll">
+            {error ? (
+              <div style={{ textAlign: "center", padding: "48px 0", color: "var(--warn)", fontSize: 14 }}>Couldn't load your orders right now. Please try again shortly.</div>
+            ) : orders.length === 0 ? (
+              <div style={{ textAlign: "center", padding: "48px 0", color: "var(--muted)" }}>
+                <span style={{ display: "inline-flex", width: 64, height: 64, borderRadius: "50%", background: "var(--gold-tint)", color: "var(--gold-deep)", alignItems: "center", justifyContent: "center" }}><IcReceipt size={26} /></span>
+                <p style={{ marginTop: 14, fontSize: 14 }}>You haven't placed any orders yet.</p>
               </div>
-              <div style={{ overflow: "auto" }} className="at-scroll">
-                {error ? (
-                  <div style={{ textAlign: "center", padding: "60px 24px", color: "var(--warn)" }}>
-                    <p style={{ fontSize: 14 }}>Couldn't load your orders right now. Please try again shortly.</p>
+            ) : orders.map(o => (
+              <div key={o.id} style={{ border: "1px solid var(--line)", borderRadius: 12, padding: 18, marginTop: 14 }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10 }}>
+                  <div>
+                    <div style={{ fontSize: 14, fontWeight: 700 }}>{o.id}</div>
+                    <div style={{ fontSize: 12, color: "var(--muted)", marginTop: 2 }}>{new Date(o.createdAt).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" })}</div>
                   </div>
-                ) : orders.length === 0 ? (
-                  <div style={{ textAlign: "center", padding: "60px 24px", color: "var(--muted)" }}>
-                    <span style={{ fontSize: 32, opacity: 0.4 }}><Receipt /></span>
-                    <p style={{ marginTop: 14, fontSize: 14 }}>You haven't placed any orders yet.</p>
-                  </div>
-                ) : orders.map(o => (
-                  <div key={o.id} style={{ padding: "16px 24px", borderBottom: "1px solid var(--line)" }}>
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                      <div className="at-mono" style={{ fontSize: 12, fontWeight: 700 }}>{o.id}</div>
-                      <span className="at-badge" style={{ background: STATUS_META[o.status].bg, color: STATUS_META[o.status].fg }}>{STATUS_META[o.status].label}</span>
+                  <span className="at-badge" style={{ background: STATUS_META[o.status].bg, color: STATUS_META[o.status].fg, borderRadius: 20 }}>{STATUS_META[o.status].label}</span>
+                </div>
+                <div style={{ marginTop: 14, display: "flex", flexDirection: "column", gap: 6 }}>
+                  {o.items.map((it, idx) => (
+                    <div key={idx} style={{ display: "flex", justifyContent: "space-between", fontSize: 13, color: "var(--ink-soft)", gap: 12 }}>
+                      <span>{it.name} <span style={{ color: "var(--muted)" }}>· {it.size} × {it.qty}</span></span>
+                      <span className="at-mono">{money(it.price * it.qty)}</span>
                     </div>
-                    <div className="at-mono" style={{ fontSize: 11, color: "var(--muted)", marginTop: 4 }}>
-                      {new Date(o.createdAt).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" })}
-                    </div>
-                    <div style={{ marginTop: 12, display: "flex", flexDirection: "column", gap: 6 }}>
-                      {o.items.map((it, idx) => (
-                        <div key={idx} style={{ display: "flex", justifyContent: "space-between", fontSize: 13, color: "var(--ink-soft)" }}>
-                          <span>{it.name} ({it.size}) × {it.qty}</span>
-                          <span className="at-mono">{money(it.price * it.qty)}</span>
-                        </div>
-                      ))}
-                    </div>
-                    <div style={{ display: "flex", justifyContent: "space-between", marginTop: 12, paddingTop: 12, borderTop: "1px dashed var(--line-strong)", fontWeight: 700, fontSize: 14 }}>
-                      <span>Total</span>
-                      <span className="at-mono">{money(o.total)}</span>
-                    </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
+                <div style={{ display: "flex", justifyContent: "space-between", marginTop: 12, paddingTop: 12, borderTop: "1px dashed var(--line-strong)", fontWeight: 700, fontSize: 14 }}>
+                  <span>Total</span><span className="at-mono">{money(o.total)}</span>
+                </div>
               </div>
-            </div>
+            ))}
           </div>
-        </>
+        </ModalShell>
       );
     }
 
@@ -1025,99 +1311,81 @@
       const onEnter = (e) => { if (e.key === "Enter") submit(); };
 
       return (
-        <>
-          <div className="at-scrim" onClick={onClose} />
-          <div className="at-modal">
-            <div className="at-card at-rise" style={{ maxWidth: 400, width: "100%", padding: 32 }} onClick={e => e.stopPropagation()}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
-                <h2 className="at-disp" style={{ fontSize: 20, fontWeight: 700 }}>{mode === "signup" ? "Create your account" : "Sign in"}</h2>
-                <button onClick={onClose} style={{ color: "var(--muted)", fontSize: 18 }}><X /></button>
-              </div>
-              <p style={{ color: "var(--muted)", fontSize: 13, marginBottom: 20 }}>
-                {mode === "signup" ? "You'll need an account to place an order." : "Sign in to continue to checkout."}
-              </p>
-              <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-                {mode === "signup" && (
-                  <div>
-                    <label className="at-label">Full name</label>
-                    <input className="at-field" value={form.name} onChange={set("name")} placeholder="Ava Lindqvist" />
-                  </div>
-                )}
-                <div>
-                  <label className="at-label">Email</label>
-                  <input className="at-field" type="email" value={form.email} onChange={set("email")} placeholder="you@email.com" />
-                </div>
-                {mode === "signup" && (
-                  <>
-                    <div>
-                      <label className="at-label">Mobile number</label>
-                      <input className="at-field at-mono" value={form.phone} onChange={set("phone")} placeholder="01XXXXXXXXX" />
-                    </div>
-                    <div>
-                      <label className="at-label">Delivery location</label>
-                      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
-                        {[{ id: "dhaka", label: "Inside Dhaka" }, { id: "outside", label: "Outside Dhaka" }].map(opt => (
-                          <button key={opt.id} type="button" onClick={() => setForm(f => ({ ...f, location: opt.id }))} className="at-field"
-                            style={{ textAlign: "left", cursor: "pointer", border: "1px solid " + (form.location === opt.id ? "var(--ink)" : "var(--line-strong)"), background: form.location === opt.id ? "var(--ink)" : "transparent", color: form.location === opt.id ? "var(--paper)" : "var(--ink)" }}>
-                            {opt.label}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  </>
-                )}
-                <div>
-                  <label className="at-label">Password</label>
-                  <input className="at-field at-mono" type="password" value={form.password} onChange={set("password")} onKeyDown={mode === "signup" ? undefined : onEnter} placeholder="••••••" />
-                </div>
-                {mode === "signup" && (
-                  <div>
-                    <label className="at-label">Confirm password</label>
-                    <input className="at-field at-mono" type="password" value={form.confirm} onChange={set("confirm")} onKeyDown={onEnter} placeholder="••••••" />
-                  </div>
-                )}
-              </div>
-              {err && <p style={{ color: "var(--warn)", fontSize: 12, marginTop: 10 }}>{err}</p>}
-              <button onClick={submit} disabled={busy} className="at-btn at-btn-dark" style={{ width: "100%", marginTop: 20 }}>
-                {busy ? "Please wait…" : mode === "signup" ? "Create account" : "Sign in"}
-              </button>
-              <button onClick={() => { setMode(mode === "signup" ? "signin" : "signup"); setErr(""); }} style={{ width: "100%", marginTop: 14, fontSize: 12, color: "var(--muted)" }}>
-                {mode === "signup" ? "Already have an account? Sign in" : "New here? Create an account"}
+        <ModalShell
+          title={mode === "signup" ? "Create your account" : "Welcome back"}
+          sub={mode === "signup" ? "You'll need an account to place an order." : "Sign in to continue to checkout and track your orders."}
+          onClose={onClose}>
+          <div style={{ padding: "22px 24px 26px" }}>
+            {mode === "signup" && <Field label="Full name" value={form.name} onChange={set("name")} placeholder="Your name" />}
+            <Field label="Email" type="email" value={form.email} onChange={set("email")} placeholder="you@email.com" />
+            {mode === "signup" && (
+              <>
+                <Field label="Mobile number" value={form.phone} onChange={set("phone")} placeholder="01XXXXXXXXX" />
+                <label className="at-label">Delivery location</label>
+                <div style={{ marginBottom: 14 }}><LocationChoice value={form.location} onChange={(v) => setForm(f => ({ ...f, location: v }))} /></div>
+              </>
+            )}
+            <Field label="Password" type="password" value={form.password} onChange={set("password")} onKeyDown={mode === "signup" ? undefined : onEnter} placeholder="••••••" />
+            {mode === "signup" && <Field label="Confirm password" type="password" value={form.confirm} onChange={set("confirm")} onKeyDown={onEnter} placeholder="••••••" />}
+            {err && <p style={{ color: "var(--warn)", fontSize: 13, marginTop: -4 }}>{err}</p>}
+            <button onClick={submit} disabled={busy} className="at-btn at-btn-dark" style={{ width: "100%", marginTop: 10, padding: 15 }}>
+              {busy ? "Please wait…" : mode === "signup" ? "Create account" : "Sign in"}
+            </button>
+            <div style={{ textAlign: "center", marginTop: 18, fontSize: 13, color: "var(--muted)" }}>
+              {mode === "signup" ? "Already have an account? " : "New to us? "}
+              <button onClick={() => { setMode(mode === "signup" ? "signin" : "signup"); setErr(""); }} style={{ color: "var(--ink)", fontWeight: 600, textDecoration: "underline", textUnderlineOffset: 3 }}>
+                {mode === "signup" ? "Sign in" : "Create an account"}
               </button>
             </div>
           </div>
-        </>
+        </ModalShell>
       );
     }
 
     function QuickView({ product, settings, money, onClose, onAdd }) {
-      const [size, setSize] = useState(null);
+      const [size, setSize] = useState(product.sizes?.length === 1 ? product.sizes[0] : null);
       const soldOut = product.stock === 0;
       return (
         <>
           <div className="at-scrim" onClick={onClose} />
           <div className="at-modal" onClick={onClose}>
-            <div className="at-card at-rise" onClick={e => e.stopPropagation()} style={{ maxWidth: 780, width: "100%", display: "grid", gridTemplateColumns: "1fr 1fr", overflow: "hidden", marginTop: 40, borderTop: "4px solid " + (CATEGORY_COLORS[product.category]?.c || "var(--gold)") }}>
-              <div style={{ aspectRatio: "1/1", background: "var(--paper)", minWidth: 0 }}><ProductImage product={product} /></div>
-              <div style={{ padding: 28, display: "flex", flexDirection: "column" }}>
-                <div style={{ display: "flex", justifyContent: "space-between" }}>
-                  <span className="at-mono" style={{ fontSize: 10, fontWeight: 700, letterSpacing: ".1em", textTransform: "uppercase", color: CATEGORY_COLORS[product.category]?.c || "var(--gold)", background: CATEGORY_COLORS[product.category]?.t || "var(--gold-tint)", padding: "3px 9px", borderRadius: 20 }}>{product.category}</span>
-                  <button onClick={onClose} style={{ fontSize: 18 }}><X /></button>
+            <div className="sf-qv at-rise" onClick={e => e.stopPropagation()}>
+              <div className="sf-qv-media">
+                <ProductImage product={product} />
+                {soldOut && <span className="sf-card-badge" style={{ background: "var(--ink)", color: "#fff" }}>Sold out</span>}
+              </div>
+              <div className="sf-qv-body">
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <span className="sf-card-cat">{product.category}</span>
+                  <button className="sf-close" onClick={onClose} aria-label="Close" style={{ marginRight: -10 }}><IcClose /></button>
                 </div>
-                <h2 className="at-disp" style={{ fontSize: 26, fontWeight: 700, marginTop: 12, lineHeight: 1.1 }}>{product.name}</h2>
-                <div className="at-mono" style={{ fontSize: 18, marginTop: 10 }}>{money(product.price)}</div>
-                <p style={{ color: "var(--ink-soft)", fontSize: 14, lineHeight: 1.6, marginTop: 16 }}>{product.description}</p>
-                <div style={{ marginTop: "auto", paddingTop: 20 }}>
-                  <div className="at-label">Select size</div>
-                  <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 18 }}>
+                <h2 className="sf-serif" style={{ fontSize: 38, fontWeight: 600, margin: "6px 0 0", lineHeight: 1.05 }}>{product.name}</h2>
+                <div className="sf-price" style={{ fontSize: 22, marginTop: 12 }}>{money(product.price)}</div>
+                {product.description && <p style={{ color: "var(--ink-soft)", fontSize: 14.5, lineHeight: 1.7, marginTop: 16 }}>{product.description}</p>}
+
+                <div style={{ marginTop: 24 }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 10 }}>
+                    <span className="at-label" style={{ marginBottom: 0 }}>Size{size ? `: ${size}` : ""}</span>
+                    {!soldOut && product.stock <= 5 && <span style={{ fontSize: 12, color: "var(--warn)", fontWeight: 600 }}>Only {product.stock} left</span>}
+                  </div>
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
                     {product.sizes.map(s => (
-                      <button key={s} onClick={() => setSize(s)} disabled={soldOut} className="at-mono"
-                        style={{ padding: "9px 14px", fontSize: 12, border: "1px solid " + (size === s ? "var(--ink)" : "var(--line-strong)"), background: size === s ? "var(--ink)" : "transparent", color: size === s ? "var(--paper)" : "var(--ink)", borderRadius: 2 }}>{s}</button>
+                      <button key={s} onClick={() => setSize(s)} disabled={soldOut} className={"sf-size" + (size === s ? " on" : "")}>{s}</button>
                     ))}
                   </div>
-                  <button disabled={soldOut || !size} onClick={() => onAdd(product, size)} className="at-btn at-btn-primary" style={{ width: "100%" }}>
-                    {soldOut ? "Sold out" : !size ? "Choose a size" : <>Add to bag <ShoppingBag /></>}
-                  </button>
+                </div>
+
+                <button disabled={soldOut || !size} onClick={() => onAdd(product, size)} className="at-btn at-btn-dark" style={{ width: "100%", padding: 16, marginTop: 24 }}>
+                  {soldOut ? "Sold out" : !size ? "Select a size" : <>Add to bag · {money(product.price)}</>}
+                </button>
+                <a href={waLink(settings, `Hi, I'd like to order "${product.name}"${size ? ` (size ${size})` : ""} – ${money(product.price)}`)} target="_blank" rel="noopener noreferrer"
+                  className="at-btn at-btn-ghost" style={{ width: "100%", padding: 14, marginTop: 10, textDecoration: "none" }}>
+                  <Whatsapp size={18} /> Order on WhatsApp
+                </a>
+
+                <div className="sf-perks">
+                  <div><IcTruck size={18} /> Inside Dhaka {money(settings.shipInsideDhaka)} · Outside Dhaka {money(settings.shipOutsideDhaka)}</div>
+                  <div><IcCash size={18} /> Cash on delivery, bKash, Nagad or card</div>
                 </div>
               </div>
             </div>
@@ -1134,9 +1402,10 @@
       const set = (k) => (e) => setForm(f => ({ ...f, [k]: e.target.value }));
       const cardFmt = (v) => v.replace(/\D/g, "").slice(0, 16).replace(/(.{4})/g, "$1 ").trim();
       const expFmt = (v) => v.replace(/\D/g, "").slice(0, 4).replace(/(.{2})(.+)/, "$1/$2");
-      const shipping = location === "dhaka" ? settings.shipInsideDhaka : settings.shipOutsideDhaka;
+      const shipping = Number(location === "dhaka" ? settings.shipInsideDhaka : settings.shipOutsideDhaka) || 0;
       const total = subtotal + shipping;
       const mobileBankingNumber = payMethod === "bkash" ? settings.bkashNumber : payMethod === "nagad" ? settings.nagadNumber : "";
+      const itemCount = cart.reduce((s, i) => s + i.qty, 0);
 
       const missing = [];
       if (!form.name.trim()) missing.push("full name");
@@ -1174,67 +1443,46 @@
         }, 1400);
       };
 
+      const PAY_OPTIONS = [
+        { id: "cod", label: "Cash on delivery", sub: "Pay the courier when it arrives" },
+        { id: "bkash", label: "bKash", sub: "Send Money, then enter TrxID" },
+        { id: "nagad", label: "Nagad", sub: "Send Money, then enter TrxID" },
+        { id: "card", label: "Card", sub: "Visa / Mastercard (demo)" },
+      ];
+
       return (
         <div style={{ minHeight: "100vh" }}>
-          <header style={{ borderBottom: "1px solid var(--line)" }}>
-            <div style={{ maxWidth: 1080, margin: "0 auto", padding: "0 24px", height: 68, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-              <button onClick={onBack} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, color: "var(--muted)", border: "none", background: "transparent", cursor: "pointer" }}><ArrowLeft /> Back to store</button>
-              {settings.logo ? (
-                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                  <img src={settings.logo} alt={settings.brand} style={{ height: 48, width: "auto", maxWidth: 220, borderRadius: "50%" }} />
-                  <span className="at-disp" style={{ fontSize: 16, letterSpacing: ".24em", fontWeight: 700 }}>{settings.brand}</span>
-                </div>
-              ) : (
-                <div className="at-disp" style={{ fontSize: 18, letterSpacing: ".24em", fontWeight: 700 }}>{settings.brand}</div>
-              )}
+          <header className="sf-co-head">
+            <div className="sf-wrap" style={{ maxWidth: 1120, height: 72, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+              <button onClick={onBack} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, fontWeight: 500, color: "var(--ink-soft)" }}><IcArrowL size={16} /> <span className="sf-hide-sm">Back to store</span></button>
+              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                {settings.logo && <img src={settings.logo} alt="" style={{ height: 42, width: 42, borderRadius: "50%", objectFit: "cover" }} />}
+                <span className="sf-wordmark" style={{ fontSize: 20 }}>{settings.brand}</span>
+              </div>
+              <span style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: "var(--muted)" }}><IcLock size={15} /> <span className="sf-hide-sm">Secure checkout</span></span>
             </div>
           </header>
-          <div className="at-checkout-grid" style={{ maxWidth: 1080, margin: "0 auto", padding: "40px 24px", display: "grid", gridTemplateColumns: "1.6fr 1fr", gap: 40 }}>
+          <div className="at-checkout-grid sf-wrap" style={{ maxWidth: 1120, padding: "36px 24px 64px", display: "grid", gridTemplateColumns: "1.5fr 1fr", gap: 32, alignItems: "start" }}>
             <div>
-              <h1 className="at-disp" style={{ fontSize: 28, fontWeight: 700, marginBottom: 4 }}>Checkout</h1>
-              <span className="at-badge" style={{ background: "var(--accent-tint)", color: "var(--accent)", marginBottom: 24 }}>Test mode — no real charge</span>
+              <h1 className="sf-serif" style={{ fontSize: 44, fontWeight: 500, lineHeight: 1, margin: 0 }}>Checkout</h1>
 
-              <section style={{ marginTop: 28 }}>
-                <div className="at-eyebrow" style={{ marginBottom: 14 }}>01 — Contact & shipping</div>
-                <Field label="Full name" value={form.name} onChange={set("name")} placeholder="Ava Lindqvist" />
+              <section className="sf-co-section">
+                <div className="sf-step"><b>1</b><span>Delivery details</span></div>
+                <Field label="Full name" value={form.name} onChange={set("name")} placeholder="Your name" />
                 <Field label="Email" value={form.email} onChange={set("email")} placeholder="you@email.com" type="email" />
-                <Field label="Address" value={form.address} onChange={set("address")} placeholder="12 Market St" />
+                <Field label="Address" value={form.address} onChange={set("address")} placeholder="House, road, area" />
                 <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: 12 }}>
                   <Field label="City" value={form.city} onChange={set("city")} placeholder="Dhaka" />
-                  <Field label="ZIP (optional)" value={form.zip} onChange={set("zip")} placeholder="1212" />
+                  <Field label="Post code (optional)" value={form.zip} onChange={set("zip")} placeholder="1212" />
                 </div>
-                <div style={{ marginBottom: 14 }}>
-                  <label className="at-label">Delivery location</label>
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
-                    {[{ id: "dhaka", label: "Inside Dhaka", rate: settings.shipInsideDhaka }, { id: "outside", label: "Outside Dhaka", rate: settings.shipOutsideDhaka }].map(opt => (
-                      <button key={opt.id} type="button" onClick={() => setLocation(opt.id)} className="at-field"
-                        style={{ textAlign: "left", cursor: "pointer", border: "1px solid " + (location === opt.id ? "var(--ink)" : "var(--line-strong)"), background: location === opt.id ? "var(--ink)" : "transparent", color: location === opt.id ? "var(--paper)" : "var(--ink)" }}>
-                        {opt.label} <span className="at-mono" style={{ fontSize: 12, opacity: 0.75 }}>· {money(opt.rate)}</span>
-                      </button>
-                    ))}
-                  </div>
-                </div>
+                <label className="at-label">Delivery location</label>
+                <LocationChoice value={location} onChange={setLocation} settings={settings} money={money} />
               </section>
 
-              <section style={{ marginTop: 28 }}>
-                <div className="at-eyebrow" style={{ marginBottom: 14, display: "flex", alignItems: "center", gap: 8 }}><CreditCard /> 02 — Payment</div>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 16 }}>
-                  <button type="button" onClick={() => setPayMethod("card")} className="at-field"
-                    style={{ textAlign: "left", cursor: "pointer", border: "1px solid " + (payMethod === "card" ? "var(--ink)" : "var(--line-strong)"), background: payMethod === "card" ? "var(--ink)" : "transparent", color: payMethod === "card" ? "var(--paper)" : "var(--ink)" }}>
-                    Card
-                  </button>
-                  <button type="button" onClick={() => setPayMethod("cod")} className="at-field"
-                    style={{ textAlign: "left", cursor: "pointer", border: "1px solid " + (payMethod === "cod" ? "var(--ink)" : "var(--line-strong)"), background: payMethod === "cod" ? "var(--ink)" : "transparent", color: payMethod === "cod" ? "var(--paper)" : "var(--ink)" }}>
-                    Cash on delivery
-                  </button>
-                  <button type="button" onClick={() => setPayMethod("bkash")} className="at-field"
-                    style={{ textAlign: "left", cursor: "pointer", border: "1px solid " + (payMethod === "bkash" ? "var(--ink)" : "var(--line-strong)"), background: payMethod === "bkash" ? "var(--ink)" : "transparent", color: payMethod === "bkash" ? "var(--paper)" : "var(--ink)" }}>
-                    bKash
-                  </button>
-                  <button type="button" onClick={() => setPayMethod("nagad")} className="at-field"
-                    style={{ textAlign: "left", cursor: "pointer", border: "1px solid " + (payMethod === "nagad" ? "var(--ink)" : "var(--line-strong)"), background: payMethod === "nagad" ? "var(--ink)" : "transparent", color: payMethod === "nagad" ? "var(--paper)" : "var(--ink)" }}>
-                    Nagad
-                  </button>
+              <section className="sf-co-section">
+                <div className="sf-step"><b>2</b><span>Payment</span></div>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 18 }} className="sf-pay-grid">
+                  {PAY_OPTIONS.map(o => <Choice key={o.id} on={payMethod === o.id} onClick={() => setPayMethod(o.id)} label={o.label} sub={o.sub} />)}
                 </div>
                 {payMethod === "card" ? (
                   <>
@@ -1243,57 +1491,64 @@
                       <Field label="Expiry" value={form.exp} onChange={(e) => setForm(f => ({ ...f, exp: expFmt(e.target.value) }))} placeholder="12/28" mono />
                       <Field label="CVC" value={form.cvc} onChange={(e) => setForm(f => ({ ...f, cvc: e.target.value.replace(/\D/g, "").slice(0, 4) }))} placeholder="123" mono />
                     </div>
-                    <p className="at-mono" style={{ fontSize: 11, color: "var(--muted)", marginTop: 4 }}>Use any 16-digit number — this is a demo gateway.</p>
+                    <p style={{ fontSize: 12, color: "var(--muted)" }}>Test mode: use any 16-digit number. No real charge is made.</p>
                   </>
                 ) : payMethod === "cod" ? (
-                  <p style={{ color: "var(--ink-soft)", fontSize: 13, lineHeight: 1.6 }}>Pay in cash when your order arrives. Please have {money(total)} ready for the courier.</p>
+                  <div style={{ padding: 16, borderRadius: 10, background: "var(--gold-tint)", fontSize: 14, color: "var(--ink-soft)", lineHeight: 1.6 }}>
+                    Pay in cash when your order arrives. Please keep <b>{money(total)}</b> ready for the courier.
+                  </div>
                 ) : (
-                  <div className="at-card" style={{ padding: 16, background: "var(--accent-tint)", border: "none" }}>
-                    <p style={{ color: "var(--ink-soft)", fontSize: 13, lineHeight: 1.6, marginBottom: 12 }}>
-                      Send <b className="at-mono">{money(total)}</b> to this {payMethod === "bkash" ? "bKash" : "Nagad"} number via <b>Send Money</b>:
+                  <div style={{ padding: 18, borderRadius: 10, background: "var(--gold-tint)" }}>
+                    <p style={{ color: "var(--ink-soft)", fontSize: 14, lineHeight: 1.6, marginBottom: 10 }}>
+                      Send <b>{money(total)}</b> to this {payMethod === "bkash" ? "bKash" : "Nagad"} number using <b>Send Money</b>:
                     </p>
-                    <div className="at-mono" style={{ fontSize: 18, fontWeight: 700, marginBottom: 14 }}>{mobileBankingNumber}</div>
+                    <div style={{ fontSize: 24, fontWeight: 700, letterSpacing: ".04em", marginBottom: 16, fontVariantNumeric: "tabular-nums" }}>{mobileBankingNumber}</div>
                     <Field label="Transaction ID (TrxID)" value={form.trxId} onChange={set("trxId")} placeholder="e.g. 8N7C6X5D4E" mono />
-                    <p className="at-mono" style={{ fontSize: 11, color: "var(--muted)" }}>We'll verify this before confirming your order.</p>
+                    <p style={{ fontSize: 12, color: "var(--muted)", marginTop: -4 }}>We'll verify this before confirming your order.</p>
                   </div>
                 )}
               </section>
-
-              <button onClick={submit} disabled={!valid || processing} className="at-btn at-btn-primary" style={{ width: "100%", marginTop: 28, padding: "15px" }}>
-                {processing
-                  ? (payMethod === "card" ? "Processing payment…" : "Placing order…")
-                  : payMethod === "card" ? <>Pay {money(total)} <Lock /></>
-                  : payMethod === "cod" ? <>Place order · {money(total)} <ArrowRight /></>
-                  : <>Confirm order · {money(total)} <ArrowRight /></>}
-              </button>
-              {!valid && !processing && (
-                <p className="at-mono" style={{ fontSize: 11, color: "var(--warn)", marginTop: 10, textAlign: "center" }}>
-                  Still needed: {missing.join(", ")}
-                </p>
-              )}
             </div>
 
-            <aside>
-              <div className="at-card" style={{ padding: 22, position: "sticky", top: 24 }}>
-                <div className="at-eyebrow" style={{ marginBottom: 16 }}>Order summary</div>
+            <aside style={{ position: "sticky", top: 24 }}>
+              <div className="sf-co-section" style={{ marginTop: 0 }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 18 }}>
+                  <span className="sf-serif" style={{ fontSize: 24, fontWeight: 600 }}>Order summary</span>
+                  <span style={{ fontSize: 12, color: "var(--muted)" }}>{itemCount} item{itemCount !== 1 ? "s" : ""}</span>
+                </div>
                 {cart.map(i => (
-                  <div key={i.key} style={{ display: "flex", gap: 12, marginBottom: 14 }}>
-                    <div style={{ width: 50, height: 50, flexShrink: 0, overflow: "hidden", background: "var(--paper)" }}><ProductImage product={i} /></div>
-                    <div style={{ flex: 1 }}>
-                      <div className="at-disp" style={{ fontSize: 13, fontWeight: 600 }}>{i.name}</div>
-                      <div className="at-mono" style={{ fontSize: 11, color: "var(--muted)" }}>{i.size} · ×{i.qty}</div>
+                  <div key={i.key} style={{ display: "flex", gap: 12, marginBottom: 14, alignItems: "center" }}>
+                    <div className="sf-thumb" style={{ width: 56, height: 68, position: "relative", overflow: "visible" }}>
+                      <div style={{ width: "100%", height: "100%", overflow: "hidden", borderRadius: 8 }}><ProductImage product={i} /></div>
+                      <span style={{ position: "absolute", top: -7, right: -7, background: "var(--ink)", color: "#fff", fontSize: 10, fontWeight: 700, minWidth: 19, height: 19, borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", padding: "0 5px" }}>{i.qty}</span>
                     </div>
-                    <div className="at-mono" style={{ fontSize: 13 }}>{money(i.price * i.qty)}</div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontSize: 14, fontWeight: 600 }}>{i.name}</div>
+                      <div style={{ fontSize: 12, color: "var(--muted)" }}>Size {i.size}</div>
+                    </div>
+                    <div className="sf-price" style={{ fontSize: 14 }}>{money(i.price * i.qty)}</div>
                   </div>
                 ))}
                 <div style={{ borderTop: "1px solid var(--line)", marginTop: 8, paddingTop: 14 }}>
                   <Row label="Subtotal" value={money(subtotal)} />
-                  <Row label="Shipping" value={money(shipping)} />
-                  <div style={{ display: "flex", justifyContent: "space-between", marginTop: 12, paddingTop: 12, borderTop: "1px solid var(--line)" }}>
-                    <span className="at-disp" style={{ fontWeight: 700 }}>Total</span>
-                    <span className="at-mono" style={{ fontWeight: 700, fontSize: 16 }}>{money(total)}</span>
+                  <Row label={"Delivery · " + (location === "dhaka" ? "Inside Dhaka" : "Outside Dhaka")} value={money(shipping)} />
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginTop: 12, paddingTop: 14, borderTop: "1px solid var(--line)" }}>
+                    <span style={{ fontWeight: 600 }}>Total</span>
+                    <span className="sf-price" style={{ fontSize: 24 }}>{money(total)}</span>
                   </div>
                 </div>
+                <button onClick={submit} disabled={!valid || processing} className="at-btn at-btn-dark" style={{ width: "100%", marginTop: 20, padding: 16 }}>
+                  {processing
+                    ? (payMethod === "card" ? "Processing payment…" : "Placing order…")
+                    : payMethod === "card" ? <>Pay {money(total)} <IcLock size={15} /></>
+                    : payMethod === "cod" ? <>Place order · {money(total)}</>
+                    : <>Confirm order · {money(total)}</>}
+                </button>
+                {!valid && !processing && (
+                  <p style={{ fontSize: 12, color: "var(--warn)", marginTop: 10, textAlign: "center", lineHeight: 1.5 }}>
+                    Still needed: {missing.join(", ")}
+                  </p>
+                )}
               </div>
             </aside>
           </div>
@@ -1406,22 +1661,25 @@
     function Confirmation({ order, settings, money, onDone }) {
       const [showInvoice, setShowInvoice] = useState(false);
       return (
-        <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
-          <div className="at-card at-rise" style={{ maxWidth: 460, width: "100%", padding: 40, textAlign: "center" }}>
-            <div style={{ width: 56, height: 56, borderRadius: "50%", background: "var(--live-tint)", color: "var(--live)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 20px", fontSize: 28 }}>
-              <Check />
+        <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", padding: 24, background: "radial-gradient(ellipse at top,#F4EAD6 0%,var(--paper) 60%)" }}>
+          <div className="at-card at-rise" style={{ maxWidth: 480, width: "100%", padding: "44px 36px 36px", textAlign: "center", borderRadius: 18, boxShadow: "0 24px 70px rgba(60,40,10,.12)" }}>
+            <div style={{ width: 68, height: 68, borderRadius: "50%", background: "var(--gold-tint)", color: "var(--gold-deep)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 22px", boxShadow: "0 0 0 8px rgba(176,138,62,.08)" }}>
+              <IcCheck size={30} sw={2} />
             </div>
-            <h1 className="at-disp" style={{ fontSize: 24, fontWeight: 700 }}>Order confirmed</h1>
-            <p style={{ color: "var(--ink-soft)", fontSize: 14, marginTop: 8 }}>Thanks, {order.customer.name.split(" ")[0]}. A receipt is on its way to {order.customer.email}.</p>
-            <div className="at-card" style={{ padding: 18, marginTop: 24, textAlign: "left", background: "var(--paper)" }}>
+            <div className="sf-eyebrow">Thank you</div>
+            <h1 className="sf-serif" style={{ fontSize: 38, fontWeight: 500, margin: "8px 0 0", lineHeight: 1.05 }}>Your order is placed</h1>
+            <p style={{ color: "var(--ink-soft)", fontSize: 14, marginTop: 12, lineHeight: 1.6 }}>Thanks, {order.customer.name.split(" ")[0]}. We'll be in touch at {order.customer.email} as your order moves along.</p>
+            <div style={{ padding: 18, marginTop: 26, textAlign: "left", background: "var(--paper)", borderRadius: 12 }}>
               <Row label="Order number" value={order.id} />
               <Row label="Items" value={order.items.reduce((s, i) => s + i.qty, 0)} />
               <Row label={dueLabel(order)} value={money(order.total)} />
               <Row label="Payment" value={paymentLabel(order)} />
             </div>
-            <button onClick={() => setShowInvoice(true)} className="at-btn at-btn-primary" style={{ width: "100%", marginTop: 24 }}><Receipt /> Download invoice</button>
-            <button onClick={onDone} className="at-btn at-btn-dark" style={{ width: "100%", marginTop: 12 }}>Continue shopping</button>
-            <p className="at-mono" style={{ fontSize: 11, color: "var(--muted)", marginTop: 14 }}>This order is now live in the admin dashboard.</p>
+            <button onClick={() => setShowInvoice(true)} className="at-btn at-btn-ghost" style={{ width: "100%", marginTop: 24, padding: 14 }}><IcReceipt size={17} /> Download invoice</button>
+            <button onClick={onDone} className="at-btn at-btn-dark" style={{ width: "100%", marginTop: 10, padding: 15 }}>Continue shopping</button>
+            <a href={waLink(settings, `Hi, I just placed order ${order.id}.`)} target="_blank" rel="noopener noreferrer" style={{ display: "inline-flex", alignItems: "center", gap: 8, marginTop: 18, fontSize: 13, color: "var(--ink-soft)" }}>
+              <Whatsapp size={16} /> Questions? Message us on WhatsApp
+            </a>
           </div>
           {showInvoice && <Invoice order={order} settings={settings} money={money} onClose={() => setShowInvoice(false)} />}
         </div>
