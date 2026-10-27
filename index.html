@@ -404,6 +404,22 @@
 }
 @media (max-width:600px){.sf-pay-grid{grid-template-columns:1fr !important;}}
 
+.sf-brand-m{visibility:hidden;}
+.sf-cover{background:radial-gradient(ellipse at 70% 30%,#F4EAD6 0%,var(--paper) 70%);border-bottom:1px solid var(--line);}
+.sf-cover-in{display:grid;grid-template-columns:1.1fr 1fr;align-items:center;gap:48px;padding-top:40px;padding-bottom:40px;}
+.sf-cover-media img{width:100%;max-height:520px;object-fit:contain;display:block;}
+.sf-cover-text{text-align:center;}
+.sf-cover-name{font-family:var(--serif);font-weight:500;font-size:clamp(60px,9vw,128px);line-height:.9;letter-spacing:.06em;text-transform:uppercase;}
+.sf-cover-sub{display:flex;align-items:center;justify-content:center;gap:18px;margin-top:18px;font-family:var(--serif);font-weight:600;
+  font-size:clamp(18px,2.2vw,28px);letter-spacing:.5em;text-transform:uppercase;color:var(--gold);padding-left:.5em;}
+.sf-cover-sub span{height:1px;width:56px;background:var(--gold);opacity:.7;}
+.sf-cover-text p{font-size:16px;color:var(--ink-soft);margin:26px auto 0;max-width:360px;line-height:1.6;}
+@media (max-width:960px){
+  .sf-brand-m{visibility:visible;}
+  .sf-cover-in{grid-template-columns:1fr;gap:20px;padding-top:24px;padding-bottom:44px;}
+  .sf-cover-media img{max-height:300px;}
+}
+
 /* admin panel responsive shell */
 .admin-shell{display:flex;width:100%;min-height:100vh;}
 .admin-sidebar{width:232px;flex-shrink:0;position:sticky;top:0;height:100vh;overflow-y:auto;}
@@ -898,8 +914,7 @@
                 <button className="sf-navlink" onClick={() => footerRef.current?.scrollIntoView({ behavior: "smooth" })}>Contact</button>
               </div>
 
-              <button className="sf-brand" onClick={() => { setView("home"); setCat("All"); setQ(""); window.scrollTo({ top: 0, behavior: "smooth" }); }} aria-label={settings.brand + " home"}>
-                {settings.logo && <img src={settings.logo} alt="" />}
+              <button className="sf-brand sf-brand-m" onClick={() => { setView("home"); setCat("All"); setQ(""); window.scrollTo({ top: 0, behavior: "smooth" }); }} aria-label={settings.brand + " home"}>
                 <Wordmark />
               </button>
 
@@ -937,17 +952,19 @@
             </div>
           </header>
 
-          {settings.bannerImage ? (
-            <div className="sf-banner">
-              <img src={settings.bannerImage} alt={settings.brand + " banner"} />
+          <section className="sf-cover">
+            <div className="sf-wrap sf-cover-in">
+              <div className="sf-cover-media">
+                {(settings.bannerImage || settings.logo) && <img src={settings.bannerImage || settings.logo} alt={settings.brand} />}
+              </div>
+              <div className="sf-cover-text">
+                <div className="sf-cover-name">{brandParts[0]}</div>
+                {brandParts.length > 1 && <div className="sf-cover-sub"><span />{brandParts.slice(1).join(" ")}<span /></div>}
+                <p>{settings.tagline}</p>
+                <button onClick={toShop} className="at-btn at-btn-dark" style={{ marginTop: 30, padding: "15px 28px" }}>Shop the collection <IcArrowR size={16} /></button>
+              </div>
             </div>
-          ) : (
-            <section className="sf-hero">
-              {settings.logo && <img src={settings.logo} alt="" />}
-              <h1>{settings.tagline}</h1>
-              <button onClick={toShop} className="at-btn at-btn-dark" style={{ marginTop: 30 }}>Shop the collection <IcArrowR size={16} /></button>
-            </section>
-          )}
+          </section>
 
           <div className="sf-trust">
             <div className="sf-wrap sf-trust-in">
