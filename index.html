@@ -445,14 +445,15 @@
 }
 
 @media print{
-  @page{size:A4;margin:14mm;}
+  @page{size:A4;margin:0;}
+  html,body{margin:0 !important;padding:0 !important;background:#fff !important;}
   *{-webkit-print-color-adjust:exact !important;print-color-adjust:exact !important;color-adjust:exact !important;}
   #root{display:none !important;}
   .no-print{display:none !important;}
-  .invoice-modal{display:block !important;position:static !important;background:none !important;padding:0 !important;inset:auto !important;}
-  .invoice-card{display:block !important;position:static !important;overflow:visible !important;
-    max-width:none !important;width:100% !important;box-shadow:none !important;border:none !important;}
-  .invoice-print{position:static !important;width:100% !important;padding:0 !important;background:none !important;}
+  .invoice-modal{display:block !important;position:static !important;background:none !important;padding:0 !important;margin:0 !important;inset:auto !important;overflow:visible !important;}
+  .invoice-card{display:block !important;position:static !important;overflow:visible !important;margin:0 !important;border-radius:0 !important;
+    max-width:none !important;width:210mm !important;box-shadow:none !important;border:none !important;animation:none !important;}
+  .invoice-print{position:static !important;width:210mm !important;min-height:296mm !important;padding:0 !important;background:#fff !important;}
   .invoice-print table tr{break-inside:avoid;}
 }
 `;
@@ -1593,7 +1594,7 @@
               </div>
 
               <div className="invoice-print" style={{ background: "#fff", display: "flex", flexDirection: "column", minHeight: "240mm" }}>
-                <div style={{ background: "#14110D", color: "#E9E1D2", padding: "28px 36px", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 20, borderBottom: "3px solid #C9A55E" }}>
+                <div style={{ background: "#3B342C", color: "#E9E1D2", padding: "28px 36px", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 20, borderBottom: "3px solid #C9A55E" }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
                     {settings.logo && <img src={settings.logo} alt="" style={{ height: 60, width: 60, borderRadius: "50%", objectFit: "cover", boxShadow: "0 0 0 1px rgba(201,165,94,.5)" }} />}
                     <div>
@@ -1653,7 +1654,7 @@
                     <div style={{ width: 280 }}>
                       <Row label="Subtotal" value={money(order.subtotal)} />
                       <Row label="Shipping" value={money(order.shipping)} />
-                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 14px", marginTop: 10, background: "#14110D", color: "#fff", borderRadius: 8 }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 14px", marginTop: 10, background: "#3B342C", color: "#fff", borderRadius: 8 }}>
                         <span style={{ fontWeight: 600, fontSize: 13 }}>Total ({itemCount} item{itemCount !== 1 ? "s" : ""})</span>
                         <span style={{ fontWeight: 700, fontSize: 16, color: "#D9B66F" }}>{money(order.total)}</span>
                       </div>
@@ -1661,7 +1662,7 @@
                   </div>
                 </div>
 
-                <div style={{ background: "#14110D", color: "#E9E1D2", padding: "20px 36px", borderTop: "3px solid #C9A55E", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 16, flexWrap: "wrap" }}>
+                <div style={{ background: "#3B342C", color: "#E9E1D2", padding: "20px 36px", borderTop: "3px solid #C9A55E", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 16, flexWrap: "wrap" }}>
                   <div className="sf-serif" style={{ fontSize: 20, fontWeight: 600, color: "#fff" }}>Thank you for shopping with {settings.brand}!</div>
                   <div style={{ fontSize: 12, color: "rgba(233,225,210,.7)", textAlign: "right", lineHeight: 1.6 }}>
                     {settings.phone}{settings.whatsapp && settings.whatsapp !== settings.phone ? ` · WhatsApp ${settings.whatsapp}` : " (call / WhatsApp)"}<br />{settings.address}
