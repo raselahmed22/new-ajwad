@@ -149,6 +149,8 @@
 }
 .at-root *{box-sizing:border-box;}
 .invoice-card, .invoice-card *{box-sizing:border-box;}
+.invoice-card{font-family:var(--body);color:var(--ink);-webkit-font-smoothing:antialiased;}
+.invoice-card button{font-family:inherit;cursor:pointer;}
 :where(.at-root) button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit;}
 .at-root input,.at-root textarea,.at-root select{font-family:inherit;font-size:14px;color:var(--ink);}
 .at-mono{font-family:var(--mono);font-variant-numeric:tabular-nums;font-weight:500;}
@@ -1590,73 +1592,80 @@
                 </div>
               </div>
 
-              <div className="invoice-print" style={{ padding: 40, background: "#fff", display: "flex", flexDirection: "column", minHeight: "240mm" }}>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", borderBottom: "3px solid var(--accent)", paddingBottom: 20, marginBottom: 28 }}>
+              <div className="invoice-print" style={{ background: "#fff", display: "flex", flexDirection: "column", minHeight: "240mm" }}>
+                <div style={{ background: "#14110D", color: "#E9E1D2", padding: "28px 36px", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 20, borderBottom: "3px solid #C9A55E" }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-                    {settings.logo && <img src={settings.logo} alt={settings.brand} style={{ height: 56, width: 56, borderRadius: "50%", objectFit: "cover" }} />}
+                    {settings.logo && <img src={settings.logo} alt="" style={{ height: 60, width: 60, borderRadius: "50%", objectFit: "cover", boxShadow: "0 0 0 1px rgba(201,165,94,.5)" }} />}
                     <div>
-                      <div className="at-disp" style={{ fontSize: 20, fontWeight: 700 }}>{settings.brand}</div>
-                      <div style={{ fontSize: 12, color: "var(--muted)", marginTop: 2 }}>{settings.address}</div>
-                      <div style={{ fontSize: 12, color: "var(--muted)" }}>{settings.phone}</div>
+                      <div className="sf-wordmark" style={{ color: "#fff", fontSize: 24 }}>
+                        {settings.brand.split(" ")[0]}
+                        {settings.brand.split(" ").length > 1 && <small style={{ color: "#C9A55E" }}>{settings.brand.split(" ").slice(1).join(" ")}</small>}
+                      </div>
+                      <div style={{ fontSize: 11.5, color: "rgba(233,225,210,.65)", marginTop: 8 }}>{settings.address} · {settings.phone}</div>
                     </div>
                   </div>
                   <div style={{ textAlign: "right" }}>
-                    <div className="at-disp" style={{ fontSize: 26, fontWeight: 700, color: "var(--accent)", letterSpacing: ".08em" }}>INVOICE</div>
-                    <div className="at-mono" style={{ fontSize: 13, marginTop: 4 }}>{order.id}</div>
-                    <div style={{ fontSize: 12, color: "var(--muted)" }}>{new Date(order.createdAt).toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric" })}</div>
+                    <div className="sf-serif" style={{ fontSize: 34, fontWeight: 600, color: "#D9B66F", letterSpacing: ".12em", lineHeight: 1 }}>INVOICE</div>
+                    <div style={{ fontSize: 13, fontWeight: 600, marginTop: 8, color: "#fff" }}>{order.id}</div>
+                    <div style={{ fontSize: 12, color: "rgba(233,225,210,.65)" }}>{new Date(order.createdAt).toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric" })}</div>
                   </div>
                 </div>
 
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20, marginBottom: 28 }}>
-                  <div>
-                    <div className="at-eyebrow" style={{ marginBottom: 8 }}>Bill to</div>
-                    <div style={{ fontWeight: 600 }}>{order.customer.name}</div>
-                    {order.customer.email && order.customer.email !== "-" && <div style={{ fontSize: 13, color: "var(--muted)" }}>{order.customer.email}</div>}
-                    <div style={{ fontSize: 13, color: "var(--muted)" }}>{order.customer.address}</div>
+                <div style={{ padding: "30px 36px 8px", flex: 1 }}>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20, marginBottom: 28 }}>
+                    <div>
+                      <div className="sf-eyebrow" style={{ marginBottom: 8 }}>Bill to</div>
+                      <div style={{ fontWeight: 600 }}>{order.customer.name}</div>
+                      {order.customer.email && order.customer.email !== "-" && <div style={{ fontSize: 13, color: "var(--muted)" }}>{order.customer.email}</div>}
+                      <div style={{ fontSize: 13, color: "var(--muted)" }}>{order.customer.address}</div>
+                    </div>
+                    <div style={{ textAlign: "right" }}>
+                      <div className="sf-eyebrow" style={{ marginBottom: 8 }}>Payment</div>
+                      <div style={{ fontSize: 13, marginBottom: 6 }}>{paymentLabel(order)}</div>
+                      <span className="at-badge" style={{ background: STATUS_META[order.status].bg, color: STATUS_META[order.status].fg, borderRadius: 20 }}>{STATUS_META[order.status].label}</span>
+                    </div>
                   </div>
-                  <div style={{ textAlign: "right" }}>
-                    <div className="at-eyebrow" style={{ marginBottom: 8 }}>Payment</div>
-                    <div style={{ fontSize: 13, marginBottom: 6 }}>{paymentLabel(order)}</div>
-                    <span className="at-badge" style={{ background: STATUS_META[order.status].bg, color: STATUS_META[order.status].fg }}>{STATUS_META[order.status].label}</span>
-                  </div>
-                </div>
 
-                <table style={{ width: "100%", borderCollapse: "collapse", marginBottom: 24 }}>
-                  <thead>
-                    <tr style={{ background: "var(--accent)" }}>
-                      <th style={{ color: "#fff", textAlign: "left", padding: "10px 12px", fontSize: 12, letterSpacing: ".04em" }}>Item</th>
-                      <th style={{ color: "#fff", padding: "10px 12px", fontSize: 12 }}>Size</th>
-                      <th style={{ color: "#fff", padding: "10px 12px", fontSize: 12 }}>Qty</th>
-                      <th style={{ color: "#fff", textAlign: "right", padding: "10px 12px", fontSize: 12 }}>Price</th>
-                      <th style={{ color: "#fff", textAlign: "right", padding: "10px 12px", fontSize: 12 }}>Total</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {order.items.map((it, i) => (
-                      <tr key={i} style={{ borderBottom: "1px solid var(--line)" }}>
-                        <td style={{ padding: "10px 12px", fontSize: 13 }}>{it.name}</td>
-                        <td style={{ padding: "10px 12px", fontSize: 13, textAlign: "center" }}>{it.size}</td>
-                        <td style={{ padding: "10px 12px", fontSize: 13, textAlign: "center" }}>{it.qty}</td>
-                        <td className="at-mono" style={{ padding: "10px 12px", fontSize: 13, textAlign: "right" }}>{money(it.price)}</td>
-                        <td className="at-mono" style={{ padding: "10px 12px", fontSize: 13, textAlign: "right" }}>{money(it.price * it.qty)}</td>
+                  <table style={{ width: "100%", borderCollapse: "collapse", marginBottom: 24 }}>
+                    <thead>
+                      <tr style={{ background: "#F6EEDC" }}>
+                        <th style={{ color: "#8A6A2C", textAlign: "left", padding: "10px 12px", fontSize: 11, letterSpacing: ".14em", textTransform: "uppercase" }}>Item</th>
+                        <th style={{ color: "#8A6A2C", padding: "10px 12px", fontSize: 11, letterSpacing: ".14em", textTransform: "uppercase" }}>Size</th>
+                        <th style={{ color: "#8A6A2C", padding: "10px 12px", fontSize: 11, letterSpacing: ".14em", textTransform: "uppercase" }}>Qty</th>
+                        <th style={{ color: "#8A6A2C", textAlign: "right", padding: "10px 12px", fontSize: 11, letterSpacing: ".14em", textTransform: "uppercase" }}>Price</th>
+                        <th style={{ color: "#8A6A2C", textAlign: "right", padding: "10px 12px", fontSize: 11, letterSpacing: ".14em", textTransform: "uppercase" }}>Total</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody>
+                      {order.items.map((it, i) => (
+                        <tr key={i} style={{ borderBottom: "1px solid var(--line)" }}>
+                          <td style={{ padding: "11px 12px", fontSize: 13 }}>{it.name}</td>
+                          <td style={{ padding: "11px 12px", fontSize: 13, textAlign: "center" }}>{it.size}</td>
+                          <td style={{ padding: "11px 12px", fontSize: 13, textAlign: "center" }}>{it.qty}</td>
+                          <td className="at-mono" style={{ padding: "11px 12px", fontSize: 13, textAlign: "right" }}>{money(it.price)}</td>
+                          <td className="at-mono" style={{ padding: "11px 12px", fontSize: 13, textAlign: "right" }}>{money(it.price * it.qty)}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
 
-                <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 32 }}>
-                  <div style={{ width: 260 }}>
-                    <Row label="Subtotal" value={money(order.subtotal)} />
-                    <Row label="Shipping" value={money(order.shipping)} />
-                    <div style={{ display: "flex", justifyContent: "space-between", paddingTop: 10, marginTop: 10, borderTop: "2px solid var(--ink)" }}>
-                      <span className="at-disp" style={{ fontWeight: 700 }}>Total ({itemCount} item{itemCount !== 1 ? "s" : ""})</span>
-                      <span className="at-mono" style={{ fontWeight: 700 }}>{money(order.total)}</span>
+                  <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 32 }}>
+                    <div style={{ width: 280 }}>
+                      <Row label="Subtotal" value={money(order.subtotal)} />
+                      <Row label="Shipping" value={money(order.shipping)} />
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 14px", marginTop: 10, background: "#14110D", color: "#fff", borderRadius: 8 }}>
+                        <span style={{ fontWeight: 600, fontSize: 13 }}>Total ({itemCount} item{itemCount !== 1 ? "s" : ""})</span>
+                        <span style={{ fontWeight: 700, fontSize: 16, color: "#D9B66F" }}>{money(order.total)}</span>
+                      </div>
                     </div>
                   </div>
                 </div>
 
-                <div style={{ marginTop: "auto", textAlign: "center", color: "var(--ink-soft)", fontSize: 15, fontWeight: 600, borderTop: "1px solid var(--line)", paddingTop: 20 }}>
-                  Thank you for shopping with {settings.brand}! · {settings.phone}
+                <div style={{ background: "#14110D", color: "#E9E1D2", padding: "20px 36px", borderTop: "3px solid #C9A55E", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 16, flexWrap: "wrap" }}>
+                  <div className="sf-serif" style={{ fontSize: 20, fontWeight: 600, color: "#fff" }}>Thank you for shopping with {settings.brand}!</div>
+                  <div style={{ fontSize: 12, color: "rgba(233,225,210,.7)", textAlign: "right", lineHeight: 1.6 }}>
+                    {settings.phone}{settings.whatsapp && settings.whatsapp !== settings.phone ? ` · WhatsApp ${settings.whatsapp}` : " (call / WhatsApp)"}<br />{settings.address}
+                  </div>
                 </div>
               </div>
             </div>
