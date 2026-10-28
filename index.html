@@ -953,17 +953,9 @@
             </div>
           </header>
 
-          {settings.bannerImage ? (
-            <div className="sf-banner">
-              <img src={settings.bannerImage} alt={settings.brand + " banner"} />
-            </div>
-          ) : (
-            <section className="sf-hero">
-              {settings.logo && <img src={settings.logo} alt="" />}
-              <h1>{settings.tagline}</h1>
-              <button onClick={toShop} className="at-btn at-btn-dark" style={{ marginTop: 30 }}>Shop the collection <IcArrowR size={16} /></button>
-            </section>
-          )}
+          <div className="sf-banner">
+            <img src={settings.bannerImage || "cover.jpg"} alt={settings.brand + " banner"} />
+          </div>
 
           <div className="sf-trust">
             <div className="sf-wrap sf-trust-in">
