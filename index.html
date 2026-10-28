@@ -1662,6 +1662,20 @@
                   </div>
                 </div>
 
+                <div style={{ padding: "0 36px 28px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 32, alignItems: "end" }}>
+                  <div style={{ border: "1px solid var(--line)", borderRadius: 10, padding: "14px 16px", background: "#FBF8F2" }}>
+                    <div className="sf-eyebrow" style={{ marginBottom: 8 }}>Payment info</div>
+                    <div style={{ fontSize: 12, color: "var(--ink-soft)", lineHeight: 1.7 }}>
+                      {settings.bkashNumber && <div>bKash: <b>{settings.bkashNumber}</b></div>}
+                      {settings.nagadNumber && <div>Nagad: <b>{settings.nagadNumber}</b></div>}
+                      <div>Cash on delivery available</div>
+                    </div>
+                  </div>
+                  <div style={{ textAlign: "center" }}>
+                    <div style={{ borderTop: "1px solid var(--ink-soft)", width: 200, margin: "0 auto", paddingTop: 8, fontSize: 11, letterSpacing: ".18em", textTransform: "uppercase", color: "var(--muted)" }}>Authorized signature</div>
+                  </div>
+                </div>
+
                 <div style={{ background: "#3B342C", color: "#E9E1D2", padding: "20px 36px", borderTop: "3px solid #C9A55E", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 16, flexWrap: "wrap" }}>
                   <div className="sf-serif" style={{ fontSize: 20, fontWeight: 600, color: "#fff" }}>Thank you for shopping with {settings.brand}!</div>
                   <div style={{ fontSize: 12, color: "rgba(233,225,210,.7)", textAlign: "right", lineHeight: 1.6 }}>
