@@ -206,10 +206,10 @@
   padding:24px;overflow:auto;animation:atfade .2s ease;}
 
 /* admin nav */
-.at-navitem{display:flex;align-items:center;gap:11px;width:100%;padding:10px 14px;border-radius:3px;
+.at-navitem{display:flex;align-items:center;gap:11px;width:100%;padding:10px 14px;border-radius:8px;
   font-size:14px;font-weight:500;color:var(--muted);transition:background .12s ease,color .12s ease;}
 .at-navitem:hover{background:rgba(255,255,255,.06);color:#fff;}
-.at-navitem.active{background:var(--accent);color:#fff;}
+.at-navitem.active{background:#C9A55E;color:#14110D;font-weight:600;}
 
 /* stat */
 .at-stat-num{font-family:var(--mono);font-weight:700;font-size:30px;letter-spacing:-.02em;line-height:1;}
@@ -1730,10 +1730,10 @@
           setBusy(false);
         };
         return (
-          <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", padding: 24, background: "linear-gradient(135deg, #6B3FA0 0%, #C77B9C 35%, #C9932E 65%, #2E8B57 100%)", backgroundSize: "300% 300%" }}>
+          <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", padding: 24, background: "radial-gradient(ellipse at top, #2A2218 0%, #14110D 70%)" }}>
             <style>{STYLES}</style>
             <div className="at-rise" style={{ maxWidth: 380, width: "100%", borderRadius: 6, overflow: "hidden", background: "var(--surface)", boxShadow: "0 24px 60px rgba(30,10,50,.35)" }}>
-              <div style={{ height: 8, background: "linear-gradient(90deg, #6B3FA0, #C77B9C, #C9932E, #2E8B57)" }} />
+              <div style={{ height: 8, background: "linear-gradient(90deg, #8A6A2C, #D9B66F, #8A6A2C)" }} />
               <div style={{ padding: "32px 36px 36px" }}>
                 {settings.logo ? (
                   <div style={{ textAlign: "center", marginBottom: 16 }}>
@@ -1744,7 +1744,7 @@
                   <div className="at-disp" style={{ fontSize: 20, letterSpacing: ".24em", fontWeight: 700, textAlign: "center" }}>{settings.brand}</div>
                 )}
                 <div style={{ textAlign: "center", marginTop: 10, marginBottom: 28 }}>
-                  <span className="at-eyebrow" style={{ background: "linear-gradient(90deg, var(--accent), #C77B9C)", color: "#fff", padding: "6px 16px", borderRadius: 20, display: "inline-block" }}>Operations · Admin access</span>
+                  <span className="at-eyebrow" style={{ background: "#14110D", color: "#D9B66F", padding: "6px 16px", borderRadius: 20, display: "inline-block" }}>Operations · Admin access</span>
                 </div>
                 <label className="at-label" style={{ display: "flex", alignItems: "center", gap: 6 }}><span style={{ color: "var(--accent)" }}>✉️</span> Email</label>
                 <input value={username} autoFocus type="email"
@@ -1758,7 +1758,7 @@
                   <button onClick={() => setShow(s => !s)} style={{ position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)", color: "var(--muted)", fontSize: 16 }}>{show ? <EyeOff /> : <Eye />}</button>
                 </div>
                 {err && <p style={{ color: "var(--warn)", fontSize: 12, marginTop: 8 }}>{err}</p>}
-                <button onClick={attempt} disabled={busy} className="at-btn" style={{ width: "100%", marginTop: 20, background: "linear-gradient(90deg, var(--accent), #C77B9C)", color: "#fff", boxShadow: "0 8px 20px rgba(107,63,160,.35)" }}>{busy ? "Signing in…" : "Enter dashboard"}</button>
+                <button onClick={attempt} disabled={busy} className="at-btn" style={{ width: "100%", marginTop: 20, background: "#14110D", color: "#fff", boxShadow: "0 8px 20px rgba(20,17,13,.25)" }}>{busy ? "Signing in…" : "Enter dashboard"}</button>
                 <button onClick={onExit} style={{ width: "100%", marginTop: 16, fontSize: 12, color: "var(--muted)" }}>← Back to storefront</button>
               </div>
             </div>
@@ -1768,17 +1768,17 @@
 
       const isSuperAdmin = currentUser.role === "super_admin";
       const NAV = [
-        { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, color: "#5B8DEF" },
-        { id: "pos", label: "POS", icon: ShoppingCart, color: "#2E8B57" },
+        { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, color: "#B08A3E" },
+        { id: "pos", label: "POS", icon: ShoppingCart, color: "#3F7A55" },
         { id: "products", label: "Products", icon: Package, color: "#7C8B6E" },
         { id: "orders", label: "Orders", icon: Receipt, color: "#D6A756" },
-        { id: "settings", label: "Settings", icon: SettingsIcon, color: "#C77B9C" },
-        ...(isSuperAdmin ? [{ id: "users", label: "Users", icon: UsersIcon, color: "#5BC0BE" }] : []),
+        { id: "settings", label: "Settings", icon: SettingsIcon, color: "#A8707F" },
+        ...(isSuperAdmin ? [{ id: "users", label: "Users", icon: UsersIcon, color: "#4E6B5C" }] : []),
       ];
 
       return (
         <div className="admin-shell">
-          <aside className="admin-sidebar" style={{ background: "linear-gradient(180deg, #1A1420 0%, #241A33 55%, #2E1F1A 100%)", color: "var(--paper)", padding: "24px 16px", display: "flex", flexDirection: "column" }}>
+          <aside className="admin-sidebar" style={{ background: "#14110D", color: "var(--paper)", padding: "24px 16px", display: "flex", flexDirection: "column" }}>
             {settings.logo ? (
               <div className="admin-brand" style={{ marginBottom: 20, padding: "0 10px" }}>
                 <img src={settings.logo} alt={settings.brand} style={{ height: 56, width: "auto", maxWidth: 220, borderRadius: "50%" }} />
@@ -1789,14 +1789,14 @@
             )}
             <div className="admin-brand" style={{ padding: "0 10px", marginBottom: 20, display: "flex", alignItems: "center", gap: 8 }}>
               <span className="at-mono" style={{ fontSize: 12, color: "rgba(241,240,236,.7)" }}>{currentUser.name}</span>
-              <span className="at-badge" style={{ background: isSuperAdmin ? "rgba(91,192,190,.18)" : "rgba(255,255,255,.1)", color: isSuperAdmin ? "#5BC0BE" : "rgba(241,240,236,.7)", fontSize: 9 }}>
+              <span className="at-badge" style={{ background: isSuperAdmin ? "rgba(201,165,94,.18)" : "rgba(255,255,255,.1)", color: isSuperAdmin ? "#D9B66F" : "rgba(241,240,236,.7)", fontSize: 9 }}>
                 {isSuperAdmin ? "Super admin" : "Admin"}
               </span>
             </div>
             <nav className="admin-nav" style={{ flex: 1 }}>
               {NAV.map(n => (
                 <button key={n.id} onClick={() => goNav(n.id)} className={"at-navitem" + (nav === n.id ? " active" : "")}>
-                  <span style={{ fontSize: 15, color: nav === n.id ? "#fff" : n.color }}><n.icon /></span>
+                  <span style={{ fontSize: 15, color: nav === n.id ? "#14110D" : "#C9A55E" }}><n.icon /></span>
                   <span className="admin-navitem-label">{n.label}</span>
                 </button>
               ))}
@@ -1813,7 +1813,7 @@
             </div>
           </aside>
 
-          <main className="admin-main" style={{ padding: 32, background: "linear-gradient(135deg, #F1E9F7 0%, #FDF6EC 45%, #E9F5EE 100%)" }}>
+          <main className="admin-main" style={{ padding: 32, background: "var(--paper)" }}>
             {nav === "dashboard" && <Dashboard products={products} orders={orders} money={money} onReset={onReset} isSuperAdmin={isSuperAdmin} />}
             {nav === "pos" && <POS products={products} settings={settings} money={money} placeOrder={placeOrder} notify={notify} currentUser={currentUser} />}
             {nav === "products" && <Products products={products} money={money} notify={notify} />}
@@ -1853,7 +1853,7 @@
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 28 }}>
             <div>
               <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                <span style={{ width: 40, height: 40, borderRadius: 10, background: "rgba(91,141,239,.14)", color: "#5B8DEF", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}><LayoutDashboard /></span>
+                <span style={{ width: 40, height: 40, borderRadius: 10, background: "rgba(176,138,62,.14)", color: "#B08A3E", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}><LayoutDashboard /></span>
                 <h1 className="at-disp" style={{ fontSize: 28, fontWeight: 700, margin: 0 }}>Dashboard</h1>
               </div>
               <p style={{ color: "var(--muted)", marginTop: 4, fontSize: 14 }}>Overview of your store</p>
@@ -1882,7 +1882,7 @@
           )}
 
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(200px,1fr))", gap: 16, marginBottom: 24 }}>
-            <div style={{ padding: 20, borderRadius: 3, background: "linear-gradient(135deg, #6B3FA0 0%, #9C6ADE 100%)", boxShadow: "0 8px 20px rgba(107,63,160,.25)" }}>
+            <div style={{ padding: 20, borderRadius: 12, background: "#14110D", boxShadow: "0 8px 20px rgba(20,17,13,.18)" }}>
               <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
                 <span style={{ width: 32, height: 32, borderRadius: 8, background: "rgba(255,255,255,.2)", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 15 }}><DollarSign /></span>
                 <div className="at-eyebrow" style={{ color: "rgba(255,255,255,.85)" }}>Total revenue</div>
@@ -1893,7 +1893,7 @@
                 All time
               </div>
             </div>
-            <div style={{ padding: 20, borderRadius: 3, background: "linear-gradient(135deg, #C9932E 0%, #E8B84B 100%)", boxShadow: "0 8px 20px rgba(201,147,46,.25)" }}>
+            <div style={{ padding: 20, borderRadius: 12, background: "#B08A3E", boxShadow: "0 8px 20px rgba(176,138,62,.22)" }}>
               <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
                 <span style={{ width: 32, height: 32, borderRadius: 8, background: "rgba(255,255,255,.2)", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 15 }}><Receipt /></span>
                 <div className="at-eyebrow" style={{ color: "rgba(255,255,255,.85)" }}>Orders to fulfill</div>
@@ -1903,7 +1903,7 @@
                 Pending + Paid
               </div>
             </div>
-            <div style={{ padding: 20, borderRadius: 3, background: "linear-gradient(135deg, #B4634B 0%, #E0855F 100%)", boxShadow: "0 8px 20px rgba(180,99,75,.25)" }}>
+            <div style={{ padding: 20, borderRadius: 12, background: "#B0664A", boxShadow: "0 8px 20px rgba(176,102,74,.22)" }}>
               <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
                 <span style={{ width: 32, height: 32, borderRadius: 8, background: "rgba(255,255,255,.2)", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 15 }}><AlertTriangle /></span>
                 <div className="at-eyebrow" style={{ color: "rgba(255,255,255,.85)" }}>Low stock</div>
@@ -1913,7 +1913,7 @@
                 Products running low
               </div>
             </div>
-            <div style={{ padding: 20, borderRadius: 3, background: "linear-gradient(135deg, #2E8B57 0%, #4FB37D 100%)", boxShadow: "0 8px 20px rgba(46,139,87,.25)" }}>
+            <div style={{ padding: 20, borderRadius: 12, background: "#4E6B5C", boxShadow: "0 8px 20px rgba(78,107,92,.22)" }}>
               <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
                 <span style={{ width: 32, height: 32, borderRadius: 8, background: "rgba(255,255,255,.2)", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 15 }}><Boxes /></span>
                 <div className="at-eyebrow" style={{ color: "rgba(255,255,255,.85)" }}>Out of stock</div>
@@ -2028,7 +2028,7 @@
       return (
         <div style={{ maxWidth: 1600 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 24 }}>
-            <span style={{ width: 40, height: 40, borderRadius: 10, background: "rgba(46,139,87,.14)", color: "#2E8B57", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}><ShoppingCart /></span>
+            <span style={{ width: 40, height: 40, borderRadius: 10, background: "rgba(63,122,85,.14)", color: "#3F7A55", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}><ShoppingCart /></span>
             <div>
               <h1 className="at-disp" style={{ fontSize: 28, fontWeight: 700, margin: 0 }}>Point of Sale</h1>
               <p style={{ color: "var(--muted)", marginTop: 4, fontSize: 14 }}>Ring up an in-store sale</p>
@@ -2073,7 +2073,7 @@
               )}
             </div>
 
-            <div className="at-card" style={{ padding: 20, position: "sticky", top: 24, borderTop: "3px solid #2E8B57" }}>
+            <div className="at-card" style={{ padding: 20, position: "sticky", top: 24, borderTop: "3px solid #3F7A55" }}>
               <div className="at-eyebrow" style={{ marginBottom: 14 }}>Current sale · {itemCount} item{itemCount !== 1 ? "s" : ""}</div>
 
               <div style={{ maxHeight: 320, overflow: "auto", marginBottom: 14 }} className="at-scroll">
@@ -2421,7 +2421,7 @@
                     <td>
                       <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
                         {o.customer.name}
-                        {o.channel === "pos" && <span className="at-badge" style={{ background: "rgba(46,139,87,.14)", color: "#2E8B57" }}>In-store</span>}
+                        {o.channel === "pos" && <span className="at-badge" style={{ background: "rgba(63,122,85,.14)", color: "#3F7A55" }}>In-store</span>}
                       </div>
                       <div style={{ fontSize: 12, color: "var(--muted)" }}>{o.customer.email}</div>
                     </td>
@@ -2532,7 +2532,7 @@
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 24 }}>
             <div>
               <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                <span style={{ width: 40, height: 40, borderRadius: 10, background: "rgba(91,192,190,.16)", color: "#5BC0BE", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}><UsersIcon /></span>
+                <span style={{ width: 40, height: 40, borderRadius: 10, background: "rgba(78,107,92,.16)", color: "#4E6B5C", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}><UsersIcon /></span>
                 <h1 className="at-disp" style={{ fontSize: 28, fontWeight: 700, margin: 0 }}>Users</h1>
               </div>
               <p style={{ color: "var(--muted)", marginTop: 4, fontSize: 14 }}>{staff.length} accounts · super admins can do everything, admins can't delete orders or users</p>
@@ -2542,7 +2542,7 @@
             </button>
           </div>
 
-          <div className="at-card" style={{ overflowX: "auto", borderTop: "3px solid #5BC0BE" }}>
+          <div className="at-card" style={{ overflowX: "auto", borderTop: "3px solid #4E6B5C" }}>
             <table className="at-table">
               <thead>
                 <tr>
@@ -2564,7 +2564,7 @@
                       </td>
                       <td className="at-mono">{u.email}</td>
                       <td>
-                        <span className="at-badge" style={{ background: u.role === "super_admin" ? "rgba(91,192,190,.15)" : "var(--accent-tint)", color: u.role === "super_admin" ? "#3A9C99" : "var(--accent)" }}>
+                        <span className="at-badge" style={{ background: u.role === "super_admin" ? "rgba(78,107,92,.15)" : "var(--accent-tint)", color: u.role === "super_admin" ? "#4E6B5C" : "var(--accent)" }}>
                           {u.role === "super_admin" ? "Super admin" : "Admin"}
                         </span>
                       </td>
@@ -2692,10 +2692,10 @@
       return (
         <div style={{ maxWidth: 680 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 24 }}>
-            <span style={{ width: 40, height: 40, borderRadius: 10, background: "rgba(199,123,156,.16)", color: "#C77B9C", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}><SettingsIcon /></span>
+            <span style={{ width: 40, height: 40, borderRadius: 10, background: "rgba(168,112,127,.16)", color: "#A8707F", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}><SettingsIcon /></span>
             <h1 className="at-disp" style={{ fontSize: 28, fontWeight: 700, margin: 0 }}>Settings</h1>
           </div>
-          <div className="at-card" style={{ padding: 24, borderTop: "3px solid #C77B9C" }}>
+          <div className="at-card" style={{ padding: 24, borderTop: "3px solid #A8707F" }}>
             <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
               <div>
                 <label className="at-label">Brand name</label>
