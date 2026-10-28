@@ -412,6 +412,18 @@
   .sf-header-in{grid-template-columns:1fr auto;gap:12px;}
 }
 
+/* header uses the footer's dark tone */
+.sf-header{background:#14110D;border-bottom:1px solid rgba(201,165,94,.18);-webkit-backdrop-filter:none;backdrop-filter:none;}
+.sf-header .sf-navlink{color:rgba(233,225,210,.72);}
+.sf-header .sf-navlink:hover,.sf-header .sf-navlink.on{color:#fff;border-bottom-color:#C9A55E;}
+.sf-header .sf-wordmark{color:#fff;}
+.sf-header .sf-wordmark small{color:#C9A55E;}
+.sf-header .sf-brand img{box-shadow:0 0 0 1px rgba(201,165,94,.45);}
+.sf-header .sf-icon-btn{color:#E9E1D2;}
+.sf-header .sf-icon-btn:hover{background:rgba(255,255,255,.08);}
+.sf-header .sf-count{box-shadow:0 0 0 2px #14110D;}
+.sf-header .sf-menu{color:var(--ink);}
+
 /* admin panel responsive shell */
 .admin-shell{display:flex;width:100%;min-height:100vh;}
 .admin-sidebar{width:232px;flex-shrink:0;position:sticky;top:0;height:100vh;overflow-y:auto;}
